@@ -1,0 +1,20 @@
+# Netlify config — used if/when this repo is connected to Netlify.
+# (Ignored by GitHub Pages; harmless to keep in the repo.)
+[build]
+  publish = "."
+
+# Contact form uses data-netlify="true" (form name "contact") — Netlify
+# auto-detects it on deploy; submissions appear under Forms in the dashboard.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

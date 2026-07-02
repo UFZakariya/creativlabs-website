@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creativ Labs — Intelligent Systems for Businesses That Want to Scale</title>
+  <meta name="description" content="Creativ Labs builds Digital Operations Systems and the AI agents that run them — workflow automation, dashboards, and agentic AI for businesses that want to scale.">
+  <meta property="og:title" content="Creativ Labs — Intelligent Systems for Businesses That Want to Scale">
+  <meta property="og:description" content="Digital Operations Systems, plus AI agents your team can talk to on WhatsApp. From manual records to an intelligent operating layer.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://creativlabs.africa/">
+  <meta property="og:image" content="https://creativlabs.africa/assets/logo-640.png">
+  <meta property="og:image:width" content="606">
+  <meta property="og:image:height" content="640">
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://creativlabs.africa/">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="assets/logo-128.png">
+  <link rel="preload" as="image" href="assets/logo-640.png" fetchpriority="high">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Creativ Labs",
+    "url": "https://creativlabs.africa/",
+    "logo": "https://creativlabs.africa/assets/logo-640.png",
+    "email": "hello@creativlabs.africa",
+    "description": "Creativ Labs builds Intelligent Digital Operations Systems and the AI agents that operate them, helping businesses scale with clarity, control, and intelligence.",
+    "address": { "@type": "PostalAddress", "addressCountry": "NG" }
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ambient background: grid + glow + WebGL wisps -->
+  <div class="page-bg" aria-hidden="true"></div>
+  <canvas id="wisp-canvas" class="wisp-canvas" aria-hidden="true"></canvas>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- svg defs: icons + liquid glass refraction filter -->
+  <svg class="svg-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="lg-refract" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="gooey">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo"/>
+        <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+      </filter>
+
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></symbol>
+      <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-8"/><path d="M22 20H2"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H13L13 2Z"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/><circle cx="12" cy="12" r="2.6"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.4 2.9 8 7 10 4.1-2 7-5.6 7-10V6l-7-3Z"/><path d="m9 11.5 2.2 2.2L15.5 9.4"/></symbol>
+      <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M9.5 4a2 2 0 1 1 4 0h4a1 1 0 0 1 1 1v4a2 2 0 1 1 0 4v4a1 1 0 0 1-1 1h-4a2 2 0 1 0-4 0h-4a1 1 0 0 1-1-1v-4a2 2 0 1 0 0-4V5a1 1 0 0 1 1-1h4Z"/></symbol>
+      <symbol id="i-scatter" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="5" r="1.8"/><circle cx="12" cy="12.5" r="2.4"/><circle cx="5" cy="18" r="1.8"/><circle cx="18.5" cy="18" r="2.2"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/></symbol>
+      <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 2.5 21 6l-4 3.5"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="m7 21.5-4-3.5 4-3.5"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></symbol>
+      <symbol id="i-funnel" viewBox="0 0 24 24"><path d="M3 4h18l-7 8.5V20l-4 1.5V12.5L3 4Z"/></symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/><path d="m3 17.5 9 5 9-5"/></symbol>
+      <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5V12c0 1.7 3.6 3 8 3s8-1.3 8-3V5.5"/><path d="M4 12v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V12"/></symbol>
+      <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+      <symbol id="i-scale" viewBox="0 0 24 24"><path d="M3 20h18"/><path d="m5 16 5-6 4 3.5L20 6"/><path d="M15.5 6H20v4.5"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.8 20c.6-3.6 3.1-5.6 6.2-5.6s5.6 2 6.2 5.6"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16.2 14.7c2.8.2 4.6 2 5.1 4.8"/></symbol>
+      <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 2.5h8L20 8.5V21a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1Z"/><path d="M14 2.5v6h6"/><path d="M9 13h7M9 17h7"/></symbol>
+      <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.8 2.6 4.2 5.6 4.2 9S14.8 18.4 12 21c-2.8-2.6-4.2-5.6-4.2-9S9.2 5.6 12 3Z"/></symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H12l-5 4.5V16H6.5A2.5 2.5 0 0 1 4 13.5v-8Z"/><path d="M8.5 8.5h7M8.5 11.5h4.5"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></symbol>
+      <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3Z"/><path d="M9 8.5c-.2 0-.5 0-.7.4-.2.4-.8 1-.8 2s.8 2.1 1 2.3c.1.2 1.6 2.6 4 3.5 2 .8 2.4.7 2.9.6.5 0 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.6-.3c-.3-.2-1.4-.7-1.6-.8-.2 0-.4-.1-.5.2l-.7.8c-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.3 0-.4.1-.5l.4-.5.3-.5v-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4Z" stroke-width="0.4"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="site-shell">
+
+    <!-- ================= NAV ================= -->
+    <header class="site-header" id="site-header">
+      <nav class="lg-nav" aria-label="Main navigation">
+        <span class="lg-nav__refraction" aria-hidden="true"></span>
+        <span class="lg-nav__sheen" aria-hidden="true"></span>
+        <a class="brand" href="#top" data-nav="top">
+          <img src="assets/logo-128.png" alt="" width="34" height="36">
+          <span>Creativ&nbsp;Labs</span>
+        </a>
+        <div class="nav-links" id="nav-links">
+          <span class="nav-indicator" aria-hidden="true"></span>
+          <a href="#agents" data-nav="agents">Agents</a>
+          <a href="#systems" data-nav="systems">Systems</a>
+          <a href="#products" data-nav="products">Products</a>
+          <a href="#process" data-nav="process">Process</a>
+          <a href="#why" data-nav="why">Why Us</a>
+          <a href="#contact" data-nav="contact">Contact</a>
+        </div>
+        <a href="#contact" class="glass-btn glass-btn--accent nav-cta">Build My System</a>
+        <button class="menu-btn" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+      </nav>
+      <div class="mobile-menu glass-panel" id="mobile-menu">
+        <a href="#agents" data-nav="agents">Agents</a>
+        <a href="#systems" data-nav="systems">Systems</a>
+        <a href="#products" data-nav="products">Products</a>
+        <a href="#process" data-nav="process">Process</a>
+        <a href="#why" data-nav="why">Why Us</a>
+        <a href="#contact" data-nav="contact">Contact</a>
+        <a href="#contact" class="glass-btn glass-btn--accent mobile-cta">Build My System</a>
+      </div>
+    </header>
+
+    <main id="main">
+
+      <!-- ================= HERO ================= -->
+      <section class="hero" id="top">
+        <div class="logo-stage" id="logo-stage" aria-hidden="true">
+          <div class="logo-wrap" id="logo-wrap">
+            <img class="logo-img" src="assets/logo-640.png" alt="" draggable="false" fetchpriority="high">
+            <span class="logo-light"></span>
+          </div>
+          <div class="logo-glow"></div>
+          <div class="logo-shadow"></div>
+        </div>
+        <h1 class="hero-title">Intelligent <span class="gradient-text">Agentic</span> Systems for Businesses That Want to Scale</h1>
+        <p class="hero-sub">Digital Operations Systems — and the AI agents that run them, on WhatsApp.</p>
+        <div class="actions">
+          <a href="#contact" class="glass-btn glass-btn--accent glass-btn--lg">Build My System <span class="btn-arrow" aria-hidden="true">&rarr;</span></a>
+          <a data-wa class="glass-btn glass-btn--whatsapp glass-btn--lg">
+            <svg class="wa-icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>Chat on WhatsApp
+          </a>
+        </div>
+        <ul class="hero-chips" aria-label="What we deliver">
+          <li class="glass-chip">Runs on WhatsApp</li>
+          <li class="glass-chip">Intelligent dashboards</li>
+          <li class="glass-chip">Agentic AI</li>
+        </ul>
+        <a class="scroll-cue" href="#positioning" aria-label="Scroll to learn more"><span></span></a>
+      </section>
+
+      <!-- ================= POSITIONING ================= -->
+      <section class="section positioning" id="positioning">
+        <div class="split" data-reveal-group>
+          <div class="section-copy" data-reveal>
+            <span class="kicker">Who we are</span>
+            <h2>We do not just build software. <em class="gradient-text-static">We build intelligent systems.</em></h2>
+            <p>Most businesses do not fail because they lack effort. They struggle because their operations are not structured enough to scale.</p>
+            <p>As the business grows, manual processes become slow. Staff updates become scattered. Reports become delayed. Decisions become reactive. Owners lose visibility. Teams repeat the same work every day.</p>
+            <p>Creativ Labs solves this by building intelligent digital systems that connect operations, people, data, workflows, reports, and decisions into one structured operating layer.</p>
+          </div>
+          <aside class="glass-panel key-message" data-reveal>
+            <svg class="km-icon"><use href="#i-layers"/></svg>
+            <blockquote>A business cannot scale properly if its operations are not systemized.</blockquote>
+            <div class="km-flow">
+              <span>Operations</span><i></i><span>Data</span><i></i><span>Agents</span><i></i><span>Decisions</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ================= AGENTS (the differentiator) ================= -->
+      <section class="section agents" id="agents">
+        <div class="split split--agents">
+          <div class="section-copy" data-reveal>
+            <span class="kicker">The differentiator</span>
+            <h2>Every system we build ships with an <em class="gradient-text-static">AI agent that runs it</em>.</h2>
+            <p>This is where Creativ Labs is different. We don't stop at software — every Digital Operations System comes with an agent, trained on your workflows, that your team simply talks to.</p>
+            <p>Staff report in plain language on WhatsApp. The agent records the data, checks it, and asks for confirmation before anything is saved. Management asks questions and gets answers — in English, Hausa, Yoruba, Igbo, or Pidgin.</p>
+            <ul class="agent-points">
+              <li class="glass-chip">Preview &rarr; confirm — nothing saves without approval</li>
+              <li class="glass-chip">Every action logged: who, what, when</li>
+              <li class="glass-chip">Reports on demand, in plain language</li>
+              <li class="glass-chip">Lives where your team already works: WhatsApp</li>
+            </ul>
+          </div>
+          <div class="glass-panel agent-demo" data-reveal aria-label="Example conversation with a Creativ Labs operations agent">
+            <div class="agent-head">
+              <img src="assets/logo-128.png" alt="" width="40" height="42">
+              <div>
+                <strong>UFMS Farm Agent</strong>
+                <small>online &middot; WhatsApp</small>
+              </div>
+            </div>
+            <div class="chat" id="agent-chat">
+              <p class="msg msg--user">Sold 40 crates to Alhaji Musa at &#8358;6,500</p>
+              <div class="msg msg--agent">
+                <p>Preview — <strong>Egg sale</strong><br>40 crates &times; &#8358;6,500 = <strong>&#8358;260,000</strong><br>Batch B2 &middot; today. Save it?</p>
+                <div class="msg-actions" aria-hidden="true"><span>&#10003; Confirm</span><span>&#10005; Cancel</span></div>
+              </div>
+              <p class="msg msg--user">Confirm</p>
+              <p class="msg msg--agent">Recorded &#10003; &mdash; today so far: <strong>112 crates</strong> sold &middot; <strong>&#8358;728,000</strong>. Want the daily summary?</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= WHAT WE BUILD ================= -->
+      <section class="section" id="systems">
+        <div class="section-head" data-reveal>
+          <span class="kicker">What we build</span>
+          <h2>Digital Operations Systems built for real business growth</h2>
+          <p>We design and develop custom Digital Operations Systems that help businesses manage daily operations, track performance, improve accountability, and make better decisions — with an AI agent doing the heavy lifting.</p>
+        </div>
+        <div class="card-grid cols-3" data-reveal-group>
+          <article class="glass-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-grid"/></svg></span>
+            <h3>Operations Management Systems</h3>
+            <p>Platforms that manage daily activities, staff roles, tasks, approvals, records, reports, and performance from one central system.</p>
+          </article>
+          <article class="glass-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-chart"/></svg></span>
+            <h3>Intelligent Dashboards</h3>
+            <p>Real-time visibility into operations, revenue, expenses, inventory, customers, staff activity, and key performance indicators.</p>
+          </article>
+          <article class="glass-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-bolt"/></svg></span>
+            <h3>Workflow Automation</h3>
+            <p>Automate approvals, reminders, reporting, customer follow-up, inventory updates, payment tracking, and internal notifications.</p>
+          </article>
+          <article class="glass-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-chat"/></svg></span>
+            <h3>AI Operations Agents</h3>
+            <p>Chat-first agents that operate the system for your team — record daily data, run reports, chase approvals, flag risks, and explain performance changes.</p>
+          </article>
+          <article class="glass-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-shield"/></svg></span>
+            <h3>Role-Based Admin Systems</h3>
+            <p>Secure systems where each user has the right level of access — with activity logs, permissions, and management control.</p>
+          </article>
+          <article class="glass-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-puzzle"/></svg></span>
+            <h3>Custom Business Platforms</h3>
+            <p>Tailored systems for businesses whose operations cannot be properly managed with generic software.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================= PROBLEM ================= -->
+      <section class="section problem" id="problem">
+        <div class="section-head" data-reveal>
+          <span class="kicker">The hidden problem</span>
+          <h2>The hidden problem in growing businesses</h2>
+          <p>Many businesses want to scale, but their internal systems are still built on paper records, spreadsheets, WhatsApp messages, manual reports, and informal staff updates.</p>
+        </div>
+        <div class="card-grid cols-3" data-reveal-group>
+          <article class="glass-card glass-card--problem" data-reveal>
+            <span class="card-icon"><svg><use href="#i-scatter"/></svg></span>
+            <h3>Scattered Operations</h3>
+            <p>Important information is spread across notebooks, phones, spreadsheets, staff conversations, and disconnected tools.</p>
+          </article>
+          <article class="glass-card glass-card--problem" data-reveal>
+            <span class="card-icon"><svg><use href="#i-eye"/></svg></span>
+            <h3>Poor Visibility</h3>
+            <p>Owners cannot easily see what is happening across departments, branches, staff, customers, sales, inventory, or expenses.</p>
+          </article>
+          <article class="glass-card glass-card--problem" data-reveal>
+            <span class="card-icon"><svg><use href="#i-clock"/></svg></span>
+            <h3>Slow Reporting</h3>
+            <p>Reports take too long to prepare — by the time management receives them, the information may already be outdated.</p>
+          </article>
+          <article class="glass-card glass-card--problem" data-reveal>
+            <span class="card-icon"><svg><use href="#i-repeat"/></svg></span>
+            <h3>Repeated Manual Work</h3>
+            <p>Staff repeat the same tasks every day, wasting time on activities that can be automated or simplified.</p>
+          </article>
+          <article class="glass-card glass-card--problem" data-reveal>
+            <span class="card-icon"><svg><use href="#i-users"/></svg></span>
+            <h3>Weak Accountability</h3>
+            <p>Without digital logs and permissions, it is difficult to know who did what, when, and whether the right process was followed.</p>
+          </article>
+          <article class="glass-card glass-card--problem" data-reveal>
+            <span class="card-icon"><svg><use href="#i-funnel"/></svg></span>
+            <h3>Scaling Bottlenecks</h3>
+            <p>As demand increases, weak systems create delays, errors, confusion, revenue leakage, and management stress.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- statement divider -->
+      <section class="statement" data-reveal>
+        <p class="statement-text">Every growing business eventually reaches a point where <span class="gradient-text">effort is no longer enough</span>. It needs a system.</p>
+      </section>
+
+      <!-- ================= SOLUTION ================= -->
+      <section class="section" id="solution">
+        <div class="section-head" data-reveal>
+          <span class="kicker">The solution</span>
+          <h2>We turn business operations into scalable systems</h2>
+          <p>We study how your business works, identify the operational bottlenecks, map the workflows, and build a digital system that improves control, speed, visibility, and decision-making.</p>
+        </div>
+        <div class="pillar-grid" data-reveal-group>
+          <article class="glass-card pillar" data-reveal>
+            <span class="pillar-num">01</span>
+            <span class="card-icon"><svg><use href="#i-layers"/></svg></span>
+            <h3>Systemize the Business</h3>
+            <p>Convert manual activities into clear digital workflows, forms, roles, approvals, and reports.</p>
+          </article>
+          <article class="glass-card pillar" data-reveal>
+            <span class="pillar-num">02</span>
+            <span class="card-icon"><svg><use href="#i-bolt"/></svg></span>
+            <h3>Automate Repetitive Work</h3>
+            <p>Reduce time wasted on routine tasks by automating notifications, calculations, reports, and follow-ups.</p>
+          </article>
+          <article class="glass-card pillar" data-reveal>
+            <span class="pillar-num">03</span>
+            <span class="card-icon"><svg><use href="#i-db"/></svg></span>
+            <h3>Centralize Business Data</h3>
+            <p>Bring important business information into one secure platform that management can access and understand.</p>
+          </article>
+          <article class="glass-card pillar" data-reveal>
+            <span class="pillar-num">04</span>
+            <span class="card-icon"><svg><use href="#i-target"/></svg></span>
+            <h3>Improve Decision-Making</h3>
+            <p>Use dashboards, analytics, and AI summaries to help owners and managers make faster, better decisions.</p>
+          </article>
+          <article class="glass-card pillar" data-reveal>
+            <span class="pillar-num">05</span>
+            <span class="card-icon"><svg><use href="#i-shield"/></svg></span>
+            <h3>Increase Accountability</h3>
+            <p>Track user actions, assign responsibilities, manage permissions, and create clear operational visibility.</p>
+          </article>
+          <article class="glass-card pillar" data-reveal>
+            <span class="pillar-num">06</span>
+            <span class="card-icon"><svg><use href="#i-scale"/></svg></span>
+            <h3>Prepare for Scale</h3>
+            <p>Build systems that support more staff, more customers, more branches, more transactions, and more complexity.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================= PRODUCTS ================= -->
+      <section class="section products" id="products">
+        <div class="section-head" data-reveal>
+          <span class="kicker">Focus areas</span>
+          <h2>Our intelligent system focus areas</h2>
+          <p>We build intelligent systems across industries where operations, data, staff activity, customer demand, and management decisions need to work together.</p>
+        </div>
+
+        <div class="product-tabs" role="tablist" aria-label="Product areas" data-reveal>
+          <span class="tab-indicator" aria-hidden="true"></span>
+          <button class="product-tab is-active" id="tab-business" data-product="business" role="tab" aria-selected="true" aria-controls="product-panel" type="button">Business Ops</button>
+          <button class="product-tab" id="tab-farm" data-product="farm" role="tab" aria-selected="false" aria-controls="product-panel" tabindex="-1" type="button">Farm Ops</button>
+          <button class="product-tab" id="tab-venue" data-product="venue" role="tab" aria-selected="false" aria-controls="product-panel" tabindex="-1" type="button">Hospitality</button>
+          <button class="product-tab" id="tab-listen" data-product="listen" role="tab" aria-selected="false" aria-controls="product-panel" tabindex="-1" type="button">AI Intelligence</button>
+        </div>
+
+        <div class="product-showcase" id="product-panel" role="tabpanel" aria-labelledby="tab-business" data-reveal>
+          <div class="glass-panel product-visual">
+            <div class="pv-window" aria-hidden="true">
+              <span class="pv-dot"></span><span class="pv-dot"></span><span class="pv-dot"></span>
+              <span class="pv-title" data-product-badge>Business OS</span>
+            </div>
+            <div class="pv-body" aria-hidden="true">
+              <div class="pv-bar" style="--w: 62%"></div>
+              <div class="pv-bar" style="--w: 84%"></div>
+              <div class="pv-bar" style="--w: 45%"></div>
+              <div class="pv-spark">
+                <span style="--h: 40%"></span><span style="--h: 65%"></span><span style="--h: 52%"></span><span style="--h: 78%"></span><span style="--h: 60%"></span><span style="--h: 92%"></span><span style="--h: 70%"></span>
+              </div>
+            </div>
+            <ul class="pv-chips" data-product-chips></ul>
+          </div>
+          <div class="product-content">
+            <h3 data-product-title>Business Operations Systems</h3>
+            <p data-product-copy>Custom internal systems for companies that need to manage staff, tasks, customers, inventory, payments, expenses, reports, and operational performance.</p>
+            <p class="product-example" hidden>Example: <strong data-product-example></strong></p>
+            <a href="#contact" class="glass-btn glass-btn--accent">Discuss Your System <span class="btn-arrow" aria-hidden="true">&rarr;</span></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- statement divider -->
+      <section class="statement" data-reveal>
+        <p class="statement-text">The future of business growth is not just digital. <span class="gradient-text">It is intelligent.</span></p>
+      </section>
+
+      <!-- ================= PROCESS ================= -->
+      <section class="section" id="process">
+        <div class="section-head" data-reveal>
+          <span class="kicker">How we work</span>
+          <h2>From business complexity to intelligent system</h2>
+        </div>
+        <ol class="process-track" data-reveal-group>
+          <li class="glass-card step" data-reveal>
+            <span class="step-num">1</span>
+            <h3>Understand the Business</h3>
+            <p>We study your current operations, staff roles, records, workflows, reports, bottlenecks, and management needs.</p>
+          </li>
+          <li class="glass-card step" data-reveal>
+            <span class="step-num">2</span>
+            <h3>Map the System</h3>
+            <p>We convert your operations into clear processes, user roles, screens, data flows, permissions, and automation logic.</p>
+          </li>
+          <li class="glass-card step" data-reveal>
+            <span class="step-num">3</span>
+            <h3>Design the System</h3>
+            <p>We design the dashboards, forms, modules, workflows, databases, and user experience needed to run the business better.</p>
+          </li>
+          <li class="glass-card step" data-reveal>
+            <span class="step-num">4</span>
+            <h3>Build and Test</h3>
+            <p>We develop in stages, test with real users, improve the workflow, and make sure it works across desktop, tablet, and mobile.</p>
+          </li>
+          <li class="glass-card step" data-reveal>
+            <span class="step-num">5</span>
+            <h3>Deploy, Train, Improve</h3>
+            <p>We launch, train users, monitor usage, collect feedback, and keep improving the system as the business grows.</p>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ================= WHY ================= -->
+      <section class="section" id="why">
+        <div class="section-head" data-reveal>
+          <span class="kicker">Why Creativ Labs</span>
+          <h2>Why Creativ Labs is different</h2>
+        </div>
+        <div class="why-grid" data-reveal-group>
+          <article class="glass-card why-card why-card--wide" data-reveal>
+            <span class="card-icon"><svg><use href="#i-layers"/></svg></span>
+            <h3>We Think in Systems</h3>
+            <p>We do not start with code. We start by understanding how the business works, where the bottlenecks are, and what system is needed to support growth.</p>
+          </article>
+          <article class="glass-card why-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-grid"/></svg></span>
+            <h3>We Build for Operations</h3>
+            <p>Our focus is operational improvement: better visibility, better control, better reporting, and better execution.</p>
+          </article>
+          <article class="glass-card why-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-spark"/></svg></span>
+            <h3>Agents That Do Real Work</h3>
+            <p>AI is not decoration here. Our agents record data, prepare reports, watch for risks, and answer questions — with preview-and-confirm control and a full audit trail.</p>
+          </article>
+          <article class="glass-card why-card" data-reveal>
+            <span class="card-icon"><svg><use href="#i-globe"/></svg></span>
+            <h3>We Build for African Business Realities</h3>
+            <p>Designed for local realities: mobile usage, staff roles, manual-to-digital transition, cost sensitivity, and practical reporting.</p>
+          </article>
+          <article class="glass-card why-card why-card--wide" data-reveal>
+            <span class="card-icon"><svg><use href="#i-scale"/></svg></span>
+            <h3>We Help Businesses Scale</h3>
+            <p>Scaling requires more than sales. It requires structure, data, accountability, automation, and management visibility. That is what our systems are built to support.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================= IMPACT ================= -->
+      <section class="section impact" id="impact">
+        <div class="section-head" data-reveal>
+          <span class="kicker">Impact</span>
+          <h2>What intelligent systems help businesses achieve</h2>
+        </div>
+        <div class="impact-rail" data-reveal-group>
+          <article class="glass-chip impact-item" data-reveal>
+            <svg><use href="#i-eye"/></svg>
+            <div><strong>Better Visibility</strong><span>See the whole business from one dashboard.</span></div>
+          </article>
+          <article class="glass-chip impact-item" data-reveal>
+            <svg><use href="#i-bolt"/></svg>
+            <div><strong>Faster Decisions</strong><span>Reports and KPIs without waiting for manual updates.</span></div>
+          </article>
+          <article class="glass-chip impact-item" data-reveal>
+            <svg><use href="#i-repeat"/></svg>
+            <div><strong>Less Manual Work</strong><span>Agents and automation absorb the repetitive tasks.</span></div>
+          </article>
+          <article class="glass-chip impact-item" data-reveal>
+            <svg><use href="#i-shield"/></svg>
+            <div><strong>Stronger Accountability</strong><span>Track activities, responsibilities, and permissions.</span></div>
+          </article>
+          <article class="glass-chip impact-item" data-reveal>
+            <svg><use href="#i-scale"/></svg>
+            <div><strong>Better Scaling</strong><span>Ready for more customers, staff, locations, and complexity.</span></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================= CTA + CONTACT ================= -->
+      <section class="section contact" id="contact">
+        <div class="glass-panel cta-panel" data-reveal>
+          <div class="cta-copy">
+            <span class="kicker">Let’s systemize your business</span>
+            <h2>Ready to build the intelligent system behind your <span class="gradient-text">business growth</span>?</h2>
+            <p>Tell us how your business currently works, what is slowing you down, and what you want to scale. We will help you define the intelligent system — and the agent — your next stage of growth needs.</p>
+            <ul class="contact-info">
+              <li><svg><use href="#i-whatsapp"/></svg><span><strong>WhatsApp</strong><a data-wa>Message us — usually replies same day</a></span></li>
+              <li><svg><use href="#i-chat"/></svg><span><strong>Email</strong><a href="mailto:hello@creativlabs.africa">hello@creativlabs.africa</a></span></li>
+              <li><svg><use href="#i-globe"/></svg><span><strong>Location</strong>Nigeria — serving businesses across Africa</span></li>
+            </ul>
+            <a data-wa class="glass-btn glass-btn--whatsapp contact-wa">
+              <svg class="wa-icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>Chat on WhatsApp instead
+            </a>
+          </div>
+          <form class="contact-form" name="contact" method="post" action="/" data-netlify="true" netlify-honeypot="bot-field" data-success-message="Thank you. We will review your operations context and reply from hello@creativlabs.africa.">
+            <input type="hidden" name="form-name" value="contact">
+            <p class="hp-field"><label>Do not fill this out<input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+            <label>Name<input type="text" name="name" autocomplete="name" placeholder="Your name" required></label>
+            <label>Email<input type="email" name="email" autocomplete="email" placeholder="you@company.com" required></label>
+            <label>Company<input type="text" name="company" autocomplete="organization" placeholder="Business name"></label>
+            <label>What do you want to systemize?
+              <select name="focus" required>
+                <option value="" disabled selected>Choose an area</option>
+                <option>Business operations</option>
+                <option>Farm operations</option>
+                <option>Hospitality / venue operations</option>
+                <option>An AI operations agent</option>
+                <option>AI intelligence &amp; insights</option>
+                <option>Something else</option>
+              </select>
+            </label>
+            <label class="form-wide">Tell us about your operations<textarea name="message" placeholder="How does the business run today? What is manual, slow, or hard to see?" required></textarea></label>
+            <button class="glass-btn glass-btn--accent glass-btn--lg form-submit" type="submit" data-submitting-label="Sending…" data-success-label="Request Sent">Start Building Your System</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="#top"><img src="assets/logo-128.png" alt="" width="34" height="36"><span>Creativ&nbsp;Labs</span></a>
+          <p>Creativ Labs builds the intelligent operating layer — Digital Operations Systems and the AI agents that run them — helping businesses scale with clarity and control.</p>
+        </div>
+        <nav class="footer-links" aria-label="Site sections">
+          <span>Explore</span>
+          <a href="#systems">What We Build</a>
+          <a href="#products">Focus Areas</a>
+          <a href="#process">How We Work</a>
+          <a href="#why">Why Creativ Labs</a>
+        </nav>
+        <div class="footer-links">
+          <span>Company</span>
+          <a href="mailto:hello@creativlabs.africa">hello@creativlabs.africa</a>
+          <a href="#contact">Talk to Creativ Labs</a>
+          <span class="footer-loc">Lagos · Abuja · Remote, Nigeria</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> Creativ Labs. All rights reserved.</span>
+        <span>Systemize Operations · Automate Workflows · Scale Intelligently</span>
+      </div>
+    </footer>
+  </div>
+
+  <a data-wa class="wa-fab" aria-label="Chat with Creativ Labs on WhatsApp">
+    <svg aria-hidden="true"><use href="#i-whatsapp"/></svg>
+  </a>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
