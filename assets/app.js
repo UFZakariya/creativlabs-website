@@ -124,7 +124,7 @@
     if (!navWrap) return;
     const indicator = navWrap.querySelector(".nav-indicator");
     const links = Array.from(navWrap.querySelectorAll("a[data-nav]"));
-    const sections = ["top", "agents", "systems", "products", "process", "why", "contact"]
+    const sections = ["top", "readiness", "agents", "systems", "products", "process", "contact"]
       .map((id) => document.getElementById(id))
       .filter(Boolean);
 
@@ -200,27 +200,38 @@
     const items = Array.from(document.querySelectorAll("[data-reveal]"));
     if (!items.length) return;
 
+    // index each group child so CSS can stagger via calc(var(--i) * var(--stag))
     document.querySelectorAll("[data-reveal-group]").forEach((group) => {
       group.querySelectorAll("[data-reveal]").forEach((el, i) => {
-        el.style.setProperty("--reveal-delay", `${Math.min(i * 90, 540)}ms`);
+        el.style.setProperty("--i", i);
       });
     });
 
-    if (reducedMotion || !("IntersectionObserver" in window)) {
+    // ?static=1 renders everything revealed — used for screenshot/QA tooling.
+    // ?solo=<section-id> additionally shows only that section (QA captures).
+    const params = new URLSearchParams(location.search);
+    const staticMode = params.has("static");
+    const solo = params.get("solo");
+    if (solo && document.getElementById(solo)) {
+      document.querySelectorAll("main > section, main > .statement-band").forEach((s) => {
+        if (s.id !== solo) s.style.display = "none";
+      });
+      document.getElementById(solo).style.minHeight = "auto";
+    }
+    if (reducedMotion || staticMode || !("IntersectionObserver" in window)) {
       items.forEach((el) => el.classList.add("in-view"));
       return;
     }
 
+    // REVERSIBLE: toggle .in-view on enter AND leave, keep observing — so each
+    // element re-animates every time it re-enters the viewport, up or down.
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            io.unobserve(entry.target);
-          }
+          entry.target.classList.toggle("in-view", entry.isIntersecting);
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0, rootMargin: "0px 0px -18% 0px" }
     );
 
     items.forEach((el) => io.observe(el));
@@ -258,7 +269,7 @@
         badge: "UFMS",
         title: "Farm Operations Systems",
         copy: "Digital management systems for farms — production, feed, mortality, sales, hatchery, and finance records — run by a WhatsApp agent your staff already know how to use.",
-        example: "UFMS — Universal Farm Management System",
+        example: "UFMS — running daily at Universal Farms, our founder's own poultry operation",
         chips: ["Daily farm records", "Egg production tracking", "Feed usage monitoring", "Mortality & health logs", "Hatchery records", "Staff activity logs", "Weekly & monthly reports"],
         bars: [78, 56, 88],
         sparks: [55, 72, 48, 84, 66, 90, 76]
@@ -267,7 +278,7 @@
         badge: "TruckVille",
         title: "Hospitality & Venue Operations Systems",
         copy: "Digital systems for restaurants, food courts, lifestyle venues, and multi-vendor destinations that need better control over vendors, orders, staff, payments, and events.",
-        example: "TruckVille Operations System",
+        example: "TruckVille Operations System — in development for a real Abuja food-court destination",
         chips: ["Vendor management", "Order tracking", "Sales visibility", "Staff dashboards", "Event management", "Payment & payout visibility", "Tablet-friendly tools"],
         bars: [70, 48, 90],
         sparks: [62, 45, 80, 58, 88, 70, 95]
@@ -276,7 +287,7 @@
         badge: "Creativ Listen",
         title: "AI Social Intelligence Systems",
         copy: "AI-powered systems for monitoring public conversations, detecting sentiment, identifying trends, and generating insights from multilingual and code-mixed African language content.",
-        example: "Creativ Listen",
+        example: "Creativ Listen — in development: Hausa & Nigerian-language sentiment at its core",
         chips: ["Social listening", "Hausa & Nigerian-language sentiment", "Topic discovery", "Public feedback analysis", "Brand reputation monitoring", "AI insight reports", "Multilingual dashboards"],
         bars: [52, 76, 64],
         sparks: [48, 70, 90, 55, 75, 62, 85]
@@ -488,6 +499,46 @@
      8b. Hero entrance choreography (one-shot, CSS-driven)
      ============================================================ */
   document.body.classList.add("fx-enter");
+
+  /* ============================================================
+     8b2. BlurText — split the hero headline into words that blur in
+          one by one. Skipped under reduced motion; if it fails the
+          headline keeps the block-level entrance.
+     ============================================================ */
+  (() => {
+    if (reducedMotion) return;
+    const h1 = document.querySelector(".hero-title");
+    if (!h1) return;
+
+    const words = [];
+    Array.from(h1.childNodes).forEach((child) => {
+      if (child.nodeType === Node.TEXT_NODE) {
+        const frag = document.createDocumentFragment();
+        child.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) {
+            frag.appendChild(document.createTextNode(" "));
+            return;
+          }
+          const s = document.createElement("span");
+          s.className = "blur-word";
+          s.textContent = part;
+          words.push(s);
+          frag.appendChild(s);
+        });
+        h1.replaceChild(frag, child);
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        // e.g. the gradient "Agentic" span — animate it as one word
+        child.classList.add("blur-word");
+        words.push(child);
+      }
+    });
+
+    if (!words.length) return;
+    h1.setAttribute("aria-label", h1.textContent.replace(/\s+/g, " ").trim());
+    words.forEach((w, i) => w.style.setProperty("--wi", i));
+    h1.classList.add("title-split");
+  })();
 
   /* ============================================================
      8c. Signature pointer FX — 3D card tilt with tracked specular,
@@ -745,4 +796,565 @@
 
     rafId = requestAnimationFrame(loop);
   })();
+
+  /* ============================================================
+     10. Business Agentic Readiness — quiz engine
+     ============================================================ */
+  (() => {
+    const quiz = document.getElementById("bar-quiz");
+    const result = document.getElementById("bar-result");
+    if (!quiz || !result) return;
+
+    // Seven weighted questions (research-derived: Cisco AI Readiness Index
+    // pillars compressed through BridgeView's SMB quiz pattern). Graded
+    // 3-level answers (0/1/2 — never yes/no); weights sum to 100.
+    const QUESTIONS = [
+      {
+        q: "If a key staff member left tomorrow, could someone follow written steps and do their job?",
+        weight: 20,
+        options: [
+          { label: "No — the steps live in people's heads", lvl: 0 },
+          { label: "Partly — some things are written down", lvl: 1 },
+          { label: "Yes — our key processes are documented", lvl: 2 }
+        ]
+      },
+      {
+        q: "Where do your business records — sales, bookings, stock — live today?",
+        weight: 20,
+        options: [
+          { label: "Paper, notebooks, or memory", lvl: 0 },
+          { label: "Spreadsheets, WhatsApp chats, phone photos", lvl: 1 },
+          { label: "Software the team actually uses", lvl: 2 }
+        ]
+      },
+      {
+        q: "How much time goes to the same repeated tasks each week — replying, recording, reporting, chasing?",
+        weight: 20,
+        options: [
+          { label: "Very little — our work is rarely routine", lvl: 0 },
+          { label: "A few hours per person, most days", lvl: 1 },
+          { label: "A huge share — the same tasks, every day", lvl: 2 }
+        ]
+      },
+      {
+        q: "Does the business already run on digital channels — WhatsApp Business, POS, an accounting app?",
+        weight: 15,
+        options: [
+          { label: "Not really — we're mostly offline", lvl: 0 },
+          { label: "Some — WhatsApp yes, the rest is manual", lvl: 1 },
+          { label: "Yes — several tools, used daily", lvl: 2 }
+        ]
+      },
+      {
+        q: "Is there one person who could own the agent — checking its work and reports every week?",
+        weight: 10,
+        options: [
+          { label: "No obvious person right now", lvl: 0 },
+          { label: "Maybe — someone could grow into it", lvl: 1 },
+          { label: "Yes — I know exactly who", lvl: 2 }
+        ]
+      },
+      {
+        q: "Can you name the ONE process that, if automated, would most change your business?",
+        weight: 10,
+        options: [
+          { label: "Not yet — everything feels tangled", lvl: 0 },
+          { label: "I have two or three candidates", lvl: 1 },
+          { label: "Instantly — I already know it", lvl: 2 }
+        ]
+      },
+      {
+        q: "How do you feel about a system drafting records and replies that a human approves before saving?",
+        weight: 5,
+        options: [
+          { label: "Cautious — I'd need to see it working first", lvl: 0 },
+          { label: "Open to it, with tight controls", lvl: 1 },
+          { label: "That's exactly what I want", lvl: 2 }
+        ]
+      }
+    ];
+
+    // Four tiers, explicit cutoffs, encouraging names, strengths-first
+    // summaries (low scorers should still feel momentum, not shame).
+    const TIERS = [
+      {
+        min: 0,
+        name: "Start With the Basics",
+        summary: "Every agent-run business started exactly here — and you have the advantage of starting deliberately. Right now your operations live in people's heads and pockets, which means the fastest, most visible wins are all still ahead of you.",
+        recs: [
+          "Put ONE core process — daily sales, stock, or records — into a simple digital system first",
+          "The task your team repeats most is your future agent's first job; note it down",
+          "Our consultation maps the shortest path from where you are to agent-ready — in plain steps"
+        ],
+        cta: "Start My Systemization Plan"
+      },
+      {
+        min: 30,
+        name: "Building the Foundation",
+        summary: "You have real strengths to build on — digital habits are forming and the repetitive work an agent thrives on is clearly there. The gaps are honest but fixable, and we design the system and the agent together so you never need a year of 'digital transformation' first.",
+        recs: [
+          "Centralize your scattered records — one place the whole team trusts",
+          "Document your most repeated process; that becomes the agent's playbook",
+          "A consultation will show which gap to close first for the fastest payoff"
+        ],
+        cta: "Map My Path to Agent-Ready"
+      },
+      {
+        min: 55,
+        name: "Nearly Ready",
+        summary: "You're closer than you think. Solid digital habits, real structure, and plenty of routine work worth handing over — usually just one process to document or one record to centralize before an agent slots in. This is exactly the stage where an Agent-as-a-System build pays off fastest.",
+        recs: [
+          "Connect the tools you already use into one operating layer for the business",
+          "Your team's daily channels are the agent's front door — it meets them where they are",
+          "In the consultation we'll pick the first workflow the agent takes over"
+        ],
+        cta: "Book My Free Readiness Consultation"
+      },
+      {
+        min: 80,
+        name: "Agent-Ready",
+        summary: "Documented processes, digital records, an owner in mind, and clear intent — your business has the foundations most companies spend a year building. An AI agent could be doing real, supervised work here within weeks, not months.",
+        recs: [
+          "Pilot an agent on your highest-volume workflow first — that's where weeks are won",
+          "Preview→confirm control means you keep full authority while the agent works",
+          "The consultation scopes your first agent: timeline, integrations, and cost"
+        ],
+        cta: "Scope My First Agent"
+      }
+    ];
+
+    const els = {
+      current: quiz.querySelector("[data-bar-current]"),
+      total: quiz.querySelector("[data-bar-total]"),
+      fill: quiz.querySelector(".bar-progress-fill"),
+      question: quiz.querySelector("[data-bar-question]"),
+      options: quiz.querySelector("[data-bar-options]"),
+      back: quiz.querySelector(".bar-back"),
+      score: result.querySelector("[data-bar-score]"),
+      tier: result.querySelector("[data-bar-tier]"),
+      summary: result.querySelector("[data-bar-summary]"),
+      recs: result.querySelector("[data-bar-recs]"),
+      cta: result.querySelector("[data-bar-cta]"),
+      retake: result.querySelector("[data-bar-retake]"),
+      gauge: result.querySelector(".bar-gauge-fill"),
+      gaugeWrap: result.querySelector("[data-bar-gauge-label]")
+    };
+
+    let step = 0;
+    const answers = new Array(QUESTIONS.length).fill(null);
+
+    els.total.textContent = String(QUESTIONS.length);
+
+    const render = () => {
+      const item = QUESTIONS[step];
+      els.current.textContent = String(step + 1);
+      els.fill.style.width = `${(step / QUESTIONS.length) * 100}%`;
+      els.question.textContent = item.q;
+      els.options.innerHTML = "";
+      item.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bar-option";
+        btn.innerHTML = `<span class="bar-dot" aria-hidden="true"></span><span>${opt.label}</span>`;
+        btn.addEventListener("click", () => {
+          answers[step] = i;
+          step += 1;
+          if (step >= QUESTIONS.length) finish();
+          else render();
+        });
+        els.options.appendChild(btn);
+      });
+      els.back.hidden = step === 0;
+    };
+
+    const finish = () => {
+      // weighted maturity score: each question contributes weight * level/2
+      const score = Math.round(
+        answers.reduce((sum, ai, qi) => sum + QUESTIONS[qi].weight * (QUESTIONS[qi].options[ai].lvl / 2), 0)
+      );
+      const tier = [...TIERS].reverse().find((t) => score >= t.min) || TIERS[0];
+
+      quiz.hidden = true;
+      result.hidden = false;
+
+      els.tier.textContent = tier.name;
+      els.summary.textContent = tier.summary;
+      els.recs.innerHTML = "";
+      tier.recs.forEach((r) => {
+        const li = document.createElement("li");
+        li.textContent = r;
+        els.recs.appendChild(li);
+      });
+      els.cta.innerHTML = `${tier.cta} <span class="btn-arrow" aria-hidden="true">&rarr;</span>`;
+      if (els.gaugeWrap) els.gaugeWrap.setAttribute("aria-label", `Business Agentic Readiness score: ${score} out of 100 — ${tier.name}`);
+
+      // feed the score into the consultation form + remember it
+      const field = document.getElementById("readiness-score-field");
+      if (field) field.value = `${score}/100 — ${tier.name}`;
+      try { sessionStorage.setItem("bar-score", String(score)); } catch {}
+
+      // animate count + gauge
+      const C = 326.7;
+      requestAnimationFrame(() => {
+        els.gauge.style.strokeDashoffset = String(C - (C * score) / 100);
+      });
+      if (reducedMotion) {
+        els.score.textContent = String(score);
+      } else {
+        const t0 = performance.now();
+        const tick = (t) => {
+          const p = Math.min(1, (t - t0) / 1000);
+          els.score.textContent = String(Math.round(score * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    };
+
+    els.back.addEventListener("click", () => {
+      if (step > 0) {
+        step -= 1;
+        render();
+      }
+    });
+
+    els.retake.addEventListener("click", () => {
+      step = 0;
+      answers.fill(null);
+      result.hidden = true;
+      quiz.hidden = false;
+      els.gauge.style.strokeDashoffset = "326.7";
+      render();
+    });
+
+    render();
+  })();
+
+  /* ============================================================
+     11. Hermes dock — site assistant. Scripted until the real
+         agent endpoint is set in assets/hermes-config.js.
+     ============================================================ */
+  (() => {
+    const dock = document.getElementById("hermes-dock");
+    const btn = document.getElementById("dock-btn");
+    const panel = document.getElementById("dock-panel");
+    const msgs = document.getElementById("dock-msgs");
+    const form = document.getElementById("dock-form");
+    const input = document.getElementById("dock-input");
+    const status = document.getElementById("dock-status");
+    if (!dock || !btn || !panel || !msgs || !form) return;
+
+    const cfg = window.HERMES || {};
+    const live = Boolean(cfg.endpoint);
+    if (status) status.textContent = live ? "Online — Creativ Labs agent" : "Creativ Labs assistant";
+
+    let sessionId;
+    try {
+      sessionId = localStorage.getItem("hermes-session") ||
+        (crypto.randomUUID ? crypto.randomUUID() : String(Math.floor(performance.now() * 1e6)));
+      localStorage.setItem("hermes-session", sessionId);
+    } catch {
+      sessionId = "anon";
+    }
+
+    const add = (text, who, asHTML) => {
+      const el = document.createElement("div");
+      el.className = `dock-msg dock-msg--${who}`;
+      if (asHTML) el.innerHTML = text;
+      else el.textContent = text;
+      msgs.appendChild(el);
+      msgs.scrollTop = msgs.scrollHeight;
+      return el;
+    };
+
+    const addQuick = () => {
+      const wrap = document.createElement("div");
+      wrap.className = "dock-quick";
+      [
+        ["Take the readiness test", "#readiness"],
+        ["What do you build?", "#systems"],
+        ["Book a consultation", "#contact"]
+      ].forEach(([label, target]) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = label;
+        b.addEventListener("click", () => {
+          setOpen(false);
+          document.querySelector(target)?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" });
+        });
+        wrap.appendChild(b);
+      });
+      msgs.appendChild(wrap);
+      msgs.scrollTop = msgs.scrollHeight;
+    };
+
+    const typing = () => {
+      const el = document.createElement("span");
+      el.className = "dock-typing";
+      el.setAttribute("aria-hidden", "true");
+      el.innerHTML = "<i></i><i></i><i></i>";
+      msgs.appendChild(el);
+      msgs.scrollTop = msgs.scrollHeight;
+      return el;
+    };
+
+    let greeted = false;
+    let open = false;
+
+    const setOpen = (next) => {
+      open = next;
+      btn.setAttribute("aria-expanded", String(next));
+      if (next) {
+        panel.hidden = false;
+        void panel.offsetWidth; // flush styles so the open transition runs
+        panel.classList.add("open");
+        if (!greeted) {
+          greeted = true;
+          add(cfg.greeting || "Hi! How can I help?", "bot");
+          if (!live) addQuick();
+        }
+        setTimeout(() => input?.focus(), 250);
+      } else {
+        panel.classList.remove("open");
+        setTimeout(() => { panel.hidden = true; }, 220);
+      }
+    };
+
+    btn.addEventListener("click", () => setOpen(!open));
+    document.getElementById("dock-close")?.addEventListener("click", () => setOpen(false));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && open) setOpen(false);
+    });
+
+    // scripted answers until the VPS agent is plugged in
+    const scripted = (text) => {
+      const t = text.toLowerCase();
+      if (/price|cost|how much|pay/.test(t)) {
+        return "Pricing depends on the size of the system and agent you need — most projects are scoped in the free consultation so you get a real number, not a guess. <a href='#contact'>Book one here</a>.";
+      }
+      if (/whatsapp|agent|bot/.test(t)) {
+        return "Every system we build ships with an AI agent your team talks to on WhatsApp — it records data, runs reports, and asks for confirmation before saving anything. See it in action in the <a href='#agents'>Agents section</a>.";
+      }
+      if (/ready|test|score|quiz/.test(t)) {
+        return "The Business Agentic Readiness test takes under a minute — six questions, instant score. <a href='#readiness'>Take it here</a>.";
+      }
+      if (/farm|ufms|poultry/.test(t)) {
+        return "UFMS is our farm operations system — daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='#products'>Use Cases</a>.";
+      }
+      return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or email <a href='mailto:hello@creativlabs.africa'>hello@creativlabs.africa</a>.`;
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = (input.value || "").trim();
+      if (!text) return;
+      input.value = "";
+      add(text, "user");
+      const t = typing();
+
+      if (live) {
+        try {
+          const res = await fetch(cfg.endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text, sessionId, page: location.pathname })
+          });
+          if (!res.ok) throw new Error(String(res.status));
+          const data = await res.json();
+          t.remove();
+          add(data.reply || "Sorry — I didn't catch that. Try again?", "bot");
+        } catch {
+          t.remove();
+          add("I'm having trouble reaching the agent right now. You can always email <a href='mailto:hello@creativlabs.africa'>hello@creativlabs.africa</a> or <a href='#contact'>book a consultation</a>.", "bot", true);
+        }
+      } else {
+        setTimeout(() => {
+          t.remove();
+          add(scripted(text), "bot", true);
+        }, reducedMotion ? 50 : 700);
+      }
+    });
+  })();
+
+  /* ============================================================
+     12. Fit engine — every section is one viewport tall in every
+         view. Measures each section against the real viewport and
+         applies the lightest density tier that fits:
+         (roomy) → .s-tight → .s-tighter. Re-runs on resize, font
+         load, quiz/tab/FAQ state changes.
+     ============================================================ */
+  (() => {
+    const sections = Array.from(document.querySelectorAll(".hero, main > .section, main > .statement"));
+    if (!sections.length) return;
+
+    // measure the true small-viewport height (svh) once per resize
+    const probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;top:0;left:0;height:100svh;width:1px;visibility:hidden;pointer-events:none;";
+    document.body.appendChild(probe);
+
+    // layout-based measurement: offsetTop/offsetHeight ignore transforms, so
+    // entrance/reveal animations (which translate elements downward) can't
+    // inflate the reading. Sections are position:relative, making children's
+    // offsetTop section-relative.
+    const neededHeight = (sec) => {
+      let max = 0;
+      for (const c of sec.children) {
+        if (!c.offsetHeight && !c.offsetWidth) continue; // display:none
+        // absolutely-positioned decoration (e.g. .scroll-cue) is anchored to
+        // a corner of the section independent of content — its offsetTop
+        // reflects that anchor, not "how tall is my content", so counting
+        // it here would make sections falsely read as overflowing forever
+        if (getComputedStyle(c).position === "absolute") continue;
+        const b = c.offsetTop + c.offsetHeight;
+        if (b > max) max = b;
+      }
+      return max + parseFloat(getComputedStyle(sec).paddingBottom || "0");
+    };
+
+    // graduated stages, applied cumulatively until the section fits:
+    // s-snug  — geometry only (spacing/type shrink, no text lost)
+    // s-tight — adds gentle 2-3 line clamps on secondary text
+    // s-tighter — essentials only
+    const STAGES = ["s-snug", "s-tight", "s-tighter"];
+
+    const fit = () => {
+      const vh = probe.offsetHeight || window.innerHeight;
+      sections.forEach((sec) => {
+        if (sec.style.display === "none") return; // ?solo QA mode
+        sec.classList.remove(...STAGES);
+        for (const stage of STAGES) {
+          // reading layout after each class change forces a reflow,
+          // so every measurement is accurate
+          if (neededHeight(sec) <= vh + 2) break;
+          sec.classList.add(stage);
+        }
+      });
+    };
+
+    let t = 0;
+    const queueFit = (delay) => {
+      clearTimeout(t);
+      t = setTimeout(fit, delay);
+    };
+
+    window.addEventListener("resize", () => queueFit(120));
+    window.addEventListener("orientationchange", () => queueFit(220));
+    // mobile URL-bar show/hide changes the visual viewport without always
+    // firing window resize
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", () => queueFit(150));
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => queueFit(0));
+
+    // content that changes a section's height after load
+    document.addEventListener("click", (e) => {
+      if (e.target.closest(".bar-option, [data-bar-retake], .product-tab")) queueFit(120);
+    });
+    document.addEventListener("toggle", () => queueFit(60), true);
+
+    fit();
+  })();
+
+  /* ============================================================
+     13. Statement transition bands — scroll-scrubbed. Each breath-line
+         rises + sharpens + brightens as it nears viewport centre, then
+         drifts + softens + fades as it leaves. Animates coming IN and
+         going OUT, continuously tied to scroll position.
+     ============================================================ */
+  (() => {
+    const lines = Array.from(document.querySelectorAll(".statement-text"));
+    if (!lines.length) return;
+
+    // reduced motion (or no rAF): show them plainly, no scrub
+    if (reducedMotion) {
+      document.documentElement.classList.add("no-scrub");
+      return;
+    }
+
+    const scrub = () => {
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const half = vh / 2;
+      for (const el of lines) {
+        const r = el.getBoundingClientRect();
+        if (r.height === 0) continue;
+        const centre = r.top + r.height / 2;
+        // signed distance from viewport centre, normalised to roughly [-1, 1]:
+        // >0 while the line sits below centre (entering), <0 above (leaving)
+        let dir = (centre - half) / (half + r.height / 2);
+        dir = Math.max(-1.2, Math.min(1.2, dir));
+        const p = Math.max(0, 1 - Math.abs(dir)); // 0 at edges → 1 at centre
+        el.style.setProperty("--p", p.toFixed(3));
+        el.style.setProperty("--dir", dir.toFixed(3));
+      }
+    };
+
+    // cancel-and-reschedule: coalesces to one update per frame and can never
+    // get permanently stuck (a dropped frame just gets superseded)
+    let rafId = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(scrub);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", onScroll, { passive: true });
+    scrub(); // set initial state for whatever is already on screen
+  })();
+
+  /* ============================================================
+     14. The two designated scroll-scrubs (per the motion spec):
+         (a) readiness heading — horizontal clip-wipe as it enters
+         (b) agents iPhone — a 3D dolly (tilts upright + pushes forward)
+         Both are per-frame scroll-linked; pinned to rest under reduced
+         motion or ?static (QA), and the phone dolly is desktop-only so it
+         never shifts the phone out of its narrow mobile column.
+     ============================================================ */
+  (() => {
+    const staticMode = new URLSearchParams(location.search).has("static");
+    if (reducedMotion || staticMode) return; // elements sit at their CSS rest state
+
+    const phone = document.querySelector(".iphone-stage");
+    const agents = document.getElementById("agents");
+    const readH2 = document.querySelector("#readiness .section-head h2");
+    if (!phone && !readH2) return;
+
+    // 0 as a section's reference point sits near the bottom of the viewport
+    // (just entering), 1 once it has travelled up to the settle line. Clamped.
+    const progress = (el, startFrac, endFrac) => {
+      const top = el.getBoundingClientRect().top;
+      const vh = window.innerHeight || 1;
+      return Math.max(0, Math.min(1, (startFrac * vh - top) / ((startFrac - endFrac) * vh)));
+    };
+
+    const scrub = () => {
+      if (phone && agents) {
+        if (window.innerWidth >= 880) {
+          const p = progress(agents, 0.9, 0.4);
+          const k = 1 - p;
+          phone.style.opacity = (0.25 + 0.75 * p).toFixed(3);
+          phone.style.transform =
+            `perspective(1400px) rotateY(${(-10 * k).toFixed(2)}deg) rotateX(${(4 * k).toFixed(2)}deg) ` +
+            `translateZ(${(-64 * k).toFixed(1)}px) translateX(${(32 * k).toFixed(1)}px)`;
+        } else {
+          // mobile: no 3D dolly (would shift the phone out of its column)
+          phone.style.opacity = "";
+          phone.style.transform = "";
+        }
+      }
+      if (readH2) {
+        const p = progress(readH2, 0.92, 0.5);
+        readH2.style.setProperty("--wipe-r", `${((1 - p) * 100).toFixed(1)}%`);
+      }
+    };
+
+    let rafId = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(scrub);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", onScroll, { passive: true });
+    scrub();
+  })();
+
 })();
