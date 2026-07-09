@@ -665,19 +665,20 @@
                       </header>
                       <div class="ufms-body">
                         <nav class="ufms-side">
-                          <a class="ufms-nav is-active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+                          <a class="ufms-nav is-active" data-ufms-goto="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-6M22 20H2"/></svg>Production</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg>Flock &amp; Batches</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.3-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.7-7 10-7 10Z"/></svg>Health</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Finance</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M6 2.5h8L20 8.5V21a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1Z"/><path d="M9 13h7M9 17h5"/></svg>Daily Entry</a>
-                          <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 18.5Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Records</a>
+                          <a class="ufms-nav" data-ufms-goto="records"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 18.5Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Records</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H13Z"/></svg>Actions</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.4 2.9 8 7 10 4.1-2 7-5.6 7-10V6Z"/><path d="m9 11.5 2.2 2.2L15.5 9.4"/></svg>Approvals</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c.6-3.6 3.4-5.6 7-5.6s6.4 2 7 5.6"/></svg>Admin</a>
                         </nav>
                         <main class="ufms-main">
+                          <div class="ufms-page is-active" data-ufms-page="dashboard">
                           <div class="ufms-pagehead">
                             <div><h1>Good morning, Zakariya</h1><p>Layers · Universal Farms · Today, live</p></div>
                             <div class="ufms-filters"><span class="ufms-chip is-on">Today</span><span class="ufms-chip">7 days</span><span class="ufms-chip">All houses</span></div>
@@ -718,6 +719,40 @@
                               </tbody>
                             </table>
                           </section>
+                          </div>
+
+                          <div class="ufms-page" data-ufms-page="records">
+                            <div class="ufms-pagehead">
+                              <div><h1>Records</h1><p>Browse farms, pens, batches, transactions and more. Click a row for detail; create, edit, or change lifecycle where your role allows.</p></div>
+                            </div>
+                            <div class="ufms-card ufms-setup">
+                              <div class="ufms-setup-h">
+                                <span class="ufms-setup-ic"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg></span>
+                                <div><strong>Set up your farm</strong><small>Build the structure top-down — Farm → Pen → Batch. Codes auto-fill and increment; you can always edit them.</small></div>
+                              </div>
+                              <div class="ufms-setup-cards">
+                                <div class="ufms-setup-card"><span class="ufms-setup-num">🏡</span><div><strong>New Farm</strong><small>Register a farm — the top of the structure.</small></div></div>
+                                <div class="ufms-setup-card"><span class="ufms-setup-num">🚪</span><div><strong>New Pen</strong><small>Add a pen inside a farm. Auto-codes P001, P002…</small></div></div>
+                                <div class="ufms-setup-card"><span class="ufms-setup-num">📦</span><div><strong>New Batch</strong><small>Place a flock in a pen. Bird-type code auto-fills.</small></div></div>
+                              </div>
+                            </div>
+                            <div class="ufms-rtabs">
+                              <span class="ufms-rtab is-on">Farms</span><span class="ufms-rtab">Pens</span><span class="ufms-rtab">Batches</span><span class="ufms-rtab">Transactions</span><span class="ufms-rtab">Health checks</span><span class="ufms-rtab">Treatment logs</span><span class="ufms-rtab">Users</span><span class="ufms-rtab">API tokens</span>
+                            </div>
+                            <div class="ufms-card">
+                              <div class="ufms-toolbar">
+                                <label class="ufms-check"><span class="ufms-box"></span>Include inactive</label>
+                                <div class="ufms-toolbar-r"><span class="ufms-btn">Refresh</span><span class="ufms-btn ufms-btn--primary">+ Create</span></div>
+                              </div>
+                              <table class="ufms-table ufms-rtable">
+                                <thead><tr><th>ID</th><th>Name</th><th>Location</th><th>State</th><th></th></tr></thead>
+                                <tbody>
+                                  <tr><td class="tnum">#1</td><td><strong>Universal Farms</strong></td><td>Kaduna, Nigeria</td><td><span class="ufms-pill ok">active</span></td><td class="r"><span class="ufms-view">View</span></td></tr>
+                                </tbody>
+                              </table>
+                              <div class="ufms-pager"><span>1–1 of 1</span><div class="ufms-pager-b"><span class="ufms-btn">‹ Prev</span><span class="ufms-pager-n">Page 1 / 1</span><span class="ufms-btn">Next ›</span></div></div>
+                            </div>
+                          </div>
                         </main>
                       </div>
                     </div>

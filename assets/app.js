@@ -514,6 +514,30 @@
   })();
 
   /* ============================================================
+     6d. In-app preview navigation — a clickable sidebar switches
+         pages inside a Use Cases app preview (UFMS: Dashboard ↔
+         Records), so the laptop is browsable, not a single screen.
+     ============================================================ */
+  (() => {
+    const navs = Array.from(document.querySelectorAll("[data-ufms-goto]"));
+    if (!navs.length) return;
+    navs.forEach((nav) => {
+      nav.addEventListener("click", () => {
+        const app = nav.closest(".ufms");
+        if (!app) return;
+        const key = nav.dataset.ufmsGoto;
+        app.querySelectorAll("[data-ufms-goto]").forEach((n) => n.classList.toggle("is-active", n === nav));
+        app.querySelectorAll("[data-ufms-page]").forEach((p) => p.classList.toggle("is-active", p.dataset.ufmsPage === key));
+        const vp = app.closest(".uc-viewport");
+        if (vp) vp.scrollTop = 0;
+      });
+    });
+    // ?ufms=<page> forces a UFMS in-app page on load — QA/screenshot hook
+    const qaUfms = new URLSearchParams(location.search).get("ufms");
+    if (qaUfms) { const t = navs.find((n) => n.dataset.ufmsGoto === qaUfms); if (t) t.click(); }
+  })();
+
+  /* ============================================================
      7. Contact form (Netlify)
      ============================================================ */
   (() => {
