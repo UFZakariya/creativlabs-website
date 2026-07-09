@@ -1,6 +1,6 @@
-# Creativ Labs Website v2
+# Safetyline Website v2
 
-Ground-up rebuild of the Creativ Labs site. Single-page, zero build step, deploys anywhere static files are served (Netlify-ready, forms included).
+Ground-up rebuild of the Safetyline site. Single-page, zero build step, deploys anywhere static files are served (Netlify-ready, forms included).
 
 ## Highlights
 
@@ -11,7 +11,7 @@ Ground-up rebuild of the Creativ Labs site. Single-page, zero build step, deploy
 - **Liquid glass design system** — every glass surface wears a masked 1.4px **gradient rim** (bright specular top edge → azure glow at the bottom, via `mask-composite: exclude`) instead of a flat border, over layered refraction (backdrop blur + saturation + SVG displacement where supported) and a travelling specular sheen. Nested glass-within-glass icon squares on cards. Applied to the nav bar, buttons, cards, tabs, chips, and the contact panel.
 - **Interactive hero logo** — big, static (no spin/3D): it leans toward the cursor, a specular light sweeps across its silhouette (CSS mask on the logo alpha), the glow responds to proximity, and it pops on click/tap.
 - **Same palette** as v1: cobalt `#083cff`, azure `#00b7ff`, cyan `#33f2ff` on white, with the signature animated wave ribbons fixed behind every section (never fading on scroll).
-- Full copy deck implemented: positioning, what we build, hidden problem, solution pillars, product focus areas (UFMS, TruckVille, Creativ Listen), process, why-us, impact, CTA + contact.
+- Full copy deck implemented: positioning, what we build, hidden problem, solution pillars, product focus areas (UFMS, TruckVille, Safetyline Listen), process, why-us, impact, CTA + contact.
 - Scrollspy nav with a sliding glass indicator, reveal-on-scroll animation, animated product tab showcase, scroll progress hairline.
 - **Signature pointer FX** (desktop fine-pointers, skipped under reduced motion): the wave ribbons bend and shimmer around the cursor and ripple on click (shader-level `u_mouse`/`u_energy`/`u_click` uniforms); glass cards tilt in 3D with a specular hotspot that tracks the pointer; buttons are gently magnetic; the hero plays a staggered blur-to-sharp entrance. A fine film grain sits over everything at 3.5%.
 - Accessible: semantic sections, ARIA tabs, keyboard navigation, `prefers-reduced-motion` support, visible focus rings.

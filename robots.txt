@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://creativlabs.africa/sitemap.xml
+Sitemap: https://safetyline.africa/sitemap.xml

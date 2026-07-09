@@ -52,5 +52,5 @@ createServer(async (req, res) => {
     res.end("Not found");
   }
 }).listen(PORT, "127.0.0.1", () => {
-  console.log(`Creativ Labs v2 preview: http://127.0.0.1:${PORT}/`);
+  console.log(`Safetyline v2 preview: http://127.0.0.1:${PORT}/`);
 });

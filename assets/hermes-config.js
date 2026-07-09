@@ -8,7 +8,7 @@
      response: { reply: string }
 */
 window.HERMES = {
-  endpoint: "", // e.g. "https://hermes.creativlabs.africa/api/site-chat"
-  greeting: "Hi! I'm Hermes, the Creativ Labs assistant. Ask me anything about AI agents, what we build, or your own business — or take the 60-second readiness test above.",
+  endpoint: "", // e.g. "https://hermes.safetyline.africa/api/site-chat"
+  greeting: "Hi! I'm Hermes, the Safetyline assistant. Ask me anything about AI agents, what we build, or your own business — or take the 60-second readiness test above.",
   offlineNote: "The full Hermes agent is being connected right now. Meanwhile I can point you to the right place:"
 };

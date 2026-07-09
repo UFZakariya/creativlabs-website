@@ -1,4 +1,4 @@
-/* Creativ Labs v2 — interactions */
+/* Safetyline v2 — interactions */
 (() => {
   "use strict";
 
@@ -284,10 +284,10 @@
         sparks: [62, 45, 80, 58, 88, 70, 95]
       },
       listen: {
-        badge: "Creativ Listen",
+        badge: "Safetyline Listen",
         title: "AI Social Intelligence Systems",
         copy: "AI-powered systems for monitoring public conversations, detecting sentiment, identifying trends, and generating insights from multilingual and code-mixed African language content.",
-        example: "Creativ Listen — in development: Hausa & Nigerian-language sentiment at its core",
+        example: "Safetyline Listen — in development: Hausa & Nigerian-language sentiment at its core",
         chips: ["Social listening", "Hausa & Nigerian-language sentiment", "Topic discovery", "Public feedback analysis", "Brand reputation monitoring", "AI insight reports", "Multilingual dashboards"],
         bars: [52, 76, 64],
         sparks: [48, 70, 90, 55, 75, 62, 85]
@@ -365,6 +365,87 @@
   })();
 
   /* ============================================================
+     6b. Use-case device previews — selectors switch which app shows
+         in a laptop; picking the ordering app morphs the laptop into
+         a phone. Real app UIs mount into .uc-app-inner and are scaled
+         to fit with `zoom`, recomputed on resize / device switch.
+     ============================================================ */
+  (() => {
+    const tabsWrap = document.querySelector("[data-uc-tabs]");
+    const stage = document.querySelector("[data-uc-stage]");
+    if (!tabsWrap || !stage) return;
+
+    const tabs = Array.from(tabsWrap.querySelectorAll(".uc-tab"));
+    const indicator = tabsWrap.querySelector(".uc-tab-indicator");
+    const caption = document.querySelector("[data-uc-caption]");
+    const laptopVp = stage.querySelector('[data-uc-viewport="laptop"]');
+    const phoneVp = stage.querySelector('[data-uc-viewport="phone"]');
+    const NATIVE = { laptop: 1280, phone: 390 };
+    const CAPTIONS = {
+      ufms: "UFMS — running daily at Universal Farms, our founder’s own poultry operation.",
+      os: "TruckVille OS — the operations backbone for a real Abuja food-court destination.",
+      order: "TruckVille ordering — customers order from their phone; vendors see it instantly.",
+      labour: "Membership portal — built for the Labour Party’s nationwide member registration.",
+    };
+
+    // scale each device's app to exactly fill its screen width
+    const fitZoom = () => {
+      [["laptop", laptopVp], ["phone", phoneVp]].forEach(([k, vp]) => {
+        if (!vp || !vp.clientWidth) return;
+        const inner = (vp.querySelector(".uc-app.is-active .uc-app-inner") || vp.querySelector(".uc-app-inner"));
+        const wProp = inner && inner.style.getPropertyValue("--uc-w");
+        const native = wProp ? parseFloat(wProp) : NATIVE[k];
+        vp.style.setProperty("--uc-zoom", (vp.clientWidth / native).toFixed(4));
+      });
+    };
+
+    const moveIndicator = (tab) => {
+      if (!indicator) return;
+      indicator.style.setProperty("--x", tab.offsetLeft + "px");
+      indicator.style.setProperty("--w", tab.offsetWidth + "px");
+    };
+
+    const activate = (tab) => {
+      const app = tab.dataset.app;
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.classList.toggle("is-active", on);
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      moveIndicator(tab);
+      stage.dataset.device = tab.dataset.device;
+      stage.querySelectorAll(".uc-app").forEach((v) => v.classList.toggle("is-active", v.dataset.appView === app));
+      if (caption && CAPTIONS[app]) caption.textContent = CAPTIONS[app];
+      requestAnimationFrame(fitZoom);
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => activate(tab));
+      tab.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        e.preventDefault();
+        const dir = e.key === "ArrowRight" ? 1 : -1;
+        const next = tabs[(tabs.indexOf(tab) + dir + tabs.length) % tabs.length];
+        next.focus();
+        activate(next);
+      });
+    });
+
+    // ?uc=<app> forces the initial device/app on load — QA/screenshot hook,
+    // mirrors the site's ?solo / ?feature convention
+    const qaUc = new URLSearchParams(location.search).get("uc");
+    const initial = (qaUc && tabs.find((t) => t.dataset.app === qaUc)) ||
+      tabs.find((t) => t.classList.contains("is-active")) || tabs[0];
+    requestAnimationFrame(() => { activate(initial); fitZoom(); });
+    window.addEventListener("resize", () => {
+      const cur = tabs.find((t) => t.classList.contains("is-active"));
+      if (cur) moveIndicator(cur);
+      fitZoom();
+    });
+  })();
+
+  /* ============================================================
      7. Contact form (Netlify)
      ============================================================ */
   (() => {
@@ -396,7 +477,7 @@
             button.textContent = original;
             button.disabled = false;
           }
-          if (status) status.textContent = "Something went wrong. Please email hello@creativlabs.africa instead.";
+          if (status) status.textContent = "Something went wrong. Please email hello@safetyline.africa instead.";
         }
       });
     });
@@ -416,8 +497,8 @@
          (digits only, international format, no + or spaces) <<<
      ============================================================ */
   (() => {
-    const WA_NUMBER = "2348102354786"; // Creativ Labs WhatsApp
-    const MESSAGE = "Hi Creativ Labs, I'd like to talk about building an intelligent system for my business.";
+    const WA_NUMBER = "2348102354786"; // Safetyline WhatsApp
+    const MESSAGE = "Hi Safetyline, I'd like to talk about building an intelligent system for my business.";
     const href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(MESSAGE)}`;
     document.querySelectorAll("[data-wa]").forEach((el) => {
       el.setAttribute("href", href);
@@ -493,6 +574,224 @@
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+  })();
+
+  /* ============================================================
+     8c. Feature showcase (agents) — a numbered feature list that drives
+         which phone "screen" is shown (chat/confirm/dashboard/audit), with
+         an auto-advancing progress ring, pausing on hover/focus. Reduced
+         motion: no auto-advance, plain instant switching only.
+     ============================================================ */
+  (() => {
+    const root = document.querySelector("[data-feature-showcase]");
+    const section = document.getElementById("agents");
+    if (!root || !section) return;
+    const items = Array.from(root.querySelectorAll(".feature-item"));
+    const screensWrap = section.querySelector(".phone-screens");
+    const screens = Array.from(section.querySelectorAll(".phone-screen"));
+    const dots = Array.from(section.querySelectorAll(".phone-dot"));
+    if (!items.length || !screens.length) return;
+
+    // screen order, shared by the list, the in-phone dots and swipe
+    const keys = items.map((el) => el.dataset.feature); // chat, confirm, dashboard, audit
+    const AUTOPLAY_MS = 4800;
+    let activeIndex = Math.max(0, items.findIndex((el) => el.classList.contains("is-active")));
+    let startedAt = 0;
+    let paused = false;
+    let inView = true;
+    let rafId = 0;
+
+    const setActive = (index) => {
+      activeIndex = (index + items.length) % items.length;
+      const key = keys[activeIndex];
+      items.forEach((el, i) => {
+        const on = i === activeIndex;
+        el.classList.toggle("is-active", on);
+        el.setAttribute("aria-selected", String(on));
+        if (!on) el.style.removeProperty("--progress");
+      });
+      screens.forEach((s) => {
+        const on = s.dataset.screen === key;
+        s.classList.toggle("is-active", on);
+        s.setAttribute("aria-hidden", String(!on));
+      });
+      dots.forEach((d) => {
+        const on = d.dataset.goto === key;
+        d.classList.toggle("is-on", on);
+        d.setAttribute("aria-selected", String(on));
+      });
+      // "it runs the numbers live" — the agent tallies the dashboard on arrival
+      if (key === "dashboard" && !reducedMotion) animateDashNumbers();
+      startedAt = performance.now();
+    };
+
+    const select = (index) => {
+      if (index === activeIndex) return;
+      setActive(index);
+    };
+    const selectKey = (key) => {
+      const i = keys.indexOf(key);
+      if (i >= 0) select(i);
+    };
+
+    // feature list — the desktop-side primary nav
+    items.forEach((el, i) => {
+      el.addEventListener("click", () => select(i));
+      el.addEventListener("mouseenter", () => select(i));
+      el.addEventListener("focus", () => select(i));
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(i); }
+        if (e.key === "ArrowRight") { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      });
+    });
+
+    // in-phone dots — tap to jump to a screen, like a real app
+    dots.forEach((d) => d.addEventListener("click", () => selectKey(d.dataset.goto)));
+
+    // swipe left/right anywhere on the phone to change screens
+    let sx = 0, sy = 0, swiping = false, tracking = false;
+    if (screensWrap && window.PointerEvent) {
+      screensWrap.addEventListener("pointerdown", (e) => { tracking = true; swiping = false; sx = e.clientX; sy = e.clientY; });
+      screensWrap.addEventListener("pointermove", (e) => {
+        if (!tracking) return;
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (!swiping && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) swiping = true;
+      });
+      screensWrap.addEventListener("pointerup", (e) => {
+        if (tracking && swiping && Math.abs(e.clientX - sx) > 40) select(activeIndex + (e.clientX - sx < 0 ? 1 : -1));
+        tracking = false; swiping = false;
+      });
+      screensWrap.addEventListener("pointercancel", () => { tracking = false; swiping = false; });
+    }
+
+    // confirm screen — real Confirm / Cancel buttons
+    section.querySelectorAll("[data-confirm]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const card = btn.closest(".confirm-card");
+        if (!card) return;
+        if (btn.dataset.confirm === "yes") {
+          card.classList.add("is-confirmed");
+          paused = true;
+          setTimeout(() => selectKey("dashboard"), 1150);
+          setTimeout(() => { card.classList.remove("is-confirmed"); paused = false; startedAt = performance.now(); }, 1650);
+        } else {
+          card.classList.remove("is-confirmed");
+          card.classList.add("is-shake");
+          setTimeout(() => card.classList.remove("is-shake"), 480);
+        }
+      });
+    });
+
+    // dashboard — interactive Day / Week / Month range control
+    const dash = section.querySelector("[data-dash]");
+    if (dash) {
+      const N = "₦"; // naira
+      const segBtns = Array.from(dash.querySelectorAll(".dash-seg-btn"));
+      const bars = Array.from(dash.querySelectorAll("[data-chart] span"));
+      const axis = Array.from(dash.querySelectorAll(".dash-xaxis i"));
+      const totalEl = dash.querySelector("[data-chart-total]");
+      const kpi = (n) => dash.querySelector('[data-kpi="' + n + '"]');
+      const DATA = {
+        day:   { bars: [45, 60, 52, 74, 66, 88, 100], axis: ["8a", "10", "12", "2p", "4", "6", "8"], total: N + "728k", revenue: N + "728k", eggs: "112", orders: "37", mortality: "0.4%" },
+        week:  { bars: [62, 70, 58, 80, 74, 92, 86], axis: ["M", "T", "W", "T", "F", "S", "S"], total: N + "4.9M", revenue: N + "4.9M", eggs: "784", orders: "251", mortality: "0.5%" },
+        month: { bars: [50, 64, 72, 60, 84, 78, 96], axis: ["W1", "W2", "W3", "W4", "W5", "W6", "W7"], total: N + "21M", revenue: N + "21M", eggs: "3.3k", orders: "1,090", mortality: "0.6%" },
+      };
+      const render = (range) => {
+        const d = DATA[range];
+        if (!d) return;
+        bars.forEach((b, i) => b.style.setProperty("--h", (d.bars[i] || 40) + "%"));
+        axis.forEach((a, i) => { a.textContent = d.axis[i] || ""; });
+        if (totalEl) totalEl.textContent = d.total;
+        const eggsEl = kpi("eggs");
+        if (eggsEl && eggsEl.firstChild) eggsEl.firstChild.nodeValue = d.eggs; // keep the <span>crates</span>
+        if (kpi("revenue")) kpi("revenue").textContent = d.revenue;
+        if (kpi("orders")) kpi("orders").textContent = d.orders;
+        if (kpi("mortality")) kpi("mortality").textContent = d.mortality;
+      };
+      segBtns.forEach((b) => b.addEventListener("click", () => {
+        segBtns.forEach((x) => { const on = x === b; x.classList.toggle("is-on", on); x.setAttribute("aria-selected", String(on)); });
+        render(b.dataset.range);
+      }));
+    }
+
+    // count a metric up from zero, preserving its prefix/suffix (₦…k, …%, …crates)
+    const countUp = (el) => {
+      const hasChild = el.children.length > 0;
+      const node = hasChild ? el.firstChild : el;
+      const finalText = hasChild ? (node ? node.nodeValue : "") : el.textContent;
+      const m = String(finalText).match(/^([^\d]*)([\d.,]+)([\s\S]*)$/);
+      if (!m) return;
+      const prefix = m[1], raw = m[2], suffix = m[3];
+      const target = parseFloat(raw.replace(/,/g, ""));
+      if (!isFinite(target)) return;
+      const decimals = (raw.split(".")[1] || "").length;
+      const grouped = raw.indexOf(",") >= 0;
+      const fmt = (v) => {
+        const s = grouped
+          ? v.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+          : v.toFixed(decimals);
+        return prefix + s + suffix;
+      };
+      const dur = 680, start = performance.now();
+      const step = (t) => {
+        const p = Math.min(1, (t - start) / dur);
+        const v = target * (1 - Math.pow(1 - p, 3));
+        const out = p < 1 ? fmt(v) : finalText;
+        if (hasChild) { if (node) node.nodeValue = out; } else { el.textContent = out; }
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    const animateDashNumbers = () => {
+      const d = section.querySelector("[data-dash]");
+      if (!d) return;
+      [...d.querySelectorAll("[data-kpi]"), d.querySelector("[data-chart-total]")]
+        .filter(Boolean).forEach(countUp);
+    };
+
+    // ?feature=<key> forces the initial screen — QA/screenshot hook only,
+    // mirrors the existing ?static / ?solo convention.
+    const qaFeature = new URLSearchParams(location.search).get("feature");
+    if (qaFeature) {
+      const qaIndex = keys.indexOf(qaFeature);
+      if (qaIndex >= 0) activeIndex = qaIndex;
+    }
+
+    // initialise ARIA + start the ring from a clean state
+    setActive(activeIndex);
+
+    // reduced motion → no auto-advance; a forced ?feature= (QA/screenshots)
+    // also freezes autoplay so the requested screen stays put. Interactions
+    // (list, dots, swipe, buttons) keep working in both cases.
+    if (reducedMotion || qaFeature) return;
+
+    // pause auto-advance while the user is on the list OR touching the phone
+    const stage = section.querySelector(".iphone-stage");
+    [root, stage].forEach((el) => {
+      if (!el) return;
+      el.addEventListener("mouseenter", () => { paused = true; });
+      el.addEventListener("mouseleave", () => { paused = false; startedAt = performance.now(); });
+      el.addEventListener("focusin", () => { paused = true; });
+      el.addEventListener("focusout", () => { paused = false; startedAt = performance.now(); });
+    });
+
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver((es) => { inView = es[0].isIntersecting; }, { threshold: 0.25 }).observe(section);
+    }
+
+    const tick = (t) => {
+      if (!paused && inView && !document.hidden) {
+        const p = Math.min(1, (t - startedAt) / AUTOPLAY_MS);
+        items[activeIndex].style.setProperty("--progress", p.toFixed(3));
+        if (p >= 1) setActive(activeIndex + 1);
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) startedAt = performance.now() - (AUTOPLAY_MS * (+items[activeIndex].style.getPropertyValue("--progress") || 0));
+    });
   })();
 
   /* ============================================================
@@ -1046,7 +1345,7 @@
 
     const cfg = window.HERMES || {};
     const live = Boolean(cfg.endpoint);
-    if (status) status.textContent = live ? "Online — Creativ Labs agent" : "Creativ Labs assistant";
+    if (status) status.textContent = live ? "Online — Safetyline agent" : "Safetyline assistant";
 
     let sessionId;
     try {
@@ -1141,7 +1440,7 @@
       if (/farm|ufms|poultry/.test(t)) {
         return "UFMS is our farm operations system — daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='#products'>Use Cases</a>.";
       }
-      return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or email <a href='mailto:hello@creativlabs.africa'>hello@creativlabs.africa</a>.`;
+      return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or email <a href='mailto:hello@safetyline.africa'>hello@safetyline.africa</a>.`;
     };
 
     form.addEventListener("submit", async (e) => {
@@ -1165,7 +1464,7 @@
           add(data.reply || "Sorry — I didn't catch that. Try again?", "bot");
         } catch {
           t.remove();
-          add("I'm having trouble reaching the agent right now. You can always email <a href='mailto:hello@creativlabs.africa'>hello@creativlabs.africa</a> or <a href='#contact'>book a consultation</a>.", "bot", true);
+          add("I'm having trouble reaching the agent right now. You can always email <a href='mailto:hello@safetyline.africa'>hello@safetyline.africa</a> or <a href='#contact'>book a consultation</a>.", "bot", true);
         }
       } else {
         setTimeout(() => {
@@ -1246,7 +1545,7 @@
 
     // content that changes a section's height after load
     document.addEventListener("click", (e) => {
-      if (e.target.closest(".bar-option, [data-bar-retake], .product-tab")) queueFit(120);
+      if (e.target.closest(".bar-option, [data-bar-retake], .product-tab, .uc-tab")) queueFit(120);
     });
     document.addEventListener("toggle", () => queueFit(60), true);
 
