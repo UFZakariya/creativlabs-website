@@ -403,6 +403,9 @@
       if (!indicator) return;
       indicator.style.setProperty("--x", tab.offsetLeft + "px");
       indicator.style.setProperty("--w", tab.offsetWidth + "px");
+      // tabs wrap to two rows on narrow screens — track y/height too
+      indicator.style.setProperty("--y", tab.offsetTop + "px");
+      indicator.style.setProperty("--h", tab.offsetHeight + "px");
     };
 
     const activate = (tab) => {
@@ -443,6 +446,12 @@
       if (cur) moveIndicator(cur);
       fitZoom();
     });
+    // refit whenever the viewports themselves change size (density tiers,
+    // media queries, device morph) — window resize alone misses these
+    if ("ResizeObserver" in window) {
+      const ro = new ResizeObserver(() => fitZoom());
+      [laptopVp, phoneVp].forEach((vp) => { if (vp) ro.observe(vp); });
+    }
   })();
 
   /* ============================================================

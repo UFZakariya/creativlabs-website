@@ -4030,22 +4030,27 @@ main > .statement {
 .uc-tab-indicator {
   position: absolute;
   z-index: 0;
-  top: 5px;
+  top: 0;
   left: 0;
-  height: calc(100% - 10px);
+  /* tracks the active tab's box exactly — tabs can wrap to two rows on
+     narrow screens, so the pill needs y/height, not container height */
+  height: var(--h, calc(100% - 10px));
   width: var(--w, 0);
-  transform: translateX(var(--x, 0));
+  transform: translate(var(--x, 0), var(--y, 5px));
   border-radius: 999px;
   background: linear-gradient(135deg, var(--blue), var(--azure));
   box-shadow: 0 6px 16px rgba(8, 60, 255, 0.32);
-  transition: transform 440ms cubic-bezier(0.22, 1, 0.36, 1), width 440ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 440ms cubic-bezier(0.22, 1, 0.36, 1), width 440ms cubic-bezier(0.22, 1, 0.36, 1), height 440ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .uc-stage {
   position: relative;
   display: grid;
   place-items: center;
-  height: clamp(340px, 56vh, 528px);
+  /* one source of truth for the device stage height — media queries
+     override the variable and the laptop width-cap follows automatically */
+  --stage-h: clamp(340px, 56vh, 528px);
+  height: var(--stage-h);
   perspective: 1600px;
 }
 
@@ -4055,7 +4060,7 @@ main > .statement {
   /* width is also height-capped: total laptop height (lid + 16:10 screen +
      base) must fit the stage, or the centered absolute lid bleeds UP over the
      selectors. laptop_height ≈ 0.625·(W−20) + 36, so W ≤ 1.6·stageH − 50. */
-  width: min(880px, 94%, calc(1.6 * clamp(340px, 56vh, 528px) - 50px));
+  width: min(880px, 94%, calc(1.6 * var(--stage-h) - 50px));
   transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .uc-laptop-lid {
@@ -4081,7 +4086,10 @@ main > .statement {
 }
 .uc-laptop-base {
   position: relative;
-  width: 116%; left: 50%; translate: -50% 0;
+  /* never poke past the viewport — 3px of bleed makes mobile browsers
+     widen the layout viewport and the whole page pans sideways */
+  width: min(116%, calc(100vw - 6px));
+  left: 50%; translate: -50% 0;
   height: 14px;
   border-radius: 0 0 13px 13px;
   background: linear-gradient(180deg, #cbced5, #a1a6af 55%, #80848d);
@@ -4097,49 +4105,117 @@ main > .statement {
   background: rgba(0, 0, 0, 0.22);
 }
 
-/* ---- phone (ordering app) ---- */
+/* ---- phone (ordering app) — realistic device: proportional (cqw) frame,
+   side buttons, status bar + Dynamic-Island chrome above the scrolling app,
+   floating home indicator. Everything scales as one unit at any size. ---- */
 .uc-phone {
   position: absolute;
   height: min(100%, 512px);
   aspect-ratio: 191 / 396;
+  container-type: inline-size;
   opacity: 0; transform: scale(0.9);
   pointer-events: none;
   transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+/* side buttons: volume (left), power (right) */
+.uc-phone::before,
+.uc-phone::after {
+  content: "";
+  position: absolute;
+  width: 1.3cqw;
+  border-radius: 1cqw;
+  background: linear-gradient(90deg, #3a3c42, #17181b);
+}
+.uc-phone::before { left: -1.1cqw; top: 24%; height: 15cqw; }
+.uc-phone::after { right: -1.1cqw; top: 27%; height: 10cqw; }
 .uc-phone-frame {
   position: relative;
   height: 100%;
-  padding: 9px;
-  border-radius: 42px;
+  padding: 3.5cqw;
+  border-radius: 17cqw;
   background: linear-gradient(160deg, #4a4d55, #26272c 45%, #191a1e);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(0, 0, 0, 0.6), 0 34px 64px rgba(6, 16, 39, 0.34);
 }
-.uc-phone-frame .uc-viewport { border-radius: 32px; }
+/* the screen: constant chrome (status bar, home pill) around the scrolling app */
+.uc-phone-screen {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 13.8cqw;
+  overflow: hidden;
+  background: #fff7e8; /* matches the ordering app's canvas */
+}
+.uc-statusbar {
+  position: relative;
+  z-index: 6;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3cqw 7.5cqw 1.8cqw;
+  background: #fff7e8;
+}
+.uc-time {
+  font-family: var(--font-display);
+  font-size: 3.9cqw;
+  font-weight: 700;
+  color: #063824;
+  letter-spacing: 0.02em;
+}
 .uc-phone-island {
-  position: absolute; z-index: 5; top: 15px; left: 50%; translate: -50% 0;
-  width: 30%; height: 19px; border-radius: 999px; background: #05060a;
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  translate: -50% -50%;
+  width: 26cqw;
+  height: 7.2cqw;
+  border-radius: 999px;
+  background: #05060a;
+  box-shadow: inset 0 0 1.2cqw rgba(255, 255, 255, 0.08);
+}
+.uc-sicons { display: inline-flex; align-items: center; gap: 1.6cqw; color: #063824; }
+.uc-sicons svg { height: 3.3cqw; fill: currentColor; display: block; }
+.uc-sig { width: 5cqw; }
+.uc-wifi { width: 4.6cqw; }
+.uc-batt { width: 7.2cqw; }
+.uc-phone-screen .uc-viewport {
+  position: relative;
+  inset: auto;
+  flex: 1;
+  min-height: 0;
+  border-radius: 0;
+  background: #fff7e8;
 }
 .uc-phone-home {
-  position: absolute; z-index: 5; bottom: 8px; left: 50%; translate: -50% 0;
-  width: 34%; height: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  z-index: 7;
+  bottom: 2.4cqw;
+  left: 50%;
+  translate: -50% 0;
+  width: 34cqw;
+  height: 1.5cqw;
+  border-radius: 999px;
+  background: rgba(6, 20, 12, 0.6);
+  pointer-events: none;
 }
 
 /* ---- morph laptop <-> phone ---- */
 .uc-stage[data-device="phone"] .uc-laptop { opacity: 0; transform: scale(0.92); pointer-events: none; }
 .uc-stage[data-device="phone"] .uc-phone { opacity: 1; transform: scale(1); pointer-events: auto; }
 
-/* ---- scrollable viewport + zoom-scaled app ---- */
+/* ---- scrollable viewport + zoom-scaled app (scrollbars fully hidden —
+   the screens read as real devices; content still scrolls) ---- */
 .uc-viewport {
   position: absolute;
   inset: 0;
   overflow: hidden auto;
   overscroll-behavior: contain;
   background: #ffffff;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(8, 30, 90, 0.28) transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.uc-viewport::-webkit-scrollbar { width: 7px; }
-.uc-viewport::-webkit-scrollbar-thumb { background: rgba(8, 30, 90, 0.22); border-radius: 999px; }
+.uc-viewport::-webkit-scrollbar { display: none; }
 .uc-app { display: none; position: relative; min-height: 100%; }
 .uc-app.is-active { display: block; }
 .uc-app-inner {
@@ -4174,9 +4250,15 @@ main > .statement {
 
 @media (max-width: 700px) {
   .uc-tab { padding: 0.5rem 0.82rem; font-size: 0.78rem; }
-  .uc-stage { height: clamp(300px, 52vh, 460px); }
-  .uc-laptop { width: 97%; }
+  .uc-stage { --stage-h: clamp(300px, 52vh, 460px); }
+  .uc-laptop { width: min(97%, calc(1.6 * var(--stage-h) - 50px)); }
   .uc-laptop-lid { padding: 7px 7px 9px; border-radius: 12px 12px 5px 5px; }
+}
+
+/* short/landscape viewports: shrink the whole stage so devices never
+   collide with the selectors above or the caption below */
+@media (max-height: 560px) {
+  .uc-stage { --stage-h: clamp(220px, 58vh, 340px); }
 }
 
 /* ============================================================

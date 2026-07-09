@@ -909,8 +909,17 @@
           <!-- PHONE — the ordering app (laptop morphs to this when selected) -->
           <div class="uc-phone" aria-hidden="true">
             <div class="uc-phone-frame">
-              <span class="uc-phone-island" aria-hidden="true"></span>
-              <div class="uc-viewport" data-uc-viewport="phone" tabindex="0" role="group" aria-label="Ordering app — scroll to explore">
+              <div class="uc-phone-screen">
+                <div class="uc-statusbar" aria-hidden="true">
+                  <span class="uc-time">9:41</span>
+                  <span class="uc-phone-island"></span>
+                  <span class="uc-sicons">
+                    <svg viewBox="0 0 18 12" class="uc-sig"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity="0.35"/></svg>
+                    <svg viewBox="0 0 16 12" class="uc-wifi"><path d="M8 10.8 5.2 7.9a4 4 0 0 1 5.6 0L8 10.8Z"/><path d="M2.8 5.4a7.4 7.4 0 0 1 10.4 0l-1.7 1.8a5 5 0 0 0-7 0L2.8 5.4Z" opacity="0.85"/><path d="M.4 2.9a10.8 10.8 0 0 1 15.2 0l-1.7 1.8a8.4 8.4 0 0 0-11.8 0L.4 2.9Z" opacity="0.7"/></svg>
+                    <svg viewBox="0 0 25 12" class="uc-batt"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M23.5 4v4a2 2 0 0 0 0-4Z"/></svg>
+                  </span>
+                </div>
+                <div class="uc-viewport" data-uc-viewport="phone" tabindex="0" role="group" aria-label="Ordering app — scroll to explore">
                 <div class="uc-app" data-app-view="order"><div class="uc-app-inner">
                   <div class="tvo">
                     <div class="tvo-top">
@@ -1008,8 +1017,9 @@
                     </nav>
                   </div>
                 </div><div class="uc-boot"><span class="uc-boot-dot"></span>Ordering app</div></div>
+                </div>
+                <span class="uc-phone-home" aria-hidden="true"></span>
               </div>
-              <span class="uc-phone-home" aria-hidden="true"></span>
             </div>
           </div>
         </div>
