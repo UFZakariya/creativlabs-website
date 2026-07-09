@@ -4052,7 +4052,10 @@ main > .statement {
 /* ---- laptop (desktop apps) ---- */
 .uc-laptop {
   position: absolute;
-  width: min(880px, 94%);
+  /* width is also height-capped: total laptop height (lid + 16:10 screen +
+     base) must fit the stage, or the centered absolute lid bleeds UP over the
+     selectors. laptop_height ≈ 0.625·(W−20) + 36, so W ≤ 1.6·stageH − 50. */
+  width: min(880px, 94%, calc(1.6 * clamp(340px, 56vh, 528px) - 50px));
   transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .uc-laptop-lid {
