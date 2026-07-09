@@ -408,37 +408,126 @@
           <h2>Digital Operations Systems built for real business growth</h2>
           <p>We design and develop custom Digital Operations Systems that help businesses manage daily operations, track performance, improve accountability, and make better decisions — with an AI agent doing the heavy lifting.</p>
         </div>
-        <div class="card-grid cols-3" data-reveal-group>
-          <article class="glass-card" data-reveal>
-            <span class="card-icon"><svg><use href="#i-grid"/></svg></span>
-            <h3>Operations Management Systems</h3>
-            <p>Platforms that manage daily activities, staff roles, tasks, approvals, records, reports, and performance from one central system.</p>
-          </article>
-          <article class="glass-card" data-reveal>
-            <span class="card-icon"><svg><use href="#i-chart"/></svg></span>
-            <h3>Intelligent Dashboards</h3>
-            <p>Real-time visibility into operations, revenue, expenses, inventory, customers, staff activity, and key performance indicators.</p>
-          </article>
-          <article class="glass-card" data-reveal>
-            <span class="card-icon"><svg><use href="#i-bolt"/></svg></span>
-            <h3>Workflow Automation</h3>
-            <p>Automate approvals, reminders, reporting, customer follow-up, inventory updates, payment tracking, and internal notifications.</p>
-          </article>
-          <article class="glass-card" data-reveal>
-            <span class="card-icon"><svg><use href="#i-chat"/></svg></span>
-            <h3>AI Operations Agents</h3>
-            <p>Chat-first agents that operate the system for your team — record daily data, run reports, chase approvals, flag risks, and explain performance changes.</p>
-          </article>
-          <article class="glass-card" data-reveal>
-            <span class="card-icon"><svg><use href="#i-shield"/></svg></span>
-            <h3>Role-Based Admin Systems</h3>
-            <p>Secure systems where each user has the right level of access — with activity logs, permissions, and management control.</p>
-          </article>
-          <article class="glass-card" data-reveal>
-            <span class="card-icon"><svg><use href="#i-puzzle"/></svg></span>
-            <h3>Custom Business Platforms</h3>
-            <p>Tailored systems for businesses whose operations cannot be properly managed with generic software.</p>
-          </article>
+        <div class="fd" data-fd data-reveal>
+          <ol class="fd-list" role="tablist" aria-label="What we build">
+            <li class="fd-item is-active" role="tab" aria-selected="true" tabindex="0" data-fd="ops" aria-controls="fd-ops">
+              <span class="fd-ic"><svg><use href="#i-grid"/></svg></span>
+              <span class="fd-txt"><strong>Operations Management Systems</strong><small>Staff, tasks, approvals, records and reports — run from one central system.</small></span>
+            </li>
+            <li class="fd-item" role="tab" aria-selected="false" tabindex="-1" data-fd="dash" aria-controls="fd-dash">
+              <span class="fd-ic"><svg><use href="#i-chart"/></svg></span>
+              <span class="fd-txt"><strong>Intelligent Dashboards</strong><small>Live visibility into revenue, inventory, customers and the numbers that matter.</small></span>
+            </li>
+            <li class="fd-item" role="tab" aria-selected="false" tabindex="-1" data-fd="flow" aria-controls="fd-flow">
+              <span class="fd-ic"><svg><use href="#i-bolt"/></svg></span>
+              <span class="fd-txt"><strong>Workflow Automation</strong><small>Approvals, reminders, reports and follow-ups that run themselves.</small></span>
+            </li>
+            <li class="fd-item" role="tab" aria-selected="false" tabindex="-1" data-fd="agent" aria-controls="fd-agent">
+              <span class="fd-ic"><svg><use href="#i-chat"/></svg></span>
+              <span class="fd-txt"><strong>AI Operations Agents</strong><small>A chat-first agent that records, reports and flags risks for your team.</small></span>
+            </li>
+            <li class="fd-item" role="tab" aria-selected="false" tabindex="-1" data-fd="admin" aria-controls="fd-admin">
+              <span class="fd-ic"><svg><use href="#i-shield"/></svg></span>
+              <span class="fd-txt"><strong>Role-Based Admin</strong><small>The right access for every person, with permissions and a full activity log.</small></span>
+            </li>
+            <li class="fd-item" role="tab" aria-selected="false" tabindex="-1" data-fd="custom" aria-controls="fd-custom">
+              <span class="fd-ic"><svg><use href="#i-puzzle"/></svg></span>
+              <span class="fd-txt"><strong>Custom Business Platforms</strong><small>Built around operations generic software can't properly manage.</small></span>
+            </li>
+          </ol>
+
+          <div class="fd-preview">
+            <div class="fd-window glass-panel">
+              <div class="fd-bar" aria-hidden="true"><span class="fd-dot"></span><span class="fd-dot"></span><span class="fd-dot"></span><span class="fd-url" data-fd-title>operations</span></div>
+              <div class="fd-screens">
+                <!-- OPERATIONS -->
+                <div class="fd-screen is-active" id="fd-ops" data-fd-screen="ops" role="tabpanel">
+                  <div class="fd-kpis">
+                    <div class="fd-kpi"><small>Open tasks</small><strong>24</strong><em class="up">6 due today</em></div>
+                    <div class="fd-kpi"><small>On shift</small><strong>12</strong><em>staff active</em></div>
+                    <div class="fd-kpi"><small>Approvals</small><strong>5</strong><em class="warn">awaiting</em></div>
+                  </div>
+                  <div class="fd-panel">
+                    <div class="fd-panel-h"><span>Today's activity</span><i class="fd-live">live</i></div>
+                    <ul class="fd-rows">
+                      <li><span class="fd-rdot ok"></span><span><strong>Zainab</strong> closed “Restock feed — House 2”</span><em>9:41</em></li>
+                      <li><span class="fd-rdot info"></span><span><strong>Musa</strong> logged a mortality record</span><em>9:15</em></li>
+                      <li><span class="fd-rdot warn"></span><span>Agent flagged <strong>low stock</strong> — approval sent</span><em>8:50</em></li>
+                    </ul>
+                  </div>
+                </div>
+                <!-- DASHBOARDS -->
+                <div class="fd-screen" id="fd-dash" data-fd-screen="dash" role="tabpanel" aria-hidden="true">
+                  <div class="fd-kpis">
+                    <div class="fd-kpi"><small>Revenue</small><strong>&#8358;4.2M</strong><em class="up">&#9650; 12%</em></div>
+                    <div class="fd-kpi"><small>Orders</small><strong>318</strong><em class="up">&#9650; 8%</em></div>
+                    <div class="fd-kpi"><small>Margin</small><strong>34%</strong><em class="down">&#9660; 2%</em></div>
+                  </div>
+                  <div class="fd-panel">
+                    <div class="fd-panel-h"><span>Revenue · this week</span><i>Mon–Sun</i></div>
+                    <div class="fd-bars"><span style="--h:46%"></span><span style="--h:62%"></span><span style="--h:54%"></span><span style="--h:76%"></span><span style="--h:68%"></span><span style="--h:90%"></span><span style="--h:100%"></span></div>
+                  </div>
+                </div>
+                <!-- WORKFLOW -->
+                <div class="fd-screen" id="fd-flow" data-fd-screen="flow" role="tabpanel" aria-hidden="true">
+                  <div class="fd-panel fd-panel--flow">
+                    <div class="fd-panel-h"><span>Automation · Egg sale</span><i class="fd-live">running</i></div>
+                    <div class="fd-flow">
+                      <div class="fd-node"><span class="fd-node-ic"><svg><use href="#i-chat"/></svg></span>Report</div>
+                      <div class="fd-flowline"><i></i></div>
+                      <div class="fd-node"><span class="fd-node-ic"><svg><use href="#i-shield"/></svg></span>Check</div>
+                      <div class="fd-flowline"><i></i></div>
+                      <div class="fd-node"><span class="fd-node-ic"><svg><use href="#i-doc"/></svg></span>Record</div>
+                      <div class="fd-flowline"><i></i></div>
+                      <div class="fd-node"><span class="fd-node-ic"><svg><use href="#i-spark"/></svg></span>Notify</div>
+                    </div>
+                  </div>
+                  <div class="fd-kpis fd-kpis--2">
+                    <div class="fd-kpi"><small>Automated today</small><strong>1,204</strong><em class="up">runs</em></div>
+                    <div class="fd-kpi"><small>Hours saved</small><strong>38</strong><em class="up">this week</em></div>
+                  </div>
+                </div>
+                <!-- AGENT -->
+                <div class="fd-screen" id="fd-agent" data-fd-screen="agent" role="tabpanel" aria-hidden="true">
+                  <div class="fd-panel fd-panel--chat">
+                    <div class="fd-panel-h"><span>Farm Agent</span><i class="fd-live">online</i></div>
+                    <div class="fd-chat">
+                      <p class="fd-msg fd-msg--u">Sold 40 crates to Alhaji Musa at &#8358;6,500</p>
+                      <div class="fd-msg fd-msg--a"><p>Recorded &#10003; — <strong>&#8358;260,000</strong>. Today so far: <strong>&#8358;728,000</strong>. Want the daily summary?</p><div class="fd-chips"><span>Daily summary</span><span>Undo</span></div></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- ADMIN -->
+                <div class="fd-screen" id="fd-admin" data-fd-screen="admin" role="tabpanel" aria-hidden="true">
+                  <div class="fd-panel">
+                    <div class="fd-panel-h"><span>Team &amp; access</span><i>4 roles</i></div>
+                    <table class="fd-table">
+                      <thead><tr><th>Member</th><th>Role</th><th>Access</th></tr></thead>
+                      <tbody>
+                        <tr><td><strong>Zainab A.</strong></td><td>Manager</td><td><span class="fd-pill full">Full</span></td></tr>
+                        <tr><td><strong>Musa I.</strong></td><td>Staff</td><td><span class="fd-pill lim">Limited</span></td></tr>
+                        <tr><td><strong>Ada O.</strong></td><td>Accountant</td><td><span class="fd-pill fin">Finance</span></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <!-- CUSTOM -->
+                <div class="fd-screen" id="fd-custom" data-fd-screen="custom" role="tabpanel" aria-hidden="true">
+                  <div class="fd-panel">
+                    <div class="fd-panel-h"><span>Your platform · modules</span><i>tailored</i></div>
+                    <div class="fd-mods">
+                      <span class="fd-mod"><svg><use href="#i-doc"/></svg>Records</span>
+                      <span class="fd-mod"><svg><use href="#i-chart"/></svg>Reports</span>
+                      <span class="fd-mod"><svg><use href="#i-db"/></svg>Inventory</span>
+                      <span class="fd-mod"><svg><use href="#i-scale"/></svg>Billing</span>
+                      <span class="fd-mod"><svg><use href="#i-users"/></svg>Staff</span>
+                      <span class="fd-mod"><svg><use href="#i-globe"/></svg>API</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

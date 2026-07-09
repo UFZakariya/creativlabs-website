@@ -446,6 +446,74 @@
   })();
 
   /* ============================================================
+     6c. What-we-build feature-detail — a capability list drives a
+         contextual dashboard preview window, auto-advancing with
+         pause on hover/focus/out-of-view. Reduced motion: manual only.
+     ============================================================ */
+  (() => {
+    const root = document.querySelector("[data-fd]");
+    if (!root) return;
+    const items = Array.from(root.querySelectorAll(".fd-item"));
+    const screens = Array.from(root.querySelectorAll(".fd-screen"));
+    const title = root.querySelector("[data-fd-title]");
+    if (!items.length || !screens.length) return;
+
+    const SLUGS = { ops: "operations", dash: "dashboard", flow: "automations", agent: "agent", admin: "access", custom: "platform" };
+    const AUTOPLAY_MS = 4200;
+    let active = Math.max(0, items.findIndex((el) => el.classList.contains("is-active")));
+    let paused = false, inView = true, startedAt = 0;
+
+    const setActive = (i) => {
+      active = (i + items.length) % items.length;
+      const key = items[active].dataset.fd;
+      items.forEach((el, n) => {
+        const on = n === active;
+        el.classList.toggle("is-active", on);
+        el.setAttribute("aria-selected", String(on));
+        el.tabIndex = on ? 0 : -1;
+      });
+      screens.forEach((s) => {
+        const on = s.dataset.fdScreen === key;
+        s.classList.toggle("is-active", on);
+        s.setAttribute("aria-hidden", String(!on));
+      });
+      if (title) title.textContent = SLUGS[key] || key;
+      startedAt = performance.now();
+    };
+
+    items.forEach((el, i) => {
+      el.addEventListener("click", () => setActive(i));
+      el.addEventListener("mouseenter", () => setActive(i));
+      el.addEventListener("focus", () => setActive(i));
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActive(i); }
+        if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+        if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      });
+    });
+
+    // ?fd=<key> forces the initial capability — QA/screenshot hook
+    const qaFd = new URLSearchParams(location.search).get("fd");
+    if (qaFd) { const qi = items.findIndex((el) => el.dataset.fd === qaFd); if (qi >= 0) active = qi; }
+
+    setActive(active);
+    if (reducedMotion || qaFd) return;
+
+    root.addEventListener("mouseenter", () => { paused = true; });
+    root.addEventListener("mouseleave", () => { paused = false; startedAt = performance.now(); });
+    root.addEventListener("focusin", () => { paused = true; });
+    root.addEventListener("focusout", () => { paused = false; startedAt = performance.now(); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver((es) => { inView = es[0].isIntersecting; }, { threshold: 0.3 }).observe(root);
+    }
+    const tick = (t) => {
+      if (!paused && inView && !document.hidden && (t - startedAt) >= AUTOPLAY_MS) setActive(active + 1);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  })();
+
+  /* ============================================================
      7. Contact form (Netlify)
      ============================================================ */
   (() => {
