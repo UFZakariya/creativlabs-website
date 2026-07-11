@@ -16,7 +16,7 @@
   <link rel="canonical" href="https://safetyline.africa/">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" type="image/png" href="assets/logo-128.png">
-  <link rel="preload" as="image" href="assets/logo-640.png" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/logo-640.webp" fetchpriority="high">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -30,10 +30,43 @@
     "address": { "@type": "PostalAddress", "addressCountry": "NG" }
   }
   </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What happens after the readiness check?",
+        "acceptedAnswer": { "@type": "Answer", "text": "You get your score and tier instantly, on the page — no email gate. If you book the free consultation, we walk through how your business actually runs, pressure-test the score together, and you leave with a concrete roadmap — whether or not you build with us." }
+      },
+      {
+        "@type": "Question",
+        "name": "WhatsApp now has a free AI agent from Meta. Why would I need you?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Different job entirely. Meta's Business Agent answers customer chats — a receptionist. Safetyline agents run your operations: records, stock, sales, bookings, payments, reports — wired into a system built around your business, with preview-and-confirm control and a full audit trail. They can even work side by side." }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to be \"tech ready\" first?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. The readiness check tells us where you're starting from, and we build for that tier. If your records are still on paper, we design the system and the agent together — you don't need a year of \"digital transformation\" before the benefits start." }
+      },
+      {
+        "@type": "Question",
+        "name": "Will the agent replace my staff?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No — it handles the routine work: recording, reminding, compiling, chasing. Your team approves what it does (nothing saves without confirmation) and gets their time back for the work that actually needs people. You stay in control; it does the repetition." }
+      },
+      {
+        "@type": "Question",
+        "name": "What does it cost?",
+        "acceptedAnswer": { "@type": "Answer", "text": "It depends on the size of the system and agent your business needs, so we scope it in the free consultation — you get a real number, not a guess. Our builds are sized for African business realities: practical, phased, and priced to pay for themselves in saved time." }
+      }
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="assets/styles.css?v=m7">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -123,7 +156,7 @@
       <section class="hero" id="top">
         <div class="logo-stage" id="logo-stage" aria-hidden="true">
           <div class="logo-wrap" id="logo-wrap">
-            <img class="logo-img" src="assets/logo-640.png" alt="" draggable="false" fetchpriority="high">
+            <img class="logo-img" src="assets/logo-640.webp" alt="" width="606" height="640" draggable="false" fetchpriority="high">
             <span class="logo-light"></span>
           </div>
           <div class="logo-glow"></div>
@@ -387,10 +420,10 @@
                 </div>
 
                 <div class="phone-nav" role="tablist" aria-label="Switch preview screen">
-                  <button class="phone-dot is-on" type="button" data-goto="chat" aria-label="Chat" aria-selected="true"></button>
-                  <button class="phone-dot" type="button" data-goto="confirm" aria-label="Confirm" aria-selected="false"></button>
-                  <button class="phone-dot" type="button" data-goto="dashboard" aria-label="Dashboard" aria-selected="false"></button>
-                  <button class="phone-dot" type="button" data-goto="audit" aria-label="Activity" aria-selected="false"></button>
+                  <button class="phone-dot is-on" type="button" role="tab" data-goto="chat" aria-label="Chat" aria-selected="true"></button>
+                  <button class="phone-dot" type="button" role="tab" data-goto="confirm" aria-label="Confirm" aria-selected="false"></button>
+                  <button class="phone-dot" type="button" role="tab" data-goto="dashboard" aria-label="Dashboard" aria-selected="false"></button>
+                  <button class="phone-dot" type="button" role="tab" data-goto="audit" aria-label="Activity" aria-selected="false"></button>
                 </div>
 
                 <span class="iphone-homebar" aria-hidden="true"></span>
@@ -1251,7 +1284,7 @@
       <header class="dock-head">
         <img src="assets/logo-128.png" alt="" width="30" height="32">
         <div>
-          <strong>Hermes</strong>
+          <strong id="dock-name">Ada</strong>
           <small id="dock-status">Safetyline assistant</small>
         </div>
         <button class="dock-close" id="dock-close" type="button" aria-label="Close chat">&#10005;</button>
@@ -1264,7 +1297,7 @@
     </div>
   </div>
 
-  <script src="assets/hermes-config.js"></script>
-  <script src="assets/app.js"></script>
+  <script src="assets/hermes-config.js?v=m7"></script>
+  <script src="assets/app.js?v=m7"></script>
 </body>
 </html>

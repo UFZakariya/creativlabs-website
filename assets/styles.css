@@ -215,9 +215,7 @@ button, input, textarea, select { font: inherit; }
 .glass-chip::before,
 .glass-btn::before,
 .lg-nav::before,
-.product-tabs::before,
 .nav-indicator::before,
-.tab-indicator::before,
 .card-icon::before,
 .km-icon::before {
   content: "";
@@ -687,8 +685,8 @@ button, input, textarea, select { font: inherit; }
   inset: 0;
   pointer-events: none;
   background: radial-gradient(42% 36% at var(--lx, 32%) var(--ly, 26%), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 72%);
-  -webkit-mask: url("logo-640.png") center / contain no-repeat;
-  mask: url("logo-640.png") center / contain no-repeat;
+  -webkit-mask: url("logo-640.webp") center / contain no-repeat;
+  mask: url("logo-640.webp") center / contain no-repeat;
   mix-blend-mode: screen;
   opacity: var(--lo, 0);
   transition: opacity 300ms ease;
@@ -1460,229 +1458,6 @@ body.fx-enter .hero > .title-split { animation: none; }
   color: transparent;
 }
 
-/* ---------- products ---------- */
-
-.product-tabs {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  max-width: 860px;
-  margin: 0 auto 20px;
-  padding: 8px;
-  border: none;
-  border-radius: 999px;
-  background: var(--glass-fill);
-  box-shadow:
-    var(--glass-inner-top),
-    0 16px 44px rgba(8, 60, 255, 0.1);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
-}
-
-.product-tab {
-  position: relative;
-  z-index: 2;
-  min-height: 48px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-soft);
-  font-family: var(--font-display);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 220ms ease;
-}
-
-.product-tab.is-active { color: var(--blue-deep); }
-
-.tab-indicator {
-  position: absolute;
-  z-index: 1;
-  top: 8px;
-  left: 0;
-  height: calc(100% - 16px);
-  width: var(--w, 25%);
-  translate: var(--x, 8px) 0;
-  border: none;
-  border-radius: 999px;
-  background:
-    radial-gradient(70% 120% at 50% 0%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.3)),
-    linear-gradient(135deg, rgba(51, 242, 255, 0.24), rgba(8, 60, 255, 0.12));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 10px 26px rgba(8, 60, 255, 0.18);
-  filter: url("#gooey");
-  transition: translate 340ms cubic-bezier(0.3, 1.25, 0.4, 1), width 340ms cubic-bezier(0.3, 1.25, 0.4, 1);
-}
-
-.product-showcase {
-  display: grid;
-  grid-template-columns: minmax(300px, 0.95fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(28px, 5vw, 64px);
-}
-
-.product-visual {
-  display: grid;
-  gap: 0;
-  min-height: 300px;
-  padding: 20px;
-  overflow: hidden;
-}
-
-.pv-window {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 4px 14px;
-  border-bottom: 1px solid rgba(8, 60, 255, 0.1);
-}
-
-.pv-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--azure), var(--cyan));
-  opacity: 0.7;
-}
-
-.pv-dot:first-child { background: linear-gradient(135deg, var(--blue), var(--azure)); }
-
-.pv-title {
-  margin-left: auto;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--blue), #0077d4);
-  color: #fff;
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.pv-body {
-  display: grid;
-  gap: 12px;
-  padding: 18px 4px;
-}
-
-.pv-bar {
-  height: 12px;
-  width: var(--w, 50%);
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(8, 60, 255, 0.75), rgba(0, 183, 255, 0.65), rgba(51, 242, 255, 0.6));
-  box-shadow: 0 4px 12px rgba(8, 60, 255, 0.16);
-  transform-origin: 0 50%;
-  animation: bar-grow 900ms cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
-}
-
-.pv-bar:nth-child(2) { animation-delay: 120ms; opacity: 0.75; }
-.pv-bar:nth-child(3) { animation-delay: 240ms; opacity: 0.5; }
-
-@keyframes bar-grow {
-  from { scale: 0 1; }
-  to { scale: 1 1; }
-}
-
-.pv-spark {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  height: 74px;
-  margin-top: 6px;
-  padding: 0 4px;
-}
-
-.pv-spark span {
-  flex: 1;
-  height: var(--h, 40%);
-  border-radius: 8px 8px 4px 4px;
-  background: linear-gradient(180deg, rgba(51, 242, 255, 0.85), rgba(8, 60, 255, 0.55));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transform-origin: 50% 100%;
-  animation: spark-grow 800ms cubic-bezier(0.2, 0.9, 0.3, 1.15) backwards;
-}
-
-.pv-spark span:nth-child(2) { animation-delay: 70ms; }
-.pv-spark span:nth-child(3) { animation-delay: 140ms; }
-.pv-spark span:nth-child(4) { animation-delay: 210ms; }
-.pv-spark span:nth-child(5) { animation-delay: 280ms; }
-.pv-spark span:nth-child(6) { animation-delay: 350ms; }
-.pv-spark span:nth-child(7) { animation-delay: 420ms; }
-
-@keyframes spark-grow {
-  from { scale: 1 0; }
-  to { scale: 1 1; }
-}
-
-.pv-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 4px 0 0;
-  padding: 14px 4px 0;
-  border-top: 1px solid rgba(8, 60, 255, 0.1);
-  list-style: none;
-}
-
-.pv-chips li {
-  padding: 6px 13px;
-  border: 1px solid rgba(8, 60, 255, 0.16);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.6);
-  color: var(--text-soft);
-  font-family: var(--font-display);
-  font-size: 0.74rem;
-  font-weight: 600;
-  animation: chip-in 500ms ease backwards;
-}
-
-.pv-chips li:nth-child(2) { animation-delay: 60ms; }
-.pv-chips li:nth-child(3) { animation-delay: 120ms; }
-.pv-chips li:nth-child(4) { animation-delay: 180ms; }
-.pv-chips li:nth-child(5) { animation-delay: 240ms; }
-.pv-chips li:nth-child(6) { animation-delay: 300ms; }
-.pv-chips li:nth-child(7) { animation-delay: 360ms; }
-.pv-chips li:nth-child(8) { animation-delay: 420ms; }
-
-@keyframes chip-in {
-  from { opacity: 0; translate: 0 8px; }
-  to { opacity: 1; translate: 0 0; }
-}
-
-.product-content h3 {
-  margin: 0 0 16px;
-  font-family: var(--font-display);
-  font-size: clamp(1.7rem, 3.4vw, 2.6rem);
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.015em;
-}
-
-.product-content > p {
-  max-width: 520px;
-  margin: 0 0 18px;
-  color: var(--muted);
-  font-family: var(--font-display);
-  font-size: 1.02rem;
-  line-height: 1.68;
-}
-
-.product-example {
-  margin: 0 0 26px !important;
-  color: var(--text-soft);
-  font-size: 0.9rem !important;
-}
-
-.product-example strong {
-  color: var(--blue-deep);
-  font-weight: 700;
-}
-
 /* ---------- process ---------- */
 
 .process-track {
@@ -2013,27 +1788,6 @@ body.fx-enter .hero > .title-split { animation: none; }
   /* agents keeps the phone beside the copy at every width — it's the section's point */
   .split--agents { grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr); gap: 22px; align-items: center; }
 
-  .product-showcase { grid-template-columns: 1fr; gap: 24px; }
-  .product-visual { min-height: 0; }
-  .product-content { text-align: center; }
-  .product-content > p { margin-inline: auto; }
-
-  .product-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    border-radius: 26px;
-  }
-
-  .product-tab { flex: 1 1 40%; min-height: 42px; font-size: 0.84rem; }
-  .tab-indicator { display: none; }
-  .product-tab.is-active {
-    background:
-      radial-gradient(70% 120% at 50% 0%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.3)),
-      linear-gradient(135deg, rgba(51, 242, 255, 0.24), rgba(8, 60, 255, 0.12));
-    border: 1px solid rgba(255, 255, 255, 0.85);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 8px 20px rgba(8, 60, 255, 0.14);
-  }
 
   .process-track { grid-template-columns: 1fr; max-width: 480px; margin-inline: auto; }
   .process-track::before {
@@ -2238,18 +1992,6 @@ body.fx-enter .hero > .title-split { animation: none; }
   .bar-result { gap: 16px; }
   .bar-gauge { width: 120px; }
 
-  /* products */
-  .product-example { margin-bottom: 12px !important; font-size: 0.8rem !important; }
-  .product-tabs { flex-wrap: nowrap; padding: 5px; gap: 4px; margin-bottom: 12px; }
-  .product-tab { flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 0 4px; font-size: 0.66rem; }
-  .product-visual { padding: 12px; }
-  .pv-window { padding-bottom: 10px; }
-  .pv-body { padding: 11px 4px; gap: 8px; }
-  .pv-bar { height: 8px; }
-  .pv-spark { height: 42px; gap: 6px; margin-top: 2px; }
-  .pv-chips { display: none; }
-  .product-content h3 { font-size: 1.15rem; margin-bottom: 8px; }
-  .product-content > p { font-size: 0.86rem; margin-bottom: 10px; }
 
   /* process */
   .step { padding: 12px 14px; grid-template-columns: 34px 1fr; }
@@ -3548,6 +3290,91 @@ body.fx-enter .hero > .title-split { animation: none; }
   padding: 0.4rem 0.9rem;
 }
 
+/* NDPA consent line — muted, once per panel */
+.dock-consent {
+  margin: 0 0 2px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(8, 60, 255, 0.05);
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+/* transient neutral "working…" line for tool.activity */
+.dock-working {
+  align-self: flex-start;
+  padding: 4px 4px;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* limit → continue on WhatsApp affordance in the composer slot */
+.dock-form--wa { justify-content: center; }
+
+.dock-wa-btn {
+  flex: 1;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+/* teaser bubble — sits to the LEFT of the closed button so it never collides
+   with the WhatsApp FAB (which stacks vertically above the dock button) */
+.dock-teaser {
+  position: absolute;
+  right: 70px;
+  bottom: 12px;
+  display: flex;
+  align-items: stretch;
+  max-width: min(230px, calc(100vw - 96px));
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(8, 60, 255, 0.14);
+  box-shadow: 0 10px 26px rgba(8, 60, 255, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 260ms ease, transform 260ms ease;
+  overflow: hidden;
+}
+
+.dock-teaser.show { opacity: 1; transform: translateX(0); }
+
+.dock-teaser-open {
+  border: 0;
+  background: transparent;
+  padding: 9px 6px 9px 13px;
+  color: var(--blue-deep);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dock-teaser-x {
+  border: 0;
+  background: transparent;
+  padding: 0 10px 0 4px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.dock-teaser-x:hover { color: var(--blue-deep); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-teaser { transition: none; }
+}
+
 /* stack the WhatsApp FAB above the dock on touch devices */
 @media (pointer: coarse) {
   .wa-fab { bottom: 86px; }
@@ -3759,19 +3586,6 @@ body.fx-enter .hero > .title-split { animation: none; }
 .s-snug .feature-showcase { margin-top: 10px; }
 .s-snug .feature-item { padding: 8px 10px; gap: 6px; }
 
-/* products */
-.s-snug .product-tabs { margin-bottom: 10px; padding: 4px; }
-.s-snug .product-tab { min-height: 40px; font-size: clamp(0.62rem, 1.5vh, 0.8rem); }
-.s-snug .product-visual { min-height: 0; padding: 10px; }
-.s-snug .pv-spark { height: clamp(26px, 5vh, 46px); }
-.s-snug .pv-chips { display: none; }
-.s-snug .product-content h3 { margin-bottom: 6px; font-size: clamp(1rem, 2.6vh, 1.7rem); }
-.s-snug .product-content > p {
-  margin-bottom: 8px;
-  font-size: 0.84rem;
-}
-.s-snug .product-example { margin-bottom: 10px !important; }
-
 /* process */
 .s-snug .process-track { gap: 8px; }
 .s-snug .step { padding: 9px 12px; }
@@ -3819,7 +3633,6 @@ body.fx-enter .hero > .title-split { animation: none; }
 .s-tight .cta-copy > p,
 .s-tight .glass-card p,
 .s-tight .step p,
-.s-tight .product-content > p,
 .s-tight .bar-verdict > p {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -3836,7 +3649,13 @@ body.fx-enter .hero > .title-split { animation: none; }
 .s-tight .bar-gauge { width: clamp(90px, 14vh, 130px); }
 .s-tight .bar-steps { display: none; }
 .s-tight .key-message blockquote { font-size: 0.95rem; }
-.s-tight .feature-showcase { display: none; }
+/* compact list instead of hiding it: numbers + titles stay, the small copy
+   goes — the full hide remains the .s-tighter last resort below */
+.s-tight .feature-showcase { margin-top: 8px; }
+.s-tight .feature-item { padding: 5px 9px; gap: 10px; }
+.s-tight .feature-num { width: 28px; height: 28px; font-size: 0.68rem; }
+.s-tight .feature-copy small { display: none; }
+.s-tight .feature-copy strong { font-size: 0.85rem; }
 .s-tight .contact-info li:nth-child(3) { display: none; }
 .s-tight .statement-text { font-size: clamp(1.05rem, 2.6vh, 1.9rem); }
 
@@ -3846,8 +3665,6 @@ body.fx-enter .hero > .title-split { animation: none; }
 .s-tighter .glass-card p,
 .s-tighter .step p,
 .s-tighter .impact-item span,
-.s-tighter .product-content > p,
-.s-tighter .product-example,
 .s-tighter .bar-steps,
 .s-tighter .feature-showcase,
 .s-tighter .key-message,
@@ -3914,13 +3731,6 @@ main > .statement {
 
   .agents .iphone-stage { width: min(150px, 58vh); }
 
-  .product-showcase {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
-    gap: 18px;
-  }
-  .products .product-content { text-align: left; }
-  .products .product-content > p { margin-inline: 0; }
-
   .process-track {
     max-width: none;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -3950,11 +3760,6 @@ main > .statement {
 }
 
 @media (max-height: 520px) and (min-width: 640px) {
-  /* the dashboard mock is decoration — landscape height goes to the words */
-  .products .product-visual { display: none; }
-  .product-showcase { grid-template-columns: 1fr; }
-  .products .product-content { text-align: center; }
-
   .cta-panel { padding: 14px 18px; }
   .contact .contact-info { display: none; }
   .contact-form textarea { min-height: 40px; }
@@ -3970,12 +3775,6 @@ main > .statement {
 }
 
 /* named-proof line under use-case copy — a live-status dot + real deployment fact */
-.product-example {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
 .proof-dot {
   flex: none;
   width: 8px;
@@ -4260,6 +4059,19 @@ main > .statement {
 @media (max-height: 560px) {
   .uc-stage { --stage-h: clamp(220px, 58vh, 340px); }
 }
+
+/* density tiers: when the fit-engine compresses Use Cases, shrink the
+   device stage itself — the laptop width-cap follows --stage-h (see
+   .uc-laptop), so the whole device scales down and the section can
+   actually reach one-viewport height on short laptop screens. Gated to
+   >560px tall so the shorter, higher-priority short-viewport rule above
+   (which these would otherwise out-specify) still governs landscape/short
+   screens — the two must not fight. */
+@media (min-height: 561px) {
+  #products.s-tight .uc-stage { --stage-h: clamp(300px, 48vh, 460px); }
+  #products.s-tighter .uc-stage { --stage-h: clamp(250px, 42vh, 400px); }
+}
+#products.s-tighter .uc-foot { margin-top: 12px; }
 
 /* ============================================================
    UFMS — faithful reproduction of the real Universal Farms MS
@@ -4782,6 +4594,8 @@ main > .statement {
 .s-snug .fd-txt small { display: none; }
 .s-snug .fd-item { padding: 9px 13px; }
 .s-tight .fd-screens { min-height: 260px; }
+.s-tighter .fd-screens { min-height: 228px; }
+.s-tighter .fd-item { padding: 7px 11px; }
 
 /* ============================================================
    PER-SECTION MOTION — "Editorial Depth — Kinetic Glass".
@@ -4839,12 +4653,9 @@ main > .statement {
   translate: 0 32px; rotate: x -14deg; transform-origin: center bottom;
 }
 
-/* products — screen-on: the showcase unrolls top→bottom via a vertical clip */
+/* products — screen-on: tabs and stage rise in with a gentle stagger */
 #products [data-reveal] { --rv-in: 720ms; --rv-ease: cubic-bezier(0.22, 0.88, 0.3, 1); --stag: 80ms; }
 #products .section-head { translate: 0 16px; }
-#products .product-tabs { --i: 1; translate: 0 10px; }
-#products .product-showcase { --i: 2; translate: 0 16px; clip-path: inset(0 0 100% 0); }
-#products .product-showcase.in-view { clip-path: inset(0 0 0 0); }
 
 /* process — deal steps left→right; the connector line draws via scaleX */
 #process [data-reveal] { --rv-in: 580ms; --rv-ease: cubic-bezier(0.2, 0.85, 0.26, 1); --stag: 110ms; }

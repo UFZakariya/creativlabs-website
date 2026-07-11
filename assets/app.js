@@ -238,133 +238,6 @@
   })();
 
   /* ============================================================
-     6. Product tabs
-     ============================================================ */
-  (() => {
-    const tabsWrap = document.querySelector(".product-tabs");
-    const showcase = document.querySelector(".product-showcase");
-    if (!tabsWrap || !showcase) return;
-
-    const tabs = Array.from(tabsWrap.querySelectorAll(".product-tab"));
-    const indicator = tabsWrap.querySelector(".tab-indicator");
-    const titleEl = showcase.querySelector("[data-product-title]");
-    const copyEl = showcase.querySelector("[data-product-copy]");
-    const exampleEl = showcase.querySelector("[data-product-example]");
-    const badgeEl = showcase.querySelector("[data-product-badge]");
-    const chipsEl = showcase.querySelector("[data-product-chips]");
-    const bars = Array.from(showcase.querySelectorAll(".pv-bar"));
-    const sparks = Array.from(showcase.querySelectorAll(".pv-spark span"));
-
-    const PRODUCTS = {
-      business: {
-        badge: "Business OS",
-        title: "Business Operations Systems",
-        copy: "Custom internal systems for companies that need to manage staff, tasks, customers, inventory, payments, expenses, and reports — with an AI agent your team can chat with.",
-        example: null,
-        chips: ["Admin dashboards", "Staff management", "Inventory tracking", "Customer records", "Revenue & expense reports", "Approval workflows", "Branch monitoring"],
-        bars: [62, 84, 45],
-        sparks: [40, 65, 52, 78, 60, 92, 70]
-      },
-      farm: {
-        badge: "UFMS",
-        title: "Farm Operations Systems",
-        copy: "Digital management systems for farms — production, feed, mortality, sales, hatchery, and finance records — run by a WhatsApp agent your staff already know how to use.",
-        example: "UFMS — running daily at Universal Farms, our founder's own poultry operation",
-        chips: ["Daily farm records", "Egg production tracking", "Feed usage monitoring", "Mortality & health logs", "Hatchery records", "Staff activity logs", "Weekly & monthly reports"],
-        bars: [78, 56, 88],
-        sparks: [55, 72, 48, 84, 66, 90, 76]
-      },
-      venue: {
-        badge: "TruckVille",
-        title: "Hospitality & Venue Operations Systems",
-        copy: "Digital systems for restaurants, food courts, lifestyle venues, and multi-vendor destinations that need better control over vendors, orders, staff, payments, and events.",
-        example: "TruckVille Operations System — in development for a real Abuja food-court destination",
-        chips: ["Vendor management", "Order tracking", "Sales visibility", "Staff dashboards", "Event management", "Payment & payout visibility", "Tablet-friendly tools"],
-        bars: [70, 48, 90],
-        sparks: [62, 45, 80, 58, 88, 70, 95]
-      },
-      listen: {
-        badge: "Safetyline Listen",
-        title: "AI Social Intelligence Systems",
-        copy: "AI-powered systems for monitoring public conversations, detecting sentiment, identifying trends, and generating insights from multilingual and code-mixed African language content.",
-        example: "Safetyline Listen — in development: Hausa & Nigerian-language sentiment at its core",
-        chips: ["Social listening", "Hausa & Nigerian-language sentiment", "Topic discovery", "Public feedback analysis", "Brand reputation monitoring", "AI insight reports", "Multilingual dashboards"],
-        bars: [52, 76, 64],
-        sparks: [48, 70, 90, 55, 75, 62, 85]
-      }
-    };
-
-    const moveIndicator = (tab) => {
-      if (!indicator) return;
-      indicator.style.setProperty("--x", `${tab.offsetLeft}px`);
-      indicator.style.setProperty("--w", `${tab.offsetWidth}px`);
-    };
-
-    const restartAnimations = (els) => {
-      if (reducedMotion) return;
-      els.forEach((el) => {
-        el.getAnimations().forEach((a) => {
-          a.cancel();
-          a.play();
-        });
-      });
-    };
-
-    const activate = (tab) => {
-      const data = PRODUCTS[tab.dataset.product];
-      if (!data) return;
-
-      tabs.forEach((t) => {
-        const on = t === tab;
-        t.classList.toggle("is-active", on);
-        t.setAttribute("aria-selected", String(on));
-        t.tabIndex = on ? 0 : -1;
-      });
-      moveIndicator(tab);
-      showcase.setAttribute("aria-labelledby", tab.id);
-
-      titleEl.textContent = data.title;
-      copyEl.textContent = data.copy;
-      badgeEl.textContent = data.badge;
-
-      const exampleWrap = exampleEl.closest(".product-example");
-      exampleWrap.hidden = !data.example;
-      exampleEl.textContent = data.example || "";
-
-      bars.forEach((b, i) => b.style.setProperty("--w", `${data.bars[i] || 50}%`));
-      sparks.forEach((s, i) => s.style.setProperty("--h", `${data.sparks[i] || 40}%`));
-
-      chipsEl.innerHTML = "";
-      data.chips.forEach((c) => {
-        const li = document.createElement("li");
-        li.textContent = c;
-        chipsEl.appendChild(li);
-      });
-
-      restartAnimations([...bars, ...sparks]);
-    };
-
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => activate(tab));
-      tab.addEventListener("keydown", (e) => {
-        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-        e.preventDefault();
-        const dir = e.key === "ArrowRight" ? 1 : -1;
-        const next = tabs[(tabs.indexOf(tab) + dir + tabs.length) % tabs.length];
-        next.focus();
-        activate(next);
-      });
-    });
-
-    const initial = tabs.find((t) => t.classList.contains("is-active")) || tabs[0];
-    requestAnimationFrame(() => activate(initial));
-    window.addEventListener("resize", () => {
-      const current = tabs.find((t) => t.classList.contains("is-active"));
-      if (current) moveIndicator(current);
-    });
-  })();
-
-  /* ============================================================
      6b. Use-case device previews — selectors switch which app shows
          in a laptop; picking the ordering app morphs the laptop into
          a phone. Real app UIs mount into .uc-app-inner and are scaled
@@ -547,7 +420,10 @@
   })();
 
   /* ============================================================
-     7. Contact form (Netlify)
+     7. Contact form (Netlify). On hosts without a form backend
+        (e.g. GitHub Pages returns 405 for POST) the submission is
+        NOT lost: the failure path rebuilds the whole enquiry into a
+        prefilled email + WhatsApp link so the visitor can still send.
      ============================================================ */
   (() => {
     document.querySelectorAll(".contact-form").forEach((form) => {
@@ -562,6 +438,19 @@
           button.disabled = true;
         }
         if (status) status.textContent = "";
+
+        // compose the enquiry as plain text (used by the fallback links)
+        const composeEnquiry = () => {
+          const v = (name) => (form.querySelector(`[name="${name}"]`) || {}).value || "";
+          const parts = [
+            `Name: ${v("name")}`,
+            `Email: ${v("email")}`,
+            v("company") ? `Company: ${v("company")}` : null,
+            v("focus") ? `Wants to systemize: ${v("focus")}` : null,
+            v("readiness_score") ? `Readiness score: ${v("readiness_score")}` : null
+          ].filter(Boolean);
+          return parts.join("\n") + "\n\n" + v("message");
+        };
 
         try {
           const res = await fetch(form.getAttribute("action") || "/", {
@@ -578,7 +467,25 @@
             button.textContent = original;
             button.disabled = false;
           }
-          if (status) status.textContent = "Something went wrong. Please email hello@safetyline.africa instead.";
+          if (status) {
+            // build the fallback links from the visitor's own entries so
+            // nothing they typed is lost (DOM nodes, no innerHTML)
+            const body = composeEnquiry();
+            status.textContent = "That didn't go through — send it directly instead: ";
+            const mail = document.createElement("a");
+            mail.href = "mailto:hello@safetyline.africa?subject=" +
+              encodeURIComponent("Consultation request — Safetyline website") +
+              "&body=" + encodeURIComponent(body);
+            mail.textContent = "email your enquiry";
+            const or = document.createTextNode(" or ");
+            const wa = document.createElement("a");
+            wa.href = "https://wa.me/2348102354786?text=" +
+              encodeURIComponent("Hi Safetyline, consultation request:\n\n" + body);
+            wa.target = "_blank";
+            wa.rel = "noopener";
+            wa.textContent = "send it on WhatsApp";
+            status.append(mail, or, wa, document.createTextNode("."));
+          }
         }
       });
     });
@@ -1446,7 +1353,48 @@
 
     const cfg = window.HERMES || {};
     const live = Boolean(cfg.endpoint);
+    const persona = cfg.persona || "Ada";
+    // Header name follows the configured persona so the internal "Hermes"
+    // codename never surfaces to visitors.
+    const nameEl = document.getElementById("dock-name");
+    if (nameEl) nameEl.textContent = persona;
     if (status) status.textContent = live ? "Online — Safetyline agent" : "Safetyline assistant";
+
+    // First-party analytics — fire-and-forget POST to the /t ingest endpoint,
+    // only when the live backend is configured. Never blocks the UI or throws.
+    const trackUrl = live ? cfg.endpoint.replace(/\/chat\/?$/, "/t") : "";
+    const track = (kind, extra) => {
+      if (!trackUrl) return;
+      try {
+        fetch(trackUrl, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(Object.assign({ kind }, extra || {})),
+          keepalive: true
+        }).catch(() => {});
+      } catch (_) {}
+    };
+    // Honeypot: a hidden field humans never fill; bots autofill it. Its value
+    // rides the chat POST body so the backend can drop bot traffic.
+    let honeypot = null;
+    try {
+      honeypot = document.createElement("input");
+      honeypot.type = "text";
+      honeypot.name = "contact_time";
+      honeypot.tabIndex = -1;
+      honeypot.autocomplete = "off";
+      honeypot.setAttribute("aria-hidden", "true");
+      honeypot.style.cssText =
+        "position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;";
+      form.appendChild(honeypot);
+    } catch (_) {}
+
+    track("page_view", { path: location.pathname });
+    document.addEventListener("click", (e) => {
+      const el = e.target.closest && e.target.closest("[data-cta],[data-wa]");
+      if (el) track("cta_click", { target: (el.getAttribute("data-cta") || "whatsapp").slice(0, 80) });
+    }, { passive: true });
 
     let sessionId;
     try {
@@ -1498,6 +1446,142 @@
       return el;
     };
 
+    // NDPA consent line — rendered once inside the panel on first open. Only
+    // privacy surface in the widget for Milestone 2.
+    const renderConsent = () => {
+      if (!cfg.consentText) return;
+      const el = document.createElement("p");
+      el.className = "dock-consent";
+      el.textContent = cfg.consentText;
+      msgs.appendChild(el);
+    };
+
+    // Transient "working…" line for tool.activity. The backend (M4) sends a
+    // customer-safe phrase (never a raw tool name) which we render here; falls
+    // back to a generic label if none is supplied.
+    const addWorking = (label) => {
+      const el = document.createElement("div");
+      el.className = "dock-working";
+      el.textContent = label || "working…";
+      msgs.appendChild(el);
+      msgs.scrollTop = msgs.scrollHeight;
+      return el;
+    };
+
+    // Lightweight first-touch UTM + referrer capture (none existed before). The
+    // single-page site has no path/UTM richness — see SPEC §1/C10.
+    const utmParams = (() => {
+      let utm = {};
+      try {
+        const p = new URLSearchParams(location.search);
+        ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].forEach((k) => {
+          const v = p.get(k);
+          if (v) utm[k.slice(4)] = v; // {source, medium, campaign, term, content}
+        });
+        if (Object.keys(utm).length) sessionStorage.setItem("sl-utm", JSON.stringify(utm));
+        else {
+          const stored = sessionStorage.getItem("sl-utm");
+          if (stored) utm = JSON.parse(stored);
+        }
+      } catch { utm = {}; }
+      return utm;
+    })();
+
+    // Real single-page signals sent with every live turn.
+    const pageContext = () => {
+      const ctx = { referrer: document.referrer || "", utm: utmParams };
+      const sec = document.querySelector("[data-nav].is-active");
+      if (sec && sec.dataset.nav) ctx.section = sec.dataset.nav;                  // scrollspy section
+      const uc = document.querySelector(".uc-tab.is-active");
+      if (uc && uc.dataset.app) ctx.use_case = uc.dataset.app;                    // ufms|os|order|labour
+      try {
+        const score = sessionStorage.getItem("bar-score");                        // readiness test result
+        if (score != null && score !== "") ctx.readiness_score = Number(score);
+      } catch { /* no score yet */ }
+      return ctx;
+    };
+
+    // Context-aware openers (M4 — visible agency). Tailor the greeting and the
+    // teaser to what the visitor was actually looking at, using the same page
+    // signals sent with every turn. Deterministic maps, no network; founder can
+    // tune the copy. Falls back to the generic config lines.
+    const USE_CASE_LABEL = {
+      ufms: "UFMS, the farm system",
+      os: "the operations system",
+      order: "the ordering app",
+      labour: "the membership portal"
+    };
+    const USE_CASE_TEASER = {
+      ufms: "Curious about UFMS? Ask me →",
+      os: "Questions on the ops system? →",
+      order: "How the ordering app works? →",
+      labour: "About the membership portal? →"
+    };
+    // A use-case tab is ALWAYS active by default (its tabs live in the
+    // "products" section), so only treat it as a signal when the visitor is
+    // actually in that section — otherwise everyone gets the UFMS opener.
+    const activeUseCase = (ctx) => (ctx.section === "products" ? ctx.use_case : null);
+    const contextualGreeting = () => {
+      const ctx = pageContext();
+      const uc = activeUseCase(ctx);
+      if (uc && USE_CASE_LABEL[uc]) {
+        return `Hi, I'm ${persona}. Saw you looking at ${USE_CASE_LABEL[uc]} — want the quick version of how it works, or something specific?`;
+      }
+      if (typeof ctx.readiness_score === "number") {
+        return `Hi, I'm ${persona} — nice, you took the readiness test. Want to talk through what your score means for your business?`;
+      }
+      switch (ctx.section) {
+        case "products":
+        case "systems":
+          return `Hi, I'm ${persona}. Looked like you were exploring what we build — want the short version, or is there something specific in mind?`;
+        case "agents":
+          return `Hi, I'm ${persona}. The agents are the part people ask about most — want to see how one would work for your business?`;
+        case "readiness":
+          return `Hi, I'm ${persona}. Curious how ready your business is for an agent? I can walk you through it — or take the 60-second test above.`;
+        case "contact":
+          return `Hi, I'm ${persona}. Thinking of reaching out? Ask me a quick question first, or I'll point you to the right next step.`;
+        default:
+          return cfg.greeting || `Hi, I'm ${persona} — how can I help?`;
+      }
+    };
+    const contextualTeaser = () => {
+      const ctx = pageContext();
+      const uc = activeUseCase(ctx);
+      if (uc && USE_CASE_TEASER[uc]) return USE_CASE_TEASER[uc];
+      if (typeof ctx.readiness_score === "number") return "Want to talk through your score? →";
+      if (ctx.section === "contact") return "Have a quick question first? →";
+      return cfg.teaserText || "Questions? Ask me →";
+    };
+
+    // Hardcoded (non-model) error/degrade copy — safe to render as HTML.
+    const ERROR_HTML = "I'm having trouble reaching the agent right now. You can always email <a href='mailto:hello@safetyline.africa'>hello@safetyline.africa</a> or <a href='#contact'>book a consultation</a>.";
+
+    const waHref = () => {
+      const num = cfg.waNumber || "2348102354786";
+      const msg = "Hi Safetyline, I'd like to continue our chat.";
+      return `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+    };
+
+    // On a per-session turn limit, swap the composer for a "continue on WhatsApp"
+    // affordance (mirrors the site's [data-wa] link pattern).
+    let composerSwapped = false;
+    const swapComposerToWhatsApp = () => {
+      if (composerSwapped) return;
+      composerSwapped = true;
+      form.hidden = true;
+      form.style.display = "none"; // beats .dock-form { display:flex } (the [hidden] UA rule alone can't)
+      const wrap = document.createElement("div");
+      wrap.className = "dock-form dock-form--wa";
+      const a = document.createElement("a");
+      a.className = "glass-btn glass-btn--accent dock-wa-btn";
+      a.href = waHref();
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = "Continue on WhatsApp";
+      wrap.appendChild(a);
+      form.parentNode.appendChild(wrap);
+    };
+
     let greeted = false;
     let open = false;
 
@@ -1505,12 +1589,14 @@
       open = next;
       btn.setAttribute("aria-expanded", String(next));
       if (next) {
+        dismissTeaser();
         panel.hidden = false;
         void panel.offsetWidth; // flush styles so the open transition runs
         panel.classList.add("open");
         if (!greeted) {
           greeted = true;
-          add(cfg.greeting || "Hi! How can I help?", "bot");
+          renderConsent();
+          add(contextualGreeting(), "bot");
           if (!live) addQuick();
         }
         setTimeout(() => input?.focus(), 250);
@@ -1526,6 +1612,62 @@
       if (e.key === "Escape" && open) setOpen(false);
     });
 
+    // Teaser state — a one-line bubble beside the closed button, shown once per
+    // session, dismissible, that opens the dock on tap. (Proactive dwell-trigger
+    // openers are backend Milestone 4 — no timers here.)
+    let teaserEl = null;
+    const dismissTeaser = () => {
+      if (!teaserEl) return;
+      teaserEl.remove();
+      teaserEl = null;
+    };
+    const maybeTeaser = () => {
+      let seen = false;
+      try { seen = Boolean(sessionStorage.getItem("hermes-teaser")); } catch { seen = true; }
+      if (seen) return;
+      try { sessionStorage.setItem("hermes-teaser", "1"); } catch { /* private mode */ }
+
+      teaserEl = document.createElement("div");
+      teaserEl.className = "dock-teaser";
+      const label = document.createElement("button");
+      label.type = "button";
+      label.className = "dock-teaser-open";
+      label.textContent = contextualTeaser();
+      const x = document.createElement("button");
+      x.type = "button";
+      x.className = "dock-teaser-x";
+      x.setAttribute("aria-label", "Dismiss");
+      x.textContent = "✕";
+      teaserEl.appendChild(label);
+      teaserEl.appendChild(x);
+      dock.appendChild(teaserEl);
+
+      label.addEventListener("click", () => setOpen(true)); // setOpen also dismisses
+      x.addEventListener("click", (e) => { e.stopPropagation(); dismissTeaser(); });
+      requestAnimationFrame(() => teaserEl && teaserEl.classList.add("show"));
+    };
+
+    // Proactive dwell trigger (M4): don't nag on cold load. Wait until the
+    // visitor has dwelled, or has settled on a high-intent section, then show
+    // the context-aware teaser once (maybeTeaser is still once-per-session +
+    // dismissible). If they open the dock first, it never fires.
+    let teaserArmed = false;
+    const armTeaser = () => { if (teaserArmed || open) return; teaserArmed = true; maybeTeaser(); };
+    setTimeout(armTeaser, 20000); // general engaged-dwell fallback
+    const HIGH_INTENT = new Set(["products", "systems", "agents", "readiness", "contact"]);
+    let sectionTimer = null;
+    window.addEventListener("scroll", () => {
+      if (teaserArmed || open) return;
+      const sec = document.querySelector("[data-nav].is-active");
+      const id = sec && sec.dataset.nav;
+      if (id && HIGH_INTENT.has(id)) {
+        if (!sectionTimer) sectionTimer = setTimeout(armTeaser, 3500); // settled on a high-intent section
+      } else if (sectionTimer) {
+        clearTimeout(sectionTimer);
+        sectionTimer = null;
+      }
+    }, { passive: true });
+
     // scripted answers until the VPS agent is plugged in
     const scripted = (text) => {
       const t = text.toLowerCase();
@@ -1536,7 +1678,7 @@
         return "Every system we build ships with an AI agent your team talks to on WhatsApp — it records data, runs reports, and asks for confirmation before saving anything. See it in action in the <a href='#agents'>Agents section</a>.";
       }
       if (/ready|test|score|quiz/.test(t)) {
-        return "The Business Agentic Readiness test takes under a minute — six questions, instant score. <a href='#readiness'>Take it here</a>.";
+        return "The Business Agentic Readiness test takes about a minute — seven questions, instant score. <a href='#readiness'>Take it here</a>.";
       }
       if (/farm|ufms|poultry/.test(t)) {
         return "UFMS is our farm operations system — daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='#products'>Use Cases</a>.";
@@ -1544,34 +1686,169 @@
       return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or email <a href='mailto:hello@safetyline.africa'>hello@safetyline.africa</a>.`;
     };
 
+    // Offline scripted responder (also the graceful fallback when the live
+    // agent is unreachable) — keeps the widget from ever dead-ending.
+    const offlineReply = (text) => {
+      const t2 = typing();
+      setTimeout(() => {
+        t2.remove();
+        add(scripted(text), "bot", true);
+      }, reducedMotion ? 50 : 700);
+    };
+
+    // SSE-over-fetch client. Reads response.body as a stream, parses SSE frames
+    // (event:/data: lines, blank-line delimited) and renders each named event.
+    // Returns true if a terminal event (assistant.completed | limit | error) was
+    // rendered, so the caller knows the turn produced a real answer.
+    const streamLive = async (res, typingEl) => {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let bubble = null;   // growing bot bubble (built on first assistant.delta)
+      let acc = "";        // accumulated delta text
+      let workingEl = null;
+      let terminal = false;
+
+      const clearTyping = () => { if (typingEl && typingEl.parentNode) typingEl.remove(); };
+      const clearWorking = () => { if (workingEl) { workingEl.remove(); workingEl = null; } };
+      const ensureBubble = () => {
+        if (!bubble) { clearTyping(); bubble = add("", "bot"); } // add() uses textContent (I5)
+        return bubble;
+      };
+
+      const handle = (name, dataStr) => {
+        let data = {};
+        try { data = dataStr ? JSON.parse(dataStr) : {}; } catch { data = {}; }
+        switch (name) {
+          case "session":
+            break; // session id lives in the httpOnly sl_sid cookie — store nothing
+          case "assistant.delta":
+            clearWorking();
+            if (typeof data.text === "string") {
+              acc += data.text;
+              ensureBubble().textContent = acc; // I5: never innerHTML on live content
+              msgs.scrollTop = msgs.scrollHeight;
+            }
+            break;
+          case "tool.activity":
+            // Render the backend's customer-safe phrase (M4). It guarantees
+            // phrase-only text (no raw tool name), so this is safe as textContent.
+            if (data.phase === "completed" || data.phase === "failed") {
+              clearWorking();
+            } else if (!bubble) {
+              const label = (typeof data.text === "string" && data.text) ? data.text : "working…";
+              if (workingEl) workingEl.textContent = label;
+              else workingEl = addWorking(label);
+            }
+            break;
+          case "assistant.completed":
+            clearWorking();
+            if (typeof data.text === "string" && data.text) {
+              acc = data.text;
+              ensureBubble().textContent = acc;
+              msgs.scrollTop = msgs.scrollHeight;
+            } else {
+              ensureBubble();
+            }
+            terminal = true;
+            break;
+          case "limit":
+            clearWorking(); clearTyping();
+            add(data.message || "You've reached the limit for this chat — let's continue on WhatsApp.", "bot");
+            swapComposerToWhatsApp();
+            terminal = true;
+            break;
+          case "error":
+            clearWorking(); clearTyping();
+            add(ERROR_HTML, "bot", true); // hardcoded, non-model copy — HTML is safe
+            terminal = true;
+            break;
+          case "done":
+            clearWorking(); clearTyping();
+            break;
+        }
+      };
+
+      const flushFrame = (frame) => {
+        let name = "message";
+        const dataLines = [];
+        frame.split("\n").forEach((line) => {
+          if (line.startsWith(":")) return; // SSE comment / keep-alive
+          if (line.startsWith("event:")) name = line.slice(6).trim();
+          else if (line.startsWith("data:")) dataLines.push(line.slice(5).replace(/^ /, ""));
+        });
+        if (dataLines.length || name !== "message") handle(name, dataLines.join("\n"));
+      };
+
+      try {
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          buffer = buffer.replace(/\r\n/g, "\n");
+          let idx;
+          while ((idx = buffer.indexOf("\n\n")) !== -1) {
+            const frame = buffer.slice(0, idx);
+            buffer = buffer.slice(idx + 2);
+            if (frame.trim()) flushFrame(frame);
+          }
+        }
+        if (buffer.trim()) flushFrame(buffer);
+      } catch {
+        // mid-stream network drop (common on mobile): keep any partial answer
+        // already shown; if nothing was rendered, surface the standard error
+        // line. Either way the turn is "handled" — return true so the caller
+        // never stacks a second fallback beneath a partial reply.
+        if (!bubble) { clearWorking(); clearTyping(); add(ERROR_HTML, "bot", true); }
+        return true;
+      }
+      clearWorking(); clearTyping();
+      // "produced an answer" = a terminal event fired OR a partial bubble was
+      // built from deltas. When NEITHER happened (e.g. HTTP 200 + a body that
+      // streams only session/done, no assistant output), return false so the
+      // caller fires the offline fallback instead of dead-ending silently.
+      return terminal || Boolean(bubble);
+    };
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (composerSwapped) return;
       const text = (input.value || "").trim();
       if (!text) return;
       input.value = "";
       add(text, "user");
-      const t = typing();
 
       if (live) {
+        const t = typing();
         try {
           const res = await fetch(cfg.endpoint, {
             method: "POST",
+            credentials: "include",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text, sessionId, page: location.pathname })
+            body: JSON.stringify({
+              message: text,
+              page: pageContext(),
+              contact_time: honeypot ? honeypot.value : ""
+            })
           });
-          if (!res.ok) throw new Error(String(res.status));
-          const data = await res.json();
-          t.remove();
-          add(data.reply || "Sorry — I didn't catch that. Try again?", "bot");
+          // 429 / non-200 / missing body → degrade to the offline scripted path
+          if (!res.ok || !res.body) throw new Error("http " + res.status);
+          // a stream that ends without ever producing an answer must still
+          // fall back rather than leave the message unanswered
+          const produced = await streamLive(res, t);
+          if (!produced && !composerSwapped) {
+            if (cfg.degradedCopy) add(cfg.degradedCopy, "bot");
+            offlineReply(text);
+          }
         } catch {
-          t.remove();
-          add("I'm having trouble reaching the agent right now. You can always email <a href='mailto:hello@safetyline.africa'>hello@safetyline.africa</a> or <a href='#contact'>book a consultation</a>.", "bot", true);
+          if (t.parentNode) t.remove();
+          if (!composerSwapped) {
+            if (cfg.degradedCopy) add(cfg.degradedCopy, "bot");
+            offlineReply(text);
+          }
         }
       } else {
-        setTimeout(() => {
-          t.remove();
-          add(scripted(text), "bot", true);
-        }, reducedMotion ? 50 : 700);
+        offlineReply(text);
       }
     });
   })();
@@ -1584,7 +1861,7 @@
          load, quiz/tab/FAQ state changes.
      ============================================================ */
   (() => {
-    const sections = Array.from(document.querySelectorAll(".hero, main > .section, main > .statement"));
+    const sections = Array.from(document.querySelectorAll(".hero, main > .section, main > .statement-band"));
     if (!sections.length) return;
 
     // measure the true small-viewport height (svh) once per resize
@@ -1646,7 +1923,7 @@
 
     // content that changes a section's height after load
     document.addEventListener("click", (e) => {
-      if (e.target.closest(".bar-option, [data-bar-retake], .product-tab, .uc-tab")) queueFit(120);
+      if (e.target.closest(".bar-option, [data-bar-retake], .uc-tab, .fd-item")) queueFit(120);
     });
     document.addEventListener("toggle", () => queueFit(60), true);
 
