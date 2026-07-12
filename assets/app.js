@@ -1422,6 +1422,48 @@
       return el;
     };
 
+    // A WhatsApp glyph reused from the page's SVG symbol defs.
+    const waSvg = () => {
+      const NS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(NS, "svg");
+      const use = document.createElementNS(NS, "use");
+      use.setAttribute("href", "#i-whatsapp");
+      svg.appendChild(use);
+      return svg;
+    };
+
+    // Safely render bot text with clickable links — XSS-safe (DOM nodes only,
+    // never innerHTML on model output; hrefs are restricted to http(s)/wa.me by
+    // the regex). A wa.me handoff link becomes a compact "Continue on WhatsApp"
+    // button instead of a raw URL, so the ugly prefilled link never shows.
+    const LINK_RE = /(https?:\/\/[^\s<>]+|wa\.me\/[^\s<>]+)/gi;
+    const renderRich = (el, text) => {
+      el.textContent = "";
+      let last = 0, m;
+      LINK_RE.lastIndex = 0;
+      while ((m = LINK_RE.exec(text)) !== null) {
+        if (m.index > last) el.appendChild(document.createTextNode(text.slice(last, m.index)));
+        let url = m[0], trail = "";
+        const tm = url.match(/[.,);:!?]+$/); // don't swallow trailing sentence punctuation
+        if (tm) { trail = tm[0]; url = url.slice(0, -trail.length); }
+        const href = /^https?:\/\//i.test(url) ? url : "https://" + url;
+        const a = document.createElement("a");
+        a.href = href; a.target = "_blank"; a.rel = "noopener";
+        if (/(^|\/\/|\.)wa\.me\//i.test(url) || /wa\.me\//i.test(url)) {
+          a.className = "dock-wa-chip";
+          a.appendChild(waSvg());
+          a.appendChild(document.createTextNode("Continue on WhatsApp"));
+        } else {
+          a.textContent = url.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+        }
+        el.appendChild(a);
+        if (trail) el.appendChild(document.createTextNode(trail));
+        last = m.index + m[0].length;
+      }
+      if (last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
+      return el;
+    };
+
     const addQuick = () => {
       const wrap = document.createElement("div");
       wrap.className = "dock-quick";
@@ -1829,8 +1871,10 @@
             clearWorking();
             if (typeof data.text === "string" && data.text) {
               acc = data.text;
-              ensureBubble().textContent = acc;
+              renderRich(ensureBubble(), acc); // linkify only on the final text
               msgs.scrollTop = msgs.scrollHeight;
+            } else if (bubble) {
+              renderRich(bubble, acc); // linkify what streamed in via deltas
             } else {
               ensureBubble();
             }
@@ -1849,6 +1893,9 @@
             break;
           case "done":
             clearWorking(); clearTyping();
+            // safety: if the stream ended with deltas but no assistant.completed,
+            // linkify the plain text that streamed in.
+            if (bubble && acc) renderRich(bubble, acc);
             break;
         }
       };

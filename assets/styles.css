@@ -3266,6 +3266,20 @@ body.fx-enter .hero > .title-split { animation: none; }
   border-radius: 14px;
   font-size: 0.86rem;
   line-height: 1.5;
+  /* never let a long URL push the panel into horizontal scroll */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* messages spring in — gives the chat a lively, human rhythm */
+@media (prefers-reduced-motion: no-preference) {
+  .dock-msg,
+  .dock-quick,
+  .dock-picker { animation: dock-pop-in 340ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+}
+@keyframes dock-pop-in {
+  from { opacity: 0; transform: translateY(9px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
 }
 
 .dock-msg--bot {
@@ -3287,6 +3301,33 @@ body.fx-enter .hero > .title-split { animation: none; }
 
 .dock-msg a { color: var(--blue-deep); font-weight: 700; text-decoration: underline; }
 .dock-msg--user a { color: #ffffff; }
+
+/* inline WhatsApp handoff button (renderRich turns a wa.me link into this) */
+.dock-wa-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #25d366, #128c4a);
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-decoration: none !important;
+  box-shadow: 0 6px 16px rgba(18, 140, 74, 0.32);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+}
+.dock-wa-chip:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(18, 140, 74, 0.42); }
+.dock-wa-chip:active { transform: translateY(0) scale(0.98); }
+.dock-wa-chip svg { width: 16px; height: 16px; fill: currentColor; }
+@media (prefers-reduced-motion: no-preference) {
+  .dock-wa-chip { animation: dock-wa-nudge 2.6s ease-in-out 0.6s 2; }
+}
+@keyframes dock-wa-nudge {
+  0%, 100% { box-shadow: 0 6px 16px rgba(18, 140, 74, 0.32); }
+  50% { box-shadow: 0 6px 22px rgba(18, 140, 74, 0.55); }
+}
 
 .dock-quick {
   display: flex;
