@@ -1443,7 +1443,10 @@
       catch { /* private mode / quota */ }
     };
     const record = (who, text, time) => {
-      if (restoring || !text) return;
+      // skip during restore, and during the in-chat quiz (its Q/A/result render
+      // as rich cards that don't round-trip cleanly — persisting only the bare
+      // answers would restore an incoherent history).
+      if (restoring || quizActive || !text) return;
       transcript.push({ who, text, time: time || fmtTime() });
       persistChat();
     };
@@ -1533,6 +1536,7 @@
       el.textContent = "";
       // strip any [[actions: ...]] / stray [[...]] markers from the display text
       text = String(text).replace(/\[\[[^\]]*\]\]/g, "").replace(/\n{3,}/g, "\n\n").trim();
+      const forRecord = text; // keep the wa link so a restored message rebuilds the button
       let waHrefStr = null;
       const wm = text.match(WA_IN_TEXT);
       if (wm) {
@@ -1552,7 +1556,7 @@
         row.appendChild(makeAction("Continue on WhatsApp", "#i-whatsapp", "dock-action--wa", null, waHrefStr));
         el.appendChild(row);
       }
-      record("bot", text, time); // persist the clean prose (streamed replies)
+      record("bot", forRecord, time); // persist WITH the wa link so restore rebuilds the button
       addMeta(el, "bot", time);
       markRead();
       return el;
@@ -1784,6 +1788,7 @@
         const p = agentOf(next.key);
         agentKey = p.key;
         persona = p.name;
+        quizActive = false; leadCardOpen = false; // handover resets transient flows
         if (nameEl) nameEl.textContent = p.name;
         if (status) status.textContent = live ? `Online — ${p.name}` : `${p.name} · Safetyline`;
         dock.dataset.agent = p.key;
@@ -1962,11 +1967,12 @@
       whatsapp:  { label: "💬 WhatsApp",           run: () => window.open(waHref(), "_blank", "noopener") },
     };
     const detectActions = (text) => {
+      // Tight patterns — only fire on a genuine signal so chips never feel spammy.
       const t = (text || "").toLowerCase();
       const keys = [];
-      if (/\breadiness\b|how ready|where you stand|readiness (test|check)|60-second|60 second/.test(t)) keys.push("readiness");
-      if (/\bbook\b|consultation|discovery call|schedule a|hop on a call|free call|leave your details|your details|reach out/.test(t)) keys.push("book");
-      if (/use case|we (built|'ve built|have built)|for example|portfolio|proof|ufms|truckville|labour party|systems we've/.test(t)) keys.push("usecases");
+      if (/\breadiness\b|readiness (test|check)|where you stand|how ready is your|60[ -]second/.test(t)) keys.push("readiness");
+      if (/\bbook a\b|consultation|discovery call|schedule a call|hop on a call|free call|leave your details/.test(t)) keys.push("book");
+      if (/\buse cases?\b|we (built|'ve built|have built)|our portfolio|\bproof\b|\bufms\b|truckville|labour party|systems we've built/.test(t)) keys.push("usecases");
       return keys;
     };
     const parseMarkers = (raw) => {
@@ -2047,6 +2053,7 @@
     const openLeadCard = () => {
       if (leadCardOpen || composerSwapped) return;
       leadCardOpen = true;
+      quizActive = false; // opening the form abandons any in-chat quiz
       const msg = add("", "bot");
       const t = document.createElement("div");
       t.className = "dock-msg-text";
@@ -2129,6 +2136,8 @@
         setTimeout(() => input?.focus(), 250);
       } else {
         panel.classList.remove("open");
+        quizActive = false;   // don't leave the Readiness tool latched off
+        clearNudge();
         setTimeout(() => { panel.hidden = true; }, 220);
       }
     };
@@ -2404,17 +2413,20 @@
         : (live ? `Online — ${persona}` : `${persona} · Safetyline`);
     };
 
+    let sending = false; // one live turn at a time — no concurrent streams
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (composerSwapped) return;
+      if (composerSwapped || sending) return;
       const text = (input.value || "").trim();
       if (!text) return;
       input.value = "";
+      quizActive = false; // sending a message cleanly abandons any in-chat quiz
       add(text, "user");
       exchanges += 1;
       clearNudge();
 
       if (live) {
+        sending = true;
         setTyping(true);
         const t = typing();
         try {
@@ -2446,6 +2458,7 @@
           }
         } finally {
           setTyping(false);
+          sending = false;
         }
       } else {
         offlineReply(text);

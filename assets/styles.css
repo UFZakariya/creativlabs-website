@@ -3616,6 +3616,9 @@ body.fx-enter .hero > .title-split { animation: none; }
   padding: 12px;
   border-top: 1px solid rgba(8, 60, 255, 0.1);
 }
+/* the display:flex above overrides the UA [hidden] rule, so hide explicitly
+   (e.g. while the agent picker is up — no composer until a persona is chosen) */
+.dock-form[hidden] { display: none; }
 
 .dock-form input {
   flex: 1;
