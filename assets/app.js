@@ -1423,12 +1423,39 @@
       sessionId = "anon";
     }
 
+    // WhatsApp-style message meta: a subtle timestamp, plus sent/read ticks on
+    // the visitor's own messages.
+    const fmtTime = () => {
+      try { return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
+      catch { return ""; }
+    };
+    const addMeta = (el, who) => {
+      const meta = document.createElement("span");
+      meta.className = "dock-meta";
+      meta.appendChild(document.createTextNode(fmtTime()));
+      if (who === "user") {
+        const tick = document.createElement("i");
+        tick.className = "dock-tick";
+        tick.textContent = "✓"; // ✓ sent → ✓✓ once the agent responds
+        meta.appendChild(tick);
+      }
+      el.appendChild(meta);
+    };
+    // Once the agent responds, upgrade the visitor's ticks to "read".
+    const markRead = () => {
+      msgs.querySelectorAll(".dock-tick:not(.read)").forEach((t) => {
+        t.textContent = "✓✓";
+        t.classList.add("read");
+      });
+    };
     const add = (text, who, asHTML) => {
       const el = document.createElement("div");
       el.className = `dock-msg dock-msg--${who}`;
       if (asHTML) el.innerHTML = text;
-      else el.textContent = text;
+      else if (text) el.textContent = text;
       msgs.appendChild(el);
+      if (text || who === "user") addMeta(el, who); // empty bot bubbles get meta in renderBotMessage
+      if (who === "bot") markRead();
       msgs.scrollTop = msgs.scrollHeight;
       return el;
     };
@@ -1484,6 +1511,8 @@
     const WA_IN_TEXT = /\bhttps?:\/\/wa\.me\/[^\s<>]+|\bwa\.me\/[^\s<>]+/i;
     const renderBotMessage = (el, text) => {
       el.textContent = "";
+      // strip any [[actions: ...]] / stray [[...]] markers from the display text
+      text = String(text).replace(/\[\[[^\]]*\]\]/g, "").replace(/\n{3,}/g, "\n\n").trim();
       let waHrefStr = null;
       const wm = text.match(WA_IN_TEXT);
       if (wm) {
@@ -1503,6 +1532,8 @@
         row.appendChild(makeAction("Continue on WhatsApp", "#i-whatsapp", "dock-action--wa", null, waHrefStr));
         el.appendChild(row);
       }
+      addMeta(el, "bot");
+      markRead();
       return el;
     };
 
@@ -1785,7 +1816,7 @@
     // tools, like a messaging app's reply keyboard.
     let toolsBar = null;
     const TOOLS = [
-      { label: "Book a call", icon: "#i-clock", send: "I'd like to book a free discovery call." },
+      { label: "Book a call", icon: "#i-clock", lead: true },
       { label: "WhatsApp", icon: "#i-whatsapp", cls: "dock-tool--wa", wa: true },
       { label: "Readiness", icon: "#i-target", quiz: true },
     ];
@@ -1802,6 +1833,7 @@
         b.addEventListener("click", () => {
           if (a.wa) window.open(waHref(), "_blank", "noopener");
           else if (a.quiz) startReadinessQuiz();
+          else if (a.lead) openLeadCard();
           else if (a.scroll) { setOpen(false); document.querySelector(a.scroll)?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" }); }
           else if (a.send) sendText(a.send);
         });
@@ -1895,6 +1927,116 @@
       msg.appendChild(acts);
       msgs.scrollTop = msgs.scrollHeight;
       quizActive = false;
+    };
+
+    // ── Contextual action suggestions (best-of-WhatsApp/Telegram smart replies) ──
+    // After an agent reply, offer up to 3 tappable next-steps — from explicit
+    // [[actions: ...]] markers the agent may emit AND client-side intent
+    // detection of the reply. Only shows on a real signal (never spammy), and
+    // always points toward a next step / CTA.
+    const ACTION_DEFS = {
+      readiness: { label: "🧮 Check my readiness", run: () => startReadinessQuiz() },
+      book:      { label: "📅 Leave my details",   run: () => openLeadCard() },
+      usecases:  { label: "📂 See our work",       run: () => showUseCaseGallery() },
+      whatsapp:  { label: "💬 WhatsApp",           run: () => window.open(waHref(), "_blank", "noopener") },
+    };
+    const detectActions = (text) => {
+      const t = (text || "").toLowerCase();
+      const keys = [];
+      if (/\breadiness\b|how ready|where you stand|readiness (test|check)|60-second|60 second/.test(t)) keys.push("readiness");
+      if (/\bbook\b|consultation|discovery call|schedule a|hop on a call|free call|leave your details|your details|reach out/.test(t)) keys.push("book");
+      if (/use case|we (built|'ve built|have built)|for example|portfolio|proof|ufms|truckville|labour party|systems we've/.test(t)) keys.push("usecases");
+      return keys;
+    };
+    const parseMarkers = (raw) => {
+      const keys = [];
+      (String(raw || "").match(/\[\[\s*actions?\s*:\s*([^\]\n]+)\]\]/gi) || []).forEach((m) => {
+        m.replace(/\[\[\s*actions?\s*:\s*/i, "").replace(/\]\]$/, "")
+         .split(/[,\s]+/).forEach((k) => { k = k.trim().toLowerCase(); if (ACTION_DEFS[k]) keys.push(k); });
+      });
+      return keys;
+    };
+    const addSuggestions = (rawText, markerKeys) => {
+      const keys = [];
+      [...(markerKeys || []), ...detectActions(rawText)].forEach((k) => { if (ACTION_DEFS[k] && !keys.includes(k)) keys.push(k); });
+      if (!keys.length) return;
+      const wrap = document.createElement("div");
+      wrap.className = "dock-suggestions";
+      keys.slice(0, 3).forEach((k) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "dock-suggest";
+        b.textContent = ACTION_DEFS[k].label;
+        b.addEventListener("click", () => { wrap.remove(); ACTION_DEFS[k].run(); });
+        wrap.appendChild(b);
+      });
+      msgs.appendChild(wrap);
+      msgs.scrollTop = msgs.scrollHeight;
+    };
+
+    // Use-case gallery card — a rich, tappable showcase of what we've built.
+    const USE_CASES = [
+      { emoji: "🐔", name: "UFMS", desc: "Poultry farm system", q: "Tell me about UFMS, the farm system." },
+      { emoji: "🍔", name: "TruckVille OS", desc: "Food-venue operations", q: "Tell me about TruckVille OS." },
+      { emoji: "📱", name: "Ordering App", desc: "Customer ordering", q: "Tell me about the TruckVille ordering app." },
+      { emoji: "🗳️", name: "Labour Party", desc: "Membership portal", q: "Tell me about the Labour Party membership portal." },
+    ];
+    const showUseCaseGallery = () => {
+      const msg = add("", "bot");
+      const t = document.createElement("div");
+      t.className = "dock-msg-text";
+      t.textContent = "Here's some of what we've built — tap any to hear more:";
+      msg.appendChild(t);
+      const grid = document.createElement("div");
+      grid.className = "dock-gallery";
+      USE_CASES.forEach((u) => {
+        const c = document.createElement("button");
+        c.type = "button";
+        c.className = "dock-uc";
+        const e = document.createElement("span"); e.className = "dock-uc-emoji"; e.textContent = u.emoji;
+        const tx = document.createElement("span"); tx.className = "dock-uc-t";
+        const nm = document.createElement("strong"); nm.textContent = u.name;
+        const ds = document.createElement("small"); ds.textContent = u.desc;
+        tx.appendChild(nm); tx.appendChild(ds);
+        c.appendChild(e); c.appendChild(tx);
+        c.addEventListener("click", () => sendText(u.q));
+        grid.appendChild(c);
+      });
+      msg.appendChild(grid);
+      msgs.scrollTop = msgs.scrollHeight;
+    };
+
+    // Inline lead-capture card — a strong, low-friction conversion CTA.
+    let leadCardOpen = false;
+    const openLeadCard = () => {
+      if (leadCardOpen || composerSwapped) return;
+      leadCardOpen = true;
+      const msg = add("", "bot");
+      const t = document.createElement("div");
+      t.className = "dock-msg-text";
+      t.textContent = "Leave your details and the team will reach out — no obligation.";
+      msg.appendChild(t);
+      const box = document.createElement("div");
+      box.className = "dock-leadform";
+      const nameI = document.createElement("input"); nameI.type = "text"; nameI.placeholder = "Your name"; nameI.autocomplete = "name";
+      const phoneI = document.createElement("input"); phoneI.type = "tel"; phoneI.placeholder = "WhatsApp number"; phoneI.autocomplete = "tel";
+      const wantI = document.createElement("input"); wantI.type = "text"; wantI.placeholder = "What you'd like to build (optional)";
+      const submit = document.createElement("button");
+      submit.type = "button"; submit.className = "dock-action dock-action--primary dock-lead-send"; submit.textContent = "Send my details";
+      submit.addEventListener("click", () => {
+        const name = nameI.value.trim(), phone = phoneI.value.trim(), want = wantI.value.trim();
+        if (!name || !phone) { box.classList.add("is-error"); (name ? phoneI : nameI).focus(); return; }
+        box.querySelectorAll("input,button").forEach((x) => { x.disabled = true; });
+        leadCardOpen = false;
+        const done = document.createElement("p"); done.className = "dock-leadform-done";
+        done.textContent = "✓ Sent — the team will reach out. Thank you!";
+        box.appendChild(done);
+        sendText(`Please have the team follow up with me. Name: ${name}. WhatsApp: ${phone}.${want ? " I'd like to build: " + want + "." : ""}`);
+      });
+      [nameI, phoneI, wantI, submit].forEach((x) => box.appendChild(x));
+      msg.appendChild(box);
+      msgs.scrollTop = msgs.scrollHeight;
+      setTimeout(() => nameI.focus(), 60);
     };
 
     const setOpen = (next) => {
@@ -2061,9 +2203,11 @@
             if (typeof data.text === "string" && data.text) {
               acc = data.text;
               renderBotMessage(ensureBubble(), acc); // rich render only on final text
+              addSuggestions(acc, parseMarkers(acc));
               msgs.scrollTop = msgs.scrollHeight;
             } else if (bubble) {
               renderBotMessage(bubble, acc); // rich render what streamed in
+              addSuggestions(acc, parseMarkers(acc));
             } else {
               ensureBubble();
             }
@@ -2083,8 +2227,11 @@
           case "done":
             clearWorking(); clearTyping();
             // safety: if the stream ended with deltas but no assistant.completed,
-            // rich-render the plain text that streamed in.
-            if (bubble && acc) renderBotMessage(bubble, acc);
+            // rich-render the plain text and offer suggestions once.
+            if (!terminal && bubble && acc) {
+              renderBotMessage(bubble, acc);
+              addSuggestions(acc, parseMarkers(acc));
+            }
             break;
         }
       };
@@ -2130,6 +2277,14 @@
       return terminal || Boolean(bubble);
     };
 
+    // Telegram-style header status: "{persona} is typing…" during a live turn.
+    const setTyping = (on) => {
+      if (!status) return;
+      status.textContent = on
+        ? `${persona} is typing…`
+        : (live ? `Online — ${persona}` : `${persona} · Safetyline`);
+    };
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (composerSwapped) return;
@@ -2139,6 +2294,7 @@
       add(text, "user");
 
       if (live) {
+        setTyping(true);
         const t = typing();
         try {
           const res = await fetch(cfg.endpoint, {
@@ -2167,6 +2323,8 @@
             if (cfg.degradedCopy) add(cfg.degradedCopy, "bot");
             offlineReply(text);
           }
+        } finally {
+          setTyping(false);
         }
       } else {
         offlineReply(text);
