@@ -1423,39 +1423,30 @@
     };
 
     // A WhatsApp glyph reused from the page's SVG symbol defs.
-    const waSvg = () => {
+    const svgIcon = (id) => {
       const NS = "http://www.w3.org/2000/svg";
       const svg = document.createElementNS(NS, "svg");
       const use = document.createElementNS(NS, "use");
-      use.setAttribute("href", "#i-whatsapp");
+      use.setAttribute("href", id);
       svg.appendChild(use);
       return svg;
     };
 
-    // Safely render bot text with clickable links — XSS-safe (DOM nodes only,
-    // never innerHTML on model output; hrefs are restricted to http(s)/wa.me by
-    // the regex). A wa.me handoff link becomes a compact "Continue on WhatsApp"
-    // button instead of a raw URL, so the ugly prefilled link never shows.
-    const LINK_RE = /(https?:\/\/[^\s<>]+|wa\.me\/[^\s<>]+)/gi;
+    // Linkify inline URLs safely — DOM nodes only, never innerHTML on model
+    // output; hrefs are forced to http(s). Returns el.
+    const LINK_RE = /(https?:\/\/[^\s<>]+|www\.[^\s<>]+)/gi;
     const renderRich = (el, text) => {
-      el.textContent = "";
       let last = 0, m;
       LINK_RE.lastIndex = 0;
       while ((m = LINK_RE.exec(text)) !== null) {
         if (m.index > last) el.appendChild(document.createTextNode(text.slice(last, m.index)));
         let url = m[0], trail = "";
-        const tm = url.match(/[.,);:!?]+$/); // don't swallow trailing sentence punctuation
+        const tm = url.match(/[.,);:!?]+$/); // keep trailing sentence punctuation as text
         if (tm) { trail = tm[0]; url = url.slice(0, -trail.length); }
-        const href = /^https?:\/\//i.test(url) ? url : "https://" + url;
         const a = document.createElement("a");
-        a.href = href; a.target = "_blank"; a.rel = "noopener";
-        if (/(^|\/\/|\.)wa\.me\//i.test(url) || /wa\.me\//i.test(url)) {
-          a.className = "dock-wa-chip";
-          a.appendChild(waSvg());
-          a.appendChild(document.createTextNode("Continue on WhatsApp"));
-        } else {
-          a.textContent = url.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
-        }
+        a.href = /^https?:\/\//i.test(url) ? url : "https://" + url;
+        a.target = "_blank"; a.rel = "noopener";
+        a.textContent = url.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
         el.appendChild(a);
         if (trail) el.appendChild(document.createTextNode(trail));
         last = m.index + m[0].length;
@@ -1464,25 +1455,44 @@
       return el;
     };
 
-    const addQuick = () => {
-      const wrap = document.createElement("div");
-      wrap.className = "dock-quick";
-      [
-        ["Take the readiness test", "#readiness"],
-        ["What do you build?", "#systems"],
-        ["Book a consultation", "#contact"]
-      ].forEach(([label, target]) => {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.textContent = label;
-        b.addEventListener("click", () => {
-          setOpen(false);
-          document.querySelector(target)?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" });
-        });
-        wrap.appendChild(b);
-      });
-      msgs.appendChild(wrap);
-      msgs.scrollTop = msgs.scrollHeight;
+    // A block-level, right-sized in-chat action button (WhatsApp/Telegram style).
+    const makeAction = (label, iconId, cls, onClick, href) => {
+      const b = document.createElement(href ? "a" : "button");
+      b.className = "dock-action" + (cls ? " " + cls : "");
+      if (href) { b.href = href; b.target = "_blank"; b.rel = "noopener"; }
+      else { b.type = "button"; if (onClick) b.addEventListener("click", onClick); }
+      if (iconId) b.appendChild(svgIcon(iconId));
+      b.appendChild(document.createTextNode(label));
+      return b;
+    };
+
+    // Render a bot message as rich content: the text (with inline links) plus a
+    // dedicated ACTIONS row. A wa.me handoff link is lifted OUT of the prose and
+    // turned into a proper "Continue on WhatsApp" button on its own row — never a
+    // raw URL or an oversized chip jammed mid-sentence.
+    const WA_IN_TEXT = /\bhttps?:\/\/wa\.me\/[^\s<>]+|\bwa\.me\/[^\s<>]+/i;
+    const renderBotMessage = (el, text) => {
+      el.textContent = "";
+      let waHrefStr = null;
+      const wm = text.match(WA_IN_TEXT);
+      if (wm) {
+        waHrefStr = /^https?:/i.test(wm[0]) ? wm[0] : "https://" + wm[0];
+        text = text.replace(wm[0], "")
+                   .replace(/[ \t]{2,}/g, " ")
+                   .replace(/[ \t]*[:\-—][ \t]*(?=\n|$)/g, "")  // drop dangling "here:" lead-ins
+                   .replace(/\n{3,}/g, "\n\n").trim();
+      }
+      const body = document.createElement("div");
+      body.className = "dock-msg-text";
+      renderRich(body, text);
+      el.appendChild(body);
+      if (waHrefStr) {
+        const row = document.createElement("div");
+        row.className = "dock-msg-actions";
+        row.appendChild(makeAction("Continue on WhatsApp", "#i-whatsapp", "dock-action--wa", null, waHrefStr));
+        el.appendChild(row);
+      }
+      return el;
     };
 
     const typing = () => {
@@ -1617,6 +1627,7 @@
     const swapComposerToWhatsApp = () => {
       if (composerSwapped) return;
       composerSwapped = true;
+      hideTools();
       form.hidden = true;
       form.style.display = "none"; // beats .dock-form { display:flex } (the [hidden] UA rule alone can't)
       const wrap = document.createElement("div");
@@ -1640,6 +1651,7 @@
     // control lets the visitor switch mid-session.
     const renderPicker = () => {
       form.hidden = true; // no composer until they've chosen who to talk to
+      hideTools();
       const wrap = document.createElement("div");
       wrap.className = "dock-picker";
       const h = document.createElement("p");
@@ -1680,7 +1692,8 @@
       msgs.querySelectorAll(".dock-picker").forEach((el) => el.remove());
       form.hidden = false;
       add(contextualGreeting(), "bot");
-      if (!live) addQuick();
+      addStarters();
+      showTools();
       setTimeout(() => input && input.focus(), 60);
     };
 
@@ -1707,6 +1720,64 @@
         renderPicker();
       });
     })();
+
+    // ── In-chat quick actions (WhatsApp / Telegram style) ───────────────────
+    // Programmatic send — lets chips and the tool bar drive the conversation.
+    const sendText = (t) => {
+      if (composerSwapped || !t) return;
+      input.value = t;
+      form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+    };
+
+    // One-tap suggestion chips shown after the greeting to get people talking.
+    const STARTERS = [
+      "How does it work?",
+      "What could you build for my business?",
+      "What would it cost?",
+    ];
+    const addStarters = () => {
+      const wrap = document.createElement("div");
+      wrap.className = "dock-chips";
+      STARTERS.forEach((t) => {
+        const c = document.createElement("button");
+        c.type = "button";
+        c.className = "dock-chip";
+        c.textContent = t;
+        c.addEventListener("click", () => { wrap.remove(); sendText(t); });
+        wrap.appendChild(c);
+      });
+      msgs.appendChild(wrap);
+      msgs.scrollTop = msgs.scrollHeight;
+    };
+
+    // Persistent quick-actions bar pinned above the composer — always-available
+    // tools, like a messaging app's reply keyboard.
+    let toolsBar = null;
+    const TOOLS = [
+      { label: "Book a call", icon: "#i-clock", send: "I'd like to book a free discovery call." },
+      { label: "WhatsApp", icon: "#i-whatsapp", cls: "dock-tool--wa", wa: true },
+      { label: "Readiness", icon: "#i-target", scroll: "#readiness" },
+    ];
+    const showTools = () => {
+      if (toolsBar) { toolsBar.hidden = false; return; }
+      toolsBar = document.createElement("div");
+      toolsBar.className = "dock-tools";
+      TOOLS.forEach((a) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "dock-tool" + (a.cls ? " " + a.cls : "");
+        b.appendChild(svgIcon(a.icon));
+        b.appendChild(document.createTextNode(a.label));
+        b.addEventListener("click", () => {
+          if (a.wa) window.open(waHref(), "_blank", "noopener");
+          else if (a.scroll) { setOpen(false); document.querySelector(a.scroll)?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" }); }
+          else if (a.send) sendText(a.send);
+        });
+        toolsBar.appendChild(b);
+      });
+      form.parentNode.insertBefore(toolsBar, form);
+    };
+    const hideTools = () => { if (toolsBar) toolsBar.hidden = true; };
 
     const setOpen = (next) => {
       open = next;
@@ -1871,10 +1942,10 @@
             clearWorking();
             if (typeof data.text === "string" && data.text) {
               acc = data.text;
-              renderRich(ensureBubble(), acc); // linkify only on the final text
+              renderBotMessage(ensureBubble(), acc); // rich render only on final text
               msgs.scrollTop = msgs.scrollHeight;
             } else if (bubble) {
-              renderRich(bubble, acc); // linkify what streamed in via deltas
+              renderBotMessage(bubble, acc); // rich render what streamed in
             } else {
               ensureBubble();
             }
@@ -1894,8 +1965,8 @@
           case "done":
             clearWorking(); clearTyping();
             // safety: if the stream ended with deltas but no assistant.completed,
-            // linkify the plain text that streamed in.
-            if (bubble && acc) renderRich(bubble, acc);
+            // rich-render the plain text that streamed in.
+            if (bubble && acc) renderBotMessage(bubble, acc);
             break;
         }
       };
