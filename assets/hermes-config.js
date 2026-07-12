@@ -29,7 +29,7 @@
 window.HERMES = {
   // Live web-chat endpoint — the dedicated Safetyline front-desk Hermes
   // (Bari/Biba). "" = offline scripted fallback.
-  endpoint: "https://desk.187.77.174.115.sslip.io/web/chat",
+  endpoint: "https://chat.safetyline.com.ng/web/chat",
 
   // The two front-desk personas the visitor can choose between in the dock.
   // `key` MUST match a persona in the backend (adapter.PERSONAS: bari | biba).
