@@ -1429,10 +1429,29 @@
       try { return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
       catch { return ""; }
     };
-    const addMeta = (el, who) => {
+
+    // ── Conversation persistence (returning-visitor continuity) ─────────────
+    // The plain-text transcript is saved to localStorage so a reload / return
+    // visit resumes the chat. The backend session (httpOnly sl_sid cookie)
+    // persists in parallel, so the agent keeps the full context too.
+    const CHAT_KEY = "sl-chat";
+    const CHAT_TTL = 3 * 24 * 3600 * 1000; // 3 days
+    const transcript = [];
+    let restoring = false;
+    const persistChat = () => {
+      try { localStorage.setItem(CHAT_KEY, JSON.stringify({ v: 1, agent: agentKey, at: Date.now(), msgs: transcript.slice(-40) })); }
+      catch { /* private mode / quota */ }
+    };
+    const record = (who, text, time) => {
+      if (restoring || !text) return;
+      transcript.push({ who, text, time: time || fmtTime() });
+      persistChat();
+    };
+
+    const addMeta = (el, who, time) => {
       const meta = document.createElement("span");
       meta.className = "dock-meta";
-      meta.appendChild(document.createTextNode(fmtTime()));
+      meta.appendChild(document.createTextNode(time || fmtTime()));
       if (who === "user") {
         const tick = document.createElement("i");
         tick.className = "dock-tick";
@@ -1448,14 +1467,15 @@
         t.classList.add("read");
       });
     };
-    const add = (text, who, asHTML) => {
+    const add = (text, who, asHTML, time) => {
       const el = document.createElement("div");
       el.className = `dock-msg dock-msg--${who}`;
       if (asHTML) el.innerHTML = text;
       else if (text) el.textContent = text;
       msgs.appendChild(el);
-      if (text || who === "user") addMeta(el, who); // empty bot bubbles get meta in renderBotMessage
+      if (text || who === "user") addMeta(el, who, time); // empty bot bubbles get meta in renderBotMessage
       if (who === "bot") markRead();
+      if (!asHTML && text) record(who, text, time); // persist plain user/bot text
       msgs.scrollTop = msgs.scrollHeight;
       return el;
     };
@@ -1509,7 +1529,7 @@
     // turned into a proper "Continue on WhatsApp" button on its own row — never a
     // raw URL or an oversized chip jammed mid-sentence.
     const WA_IN_TEXT = /\bhttps?:\/\/wa\.me\/[^\s<>]+|\bwa\.me\/[^\s<>]+/i;
-    const renderBotMessage = (el, text) => {
+    const renderBotMessage = (el, text, time) => {
       el.textContent = "";
       // strip any [[actions: ...]] / stray [[...]] markers from the display text
       text = String(text).replace(/\[\[[^\]]*\]\]/g, "").replace(/\n{3,}/g, "\n\n").trim();
@@ -1532,7 +1552,8 @@
         row.appendChild(makeAction("Continue on WhatsApp", "#i-whatsapp", "dock-action--wa", null, waHrefStr));
         el.appendChild(row);
       }
-      addMeta(el, "bot");
+      record("bot", text, time); // persist the clean prose (streamed replies)
+      addMeta(el, "bot", time);
       markRead();
       return el;
     };
@@ -1974,6 +1995,21 @@
       msgs.scrollTop = msgs.scrollHeight;
     };
 
+    // Gentle, once-per-session re-engagement: if the visitor has chatted a bit
+    // then goes quiet after a reply, offer a soft next step (never nags).
+    let nudged = false, nudgeTimer = null, exchanges = 0;
+    const clearNudge = () => { if (nudgeTimer) { clearTimeout(nudgeTimer); nudgeTimer = null; } };
+    const scheduleNudge = () => {
+      clearNudge();
+      if (nudged || exchanges < 2) return;
+      nudgeTimer = setTimeout(() => {
+        if (nudged || !open || leadCardOpen || quizActive || composerSwapped) return;
+        nudged = true;
+        add("Whenever you're ready, I can set up a quick call or connect you on WhatsApp — no pressure at all.", "bot");
+        addSuggestions("", ["book", "whatsapp"]);
+      }, 32000);
+    };
+
     // Use-case gallery card — a rich, tappable showcase of what we've built.
     const USE_CASES = [
       { emoji: "🐔", name: "UFMS", desc: "Poultry farm system", q: "Tell me about UFMS, the farm system." },
@@ -2018,9 +2054,9 @@
       msg.appendChild(t);
       const box = document.createElement("div");
       box.className = "dock-leadform";
-      const nameI = document.createElement("input"); nameI.type = "text"; nameI.placeholder = "Your name"; nameI.autocomplete = "name";
-      const phoneI = document.createElement("input"); phoneI.type = "tel"; phoneI.placeholder = "WhatsApp number"; phoneI.autocomplete = "tel";
-      const wantI = document.createElement("input"); wantI.type = "text"; wantI.placeholder = "What you'd like to build (optional)";
+      const nameI = document.createElement("input"); nameI.type = "text"; nameI.placeholder = "Your name"; nameI.autocomplete = "name"; nameI.setAttribute("aria-label", "Your name");
+      const phoneI = document.createElement("input"); phoneI.type = "tel"; phoneI.placeholder = "WhatsApp number"; phoneI.autocomplete = "tel"; phoneI.setAttribute("aria-label", "WhatsApp number");
+      const wantI = document.createElement("input"); wantI.type = "text"; wantI.placeholder = "What you'd like to build (optional)"; wantI.setAttribute("aria-label", "What you'd like to build");
       const submit = document.createElement("button");
       submit.type = "button"; submit.className = "dock-action dock-action--primary dock-lead-send"; submit.textContent = "Send my details";
       submit.addEventListener("click", () => {
@@ -2039,6 +2075,32 @@
       setTimeout(() => nameI.focus(), 60);
     };
 
+    // Restore a saved conversation on a return visit (plain-text transcript).
+    const restoreChat = (saved) => {
+      restoring = true;
+      const p = agentOf(saved.agent);
+      agentKey = p.key;
+      persona = p.name;
+      if (nameEl) nameEl.textContent = p.name;
+      if (status) status.textContent = live ? `Online — ${p.name}` : `${p.name} · Safetyline`;
+      dock.dataset.agent = p.key;
+      if (switchBtn) switchBtn.hidden = PERSONAS.length < 2;
+      try { sessionStorage.setItem("sl-agent", p.key); } catch {}
+      const div = document.createElement("div");
+      div.className = "dock-divider";
+      div.appendChild(document.createTextNode("Welcome back — picking up where we left off"));
+      msgs.appendChild(div);
+      (saved.msgs || []).forEach((m) => {
+        if (m.who === "user") add(m.text, "user", false, m.time);
+        else renderBotMessage(add("", "bot"), m.text, m.time);
+      });
+      transcript.push(...(saved.msgs || []));
+      restoring = false;
+      form.hidden = false;
+      showTools();
+      setTimeout(() => input && input.focus(), 60);
+    };
+
     const setOpen = (next) => {
       open = next;
       btn.setAttribute("aria-expanded", String(next));
@@ -2050,11 +2112,19 @@
         if (!greeted) {
           greeted = true;
           renderConsent();
-          let saved = null;
-          try { saved = sessionStorage.getItem("sl-agent"); } catch {}
-          if (saved && PERSONAS.some((p) => p.key === saved)) chooseAgent(saved);
-          else if (PERSONAS.length > 1) renderPicker();
-          else chooseAgent(PERSONAS[0].key);
+          let savedChat = null;
+          try { savedChat = JSON.parse(localStorage.getItem(CHAT_KEY) || "null"); } catch {}
+          const canRestore = savedChat && Array.isArray(savedChat.msgs) && savedChat.msgs.length &&
+            (Date.now() - (savedChat.at || 0) < CHAT_TTL) && PERSONAS.some((p) => p.key === savedChat.agent);
+          if (canRestore) {
+            restoreChat(savedChat);
+          } else {
+            let saved = null;
+            try { saved = sessionStorage.getItem("sl-agent"); } catch {}
+            if (saved && PERSONAS.some((p) => p.key === saved)) chooseAgent(saved);
+            else if (PERSONAS.length > 1) renderPicker();
+            else chooseAgent(PERSONAS[0].key);
+          }
         }
         setTimeout(() => input?.focus(), 250);
       } else {
@@ -2157,14 +2227,31 @@
     // (event:/data: lines, blank-line delimited) and renders each named event.
     // Returns true if a terminal event (assistant.completed | limit | error) was
     // rendered, so the caller knows the turn produced a real answer.
+    // Hide code-y bits WHILE streaming so the visitor never sees a raw handoff
+    // URL or [[actions:...]] marker mid-type — they resolve into a clean button
+    // / text only at the end. Handles complete AND trailing-partial fragments.
+    const cleanStreaming = (text) => text
+      .replace(/\[\[[^\]]*\]\]/g, "")
+      .replace(/\[\[[^\]]*$/g, "")
+      .replace(/\bhttps?:\/\/wa\.me\/\S*/gi, "")
+      .replace(/\bwa\.me\/\S*/gi, "")
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/\n{3,}/g, "\n\n");
+
     const streamLive = async (res, typingEl) => {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
-      let bubble = null;   // growing bot bubble (built on first assistant.delta)
-      let acc = "";        // accumulated delta text
+      let bubble = null;       // growing bot bubble (built on first delta / completed)
+      let acc = "";            // full accumulated text to reveal
+      let finalText = null;    // authoritative final text (from assistant.completed)
       let workingEl = null;
-      let terminal = false;
+      let terminal = false, streamEnded = false, finalized = false, answered = false;
+
+      // Typewriter reveal — a pleasant, slightly-slow ChatGPT/Claude-style type-out.
+      let revealed = 0, rafId = 0, lastT = 0, resolveReveal;
+      const revealDone = new Promise((r) => { resolveReveal = r; });
+      const CPS = 58; // characters per second
 
       const clearTyping = () => { if (typingEl && typingEl.parentNode) typingEl.remove(); };
       const clearWorking = () => { if (workingEl) { workingEl.remove(); workingEl = null; } };
@@ -2172,6 +2259,38 @@
         if (!bubble) { clearTyping(); bubble = add("", "bot"); } // add() uses textContent (I5)
         return bubble;
       };
+      const finalize = () => {
+        if (finalized) return;
+        finalized = true;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+        const text = (finalText != null && finalText) ? finalText : acc;
+        if (bubble || text) {
+          renderBotMessage(ensureBubble(), text);
+          addSuggestions(text, parseMarkers(text));
+          answered = true;
+        }
+        scheduleNudge();
+        resolveReveal();
+      };
+      const tick = (t) => {
+        if (reducedMotion) {
+          revealed = acc.length;
+        } else {
+          if (!lastT) lastT = t;
+          const dt = Math.min(90, t - lastT); lastT = t;
+          const backlog = acc.length - revealed;
+          // speed up when far behind so long replies never drag
+          const rate = CPS * (backlog > 160 ? 2.4 : backlog > 70 ? 1.5 : 1);
+          revealed = Math.min(acc.length, revealed + (rate * dt) / 1000);
+        }
+        if (bubble) {
+          bubble.textContent = cleanStreaming(acc.slice(0, Math.floor(revealed)));
+          msgs.scrollTop = msgs.scrollHeight;
+        }
+        if (revealed >= acc.length && (finalText != null || streamEnded)) { finalize(); return; }
+        rafId = requestAnimationFrame(tick);
+      };
+      const startReveal = () => { if (!rafId && !finalized) { lastT = 0; rafId = requestAnimationFrame(tick); } };
 
       const handle = (name, dataStr) => {
         let data = {};
@@ -2181,10 +2300,10 @@
             break; // session id lives in the httpOnly sl_sid cookie — store nothing
           case "assistant.delta":
             clearWorking();
-            if (typeof data.text === "string") {
+            if (typeof data.text === "string" && data.text) {
               acc += data.text;
-              ensureBubble().textContent = acc; // I5: never innerHTML on live content
-              msgs.scrollTop = msgs.scrollHeight;
+              ensureBubble();  // the typewriter reveals cleaned text — never raw code
+              startReveal();
             }
             break;
           case "tool.activity":
@@ -2200,38 +2319,32 @@
             break;
           case "assistant.completed":
             clearWorking();
-            if (typeof data.text === "string" && data.text) {
-              acc = data.text;
-              renderBotMessage(ensureBubble(), acc); // rich render only on final text
-              addSuggestions(acc, parseMarkers(acc));
-              msgs.scrollTop = msgs.scrollHeight;
-            } else if (bubble) {
-              renderBotMessage(bubble, acc); // rich render what streamed in
-              addSuggestions(acc, parseMarkers(acc));
-            } else {
-              ensureBubble();
-            }
+            finalText = (typeof data.text === "string") ? data.text : "";
+            if (finalText) acc = finalText;   // reveal the authoritative final text
             terminal = true;
+            ensureBubble();
+            startReveal();                    // animate even if it never streamed deltas
             break;
           case "limit":
-            clearWorking(); clearTyping();
+            clearWorking();
+            if (bubble && acc) finalize(); else if (!finalized) { finalized = true; resolveReveal(); }
+            clearTyping();
             add(data.message || "You've reached the limit for this chat — let's continue on WhatsApp.", "bot");
             swapComposerToWhatsApp();
-            terminal = true;
+            terminal = true; answered = true;
             break;
           case "error":
-            clearWorking(); clearTyping();
+            clearWorking();
+            if (bubble && acc) finalize(); else if (!finalized) { finalized = true; resolveReveal(); }
+            clearTyping();
             add(ERROR_HTML, "bot", true); // hardcoded, non-model copy — HTML is safe
-            terminal = true;
+            terminal = true; answered = true;
             break;
           case "done":
-            clearWorking(); clearTyping();
-            // safety: if the stream ended with deltas but no assistant.completed,
-            // rich-render the plain text and offer suggestions once.
-            if (!terminal && bubble && acc) {
-              renderBotMessage(bubble, acc);
-              addSuggestions(acc, parseMarkers(acc));
-            }
+            clearWorking();
+            streamEnded = true;
+            if (!rafId && !finalized) startReveal();                 // let the reveal finalize
+            if (!bubble && finalText == null) { finalized = true; resolveReveal(); } // nothing produced
             break;
         }
       };
@@ -2262,19 +2375,25 @@
         }
         if (buffer.trim()) flushFrame(buffer);
       } catch {
-        // mid-stream network drop (common on mobile): keep any partial answer
-        // already shown; if nothing was rendered, surface the standard error
-        // line. Either way the turn is "handled" — return true so the caller
-        // never stacks a second fallback beneath a partial reply.
-        if (!bubble) { clearWorking(); clearTyping(); add(ERROR_HTML, "bot", true); }
+        // mid-stream network drop (common on mobile): finalize whatever partial
+        // answer was shown; if nothing rendered, surface the standard error line.
+        // Either way the turn is "handled" — return true so the caller never
+        // stacks a second fallback beneath a partial reply.
+        clearTyping();
+        if (bubble && acc) { finalize(); }
+        else { clearWorking(); if (!finalized) { finalized = true; resolveReveal(); } add(ERROR_HTML, "bot", true); }
         return true;
       }
+      streamEnded = true;
+      startReveal();
+      // wait for the type-out to catch up (safety cap so a stuck stream can't hang)
+      await Promise.race([revealDone, new Promise((r) => setTimeout(r, 15000))]);
+      if (!finalized) finalize();
       clearWorking(); clearTyping();
-      // "produced an answer" = a terminal event fired OR a partial bubble was
-      // built from deltas. When NEITHER happened (e.g. HTTP 200 + a body that
-      // streams only session/done, no assistant output), return false so the
+      // "produced an answer" = a bot bubble/text was finalized or a terminal
+      // event fired. Otherwise (200 + only session/done) return false so the
       // caller fires the offline fallback instead of dead-ending silently.
-      return terminal || Boolean(bubble);
+      return answered || terminal || Boolean(bubble);
     };
 
     // Telegram-style header status: "{persona} is typing…" during a live turn.
@@ -2292,6 +2411,8 @@
       if (!text) return;
       input.value = "";
       add(text, "user");
+      exchanges += 1;
+      clearNudge();
 
       if (live) {
         setTyping(true);
