@@ -40,13 +40,15 @@ window.HERMES = {
       key: "bari",
       name: "Bari",
       tagline: "Straight to business",
-      greeting: "Hi, I'm Bari from Safetyline. What does your business do, and what are you trying to fix or build? I'll tell you straight whether we can help — and what it would take."
+      greeting: "Hi, I'm Bari from Safetyline. What does your business do, and what are you trying to fix or build? I'll tell you straight whether we can help — and what it would take.",
+      handover: "Bari here — I've got your whole chat and the full context. Let's keep it moving. What do you need?"
     },
     {
       key: "biba",
       name: "Biba",
       tagline: "Warm & helpful",
-      greeting: "Hi, I'm Biba from Safetyline — lovely to meet you. I'd love to hear a bit about your business: what do you do, and what made you look us up today?"
+      greeting: "Hi, I'm Biba from Safetyline — lovely to meet you. I'd love to hear a bit about your business: what do you do, and what made you look us up today?",
+      handover: "Hi, I'm Biba — I've got everything from your chat so far, so we can just carry on. How can I help?"
     }
   ],
   // Persona shown if the visitor never picks, and the default `agent` sent.

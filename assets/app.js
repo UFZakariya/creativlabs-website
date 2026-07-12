@@ -1230,6 +1230,17 @@
       }
     ];
 
+    // Expose the readiness data + scoring so the chat dock can run the SAME quiz
+    // inline — single source of truth for questions, tiers, and scoring.
+    window.SL_BAR = {
+      questions: QUESTIONS,
+      tiers: TIERS,
+      score: (answers) => Math.round(
+        answers.reduce((sum, ai, qi) => sum + QUESTIONS[qi].weight * (QUESTIONS[qi].options[ai].lvl / 2), 0)
+      ),
+      tierFor: (score) => [...TIERS].reverse().find((t) => score >= t.min) || TIERS[0]
+    };
+
     const els = {
       current: quiz.querySelector("[data-bar-current]"),
       total: quiz.querySelector("[data-bar-total]"),
@@ -1711,13 +1722,28 @@
       switchBtn.textContent = "⇄";
       head.insertBefore(switchBtn, closeBtn || null);
       switchBtn.addEventListener("click", () => {
-        agentKey = null;
-        switchBtn.hidden = true;
-        if (nameEl) nameEl.textContent = "Safetyline";
-        if (status) status.textContent = live ? "Online — Safetyline" : "Safetyline assistant";
-        msgs.innerHTML = "";
-        renderConsent();
-        renderPicker();
+        // Seamless handover to the next persona — KEEP the whole conversation and
+        // context; the backend + strengthened identity rule make the new persona
+        // take over cleanly (no restart, no lost history).
+        const idx = PERSONAS.findIndex((x) => x.key === agentKey);
+        const next = PERSONAS[(idx + 1) % PERSONAS.length];
+        if (!next || next.key === agentKey) return;
+        const fromName = persona;
+        const p = agentOf(next.key);
+        agentKey = p.key;
+        persona = p.name;
+        if (nameEl) nameEl.textContent = p.name;
+        if (status) status.textContent = live ? `Online — ${p.name}` : `${p.name} · Safetyline`;
+        dock.dataset.agent = p.key;
+        try { sessionStorage.setItem("sl-agent", p.key); } catch {}
+        const div = document.createElement("div");
+        div.className = "dock-divider";
+        div.innerHTML = ""; // built via DOM below
+        div.appendChild(document.createTextNode(`${fromName} handed you over to ${p.name}`));
+        msgs.appendChild(div);
+        add(p.handover || `Hi, I'm ${p.name} — I've got everything from your chat so far. How can I help?`, "bot");
+        msgs.scrollTop = msgs.scrollHeight;
+        setTimeout(() => input && input.focus(), 60);
       });
     })();
 
@@ -1731,19 +1757,24 @@
 
     // One-tap suggestion chips shown after the greeting to get people talking.
     const STARTERS = [
-      "How does it work?",
-      "What could you build for my business?",
-      "What would it cost?",
+      { label: "How does it work?", send: "How does it work?" },
+      { label: "🧮 Check my AI readiness", quiz: true },
+      { label: "What would it cost?", send: "What would it cost?" },
     ];
+    const runStarter = (a, wrap) => {
+      wrap.remove();
+      if (a.quiz) startReadinessQuiz();
+      else if (a.send) sendText(a.send);
+    };
     const addStarters = () => {
       const wrap = document.createElement("div");
       wrap.className = "dock-chips";
-      STARTERS.forEach((t) => {
+      STARTERS.forEach((a) => {
         const c = document.createElement("button");
         c.type = "button";
         c.className = "dock-chip";
-        c.textContent = t;
-        c.addEventListener("click", () => { wrap.remove(); sendText(t); });
+        c.textContent = a.label;
+        c.addEventListener("click", () => runStarter(a, wrap));
         wrap.appendChild(c);
       });
       msgs.appendChild(wrap);
@@ -1756,7 +1787,7 @@
     const TOOLS = [
       { label: "Book a call", icon: "#i-clock", send: "I'd like to book a free discovery call." },
       { label: "WhatsApp", icon: "#i-whatsapp", cls: "dock-tool--wa", wa: true },
-      { label: "Readiness", icon: "#i-target", scroll: "#readiness" },
+      { label: "Readiness", icon: "#i-target", quiz: true },
     ];
     const showTools = () => {
       if (toolsBar) { toolsBar.hidden = false; return; }
@@ -1770,6 +1801,7 @@
         b.appendChild(document.createTextNode(a.label));
         b.addEventListener("click", () => {
           if (a.wa) window.open(waHref(), "_blank", "noopener");
+          else if (a.quiz) startReadinessQuiz();
           else if (a.scroll) { setOpen(false); document.querySelector(a.scroll)?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" }); }
           else if (a.send) sendText(a.send);
         });
@@ -1778,6 +1810,92 @@
       form.parentNode.insertBefore(toolsBar, form);
     };
     const hideTools = () => { if (toolsBar) toolsBar.hidden = true; };
+
+    // ── In-chat AI Readiness test — interactive, button-driven, inline ──────
+    // Runs the SAME 7-question quiz as the page (window.SL_BAR), rendered as
+    // tappable option buttons in the chat (WhatsApp/Telegram style). Feeds the
+    // score into the agent's context (sessionStorage bar-score → page.readiness).
+    let quizActive = false;
+    const startReadinessQuiz = () => {
+      const BAR = window.SL_BAR;
+      if (quizActive) return;
+      if (!BAR || !BAR.questions) { // fallback to the on-page test
+        setOpen(false);
+        document.querySelector("#readiness")?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" });
+        return;
+      }
+      quizActive = true;
+      add("Let's do a quick readiness check — 7 short questions, about a minute. Just tap your answer for each.", "bot");
+      const answers = [];
+      const askQ = (i) => {
+        if (i >= BAR.questions.length) return finishQuiz(answers);
+        const q = BAR.questions[i];
+        const msg = add("", "bot");
+        const t = document.createElement("div");
+        t.className = "dock-msg-text";
+        t.textContent = `Question ${i + 1} of ${BAR.questions.length}\n${q.q}`;
+        msg.appendChild(t);
+        const opts = document.createElement("div");
+        opts.className = "dock-quiz-opts";
+        q.options.forEach((opt, oi) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "dock-quiz-opt";
+          b.textContent = opt.label;
+          b.addEventListener("click", () => {
+            opts.querySelectorAll("button").forEach((x) => { x.disabled = true; });
+            b.classList.add("is-chosen");
+            add(opt.label, "user");
+            answers[i] = oi;
+            setTimeout(() => askQ(i + 1), 260);
+          });
+          opts.appendChild(b);
+        });
+        msg.appendChild(opts);
+        msgs.scrollTop = msgs.scrollHeight;
+      };
+      askQ(0);
+    };
+    const finishQuiz = (answers) => {
+      const BAR = window.SL_BAR;
+      const score = BAR.score(answers);
+      const tier = BAR.tierFor(score);
+      try { sessionStorage.setItem("bar-score", String(score)); } catch {}
+      const field = document.getElementById("readiness-score-field");
+      if (field) field.value = `${score}/100 — ${tier.name}`;
+
+      const msg = add("", "bot");
+      msg.classList.add("dock-result");
+      const card = document.createElement("div");
+      card.className = "dock-result-card";
+      const sc = document.createElement("div");
+      sc.className = "dock-result-score";
+      const big = document.createElement("strong"); big.textContent = String(score);
+      const outof = document.createElement("span"); outof.textContent = "/100";
+      sc.appendChild(big); sc.appendChild(outof);
+      const tn = document.createElement("div");
+      tn.className = "dock-result-tier"; tn.textContent = tier.name;
+      card.appendChild(sc); card.appendChild(tn);
+      msg.appendChild(card);
+      const sum = document.createElement("div");
+      sum.className = "dock-msg-text"; sum.textContent = tier.summary;
+      msg.appendChild(sum);
+      const ul = document.createElement("ul");
+      ul.className = "dock-result-recs";
+      (tier.recs || []).slice(0, 2).forEach((r) => {
+        const li = document.createElement("li"); li.textContent = r; ul.appendChild(li);
+      });
+      if (ul.children.length) msg.appendChild(ul);
+      const acts = document.createElement("div");
+      acts.className = "dock-msg-actions";
+      acts.appendChild(makeAction(
+        tier.cta || "Book my free consultation", "#i-clock", "dock-action--primary",
+        () => sendText(`I just did the readiness test — I scored ${score}/100 (${tier.name}). I'd like to book my free consultation.`)
+      ));
+      msg.appendChild(acts);
+      msgs.scrollTop = msgs.scrollHeight;
+      quizActive = false;
+    };
 
     const setOpen = (next) => {
       open = next;
