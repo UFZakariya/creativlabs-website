@@ -27,16 +27,34 @@
    shipped default until the backend goes live.
 */
 window.HERMES = {
-  // The Milestone-2 web-chat endpoint. "" = offline scripted fallback.
-  endpoint: "", // e.g. "https://hermes.safetyline.africa/web/chat"
+  // Live web-chat endpoint — the dedicated Safetyline front-desk Hermes
+  // (Bari/Biba). "" = offline scripted fallback.
+  endpoint: "https://desk.187.77.174.115.sslip.io/web/chat",
 
-  // The front-desk persona's first name — shown in the header and openers, and
-  // kept in sync with the backend character sheet
-  // (hermes-farm-fork/plugins/safetyline_web/seed_playbooks/*/SKILL.md). Change
-  // it in BOTH places. "Hermes" is an internal codename and must never surface.
-  persona: "Ada",
+  // The two front-desk personas the visitor can choose between in the dock.
+  // `key` MUST match a persona in the backend (adapter.PERSONAS: bari | biba).
+  // The widget sends the chosen `key` as `agent` on every live turn; the
+  // backend selects that character's voice. Order = display order in the picker.
+  personas: [
+    {
+      key: "bari",
+      name: "Bari",
+      tagline: "Straight to business",
+      greeting: "Hi, I'm Bari from Safetyline. What does your business do, and what are you trying to fix or build? I'll tell you straight whether we can help — and what it would take."
+    },
+    {
+      key: "biba",
+      name: "Biba",
+      tagline: "Warm & helpful",
+      greeting: "Hi, I'm Biba from Safetyline — lovely to meet you. I'd love to hear a bit about your business: what do you do, and what made you look us up today?"
+    }
+  ],
+  // Persona shown if the visitor never picks, and the default `agent` sent.
+  defaultPersona: "biba",
 
-  greeting: "Hi, I'm Ada — I help out here at Safetyline. Ask me anything about what we build, or how an agent could work for your business. No rush.",
+  // Back-compat single-name fallback (used only if `personas` is removed).
+  persona: "Biba",
+  greeting: "Hi — I help out here at Safetyline. Ask me anything about what we build, or how an agent could work for your business. No rush.",
   offlineNote: "Let me point you to the right place:",
 
   // NDPA one-liner, rendered once inside the panel on first open. This is the

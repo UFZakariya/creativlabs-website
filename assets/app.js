@@ -1353,12 +1353,19 @@
 
     const cfg = window.HERMES || {};
     const live = Boolean(cfg.endpoint);
-    const persona = cfg.persona || "Ada";
-    // Header name follows the configured persona so the internal "Hermes"
-    // codename never surfaces to visitors.
+    // Two selectable personas (Bari / Biba). The visitor picks one when the dock
+    // opens; the choice is sent as `agent` on every live turn and flavours the
+    // greeting. Falls back to a single persona for older configs.
+    const PERSONAS = (Array.isArray(cfg.personas) && cfg.personas.length)
+      ? cfg.personas
+      : [{ key: "biba", name: cfg.persona || "Biba", tagline: "Safetyline assistant" }];
+    const DEFAULT_AGENT = cfg.defaultPersona || PERSONAS[0].key;
+    const agentOf = (k) => PERSONAS.find((p) => p.key === k) || PERSONAS[0];
+    let agentKey = null;                        // chosen persona key (null = not yet picked)
+    let persona = agentOf(DEFAULT_AGENT).name;  // current display name (used by greeting copy)
     const nameEl = document.getElementById("dock-name");
-    if (nameEl) nameEl.textContent = persona;
-    if (status) status.textContent = live ? "Online — Safetyline agent" : "Safetyline assistant";
+    if (nameEl) nameEl.textContent = PERSONAS.length > 1 ? "Safetyline" : persona;
+    if (status) status.textContent = live ? "Online — Safetyline" : "Safetyline assistant";
 
     // First-party analytics — fire-and-forget POST to the /t ingest endpoint,
     // only when the live backend is configured. Never blocks the UI or throws.
@@ -1541,7 +1548,7 @@
         case "contact":
           return `Hi, I'm ${persona}. Thinking of reaching out? Ask me a quick question first, or I'll point you to the right next step.`;
         default:
-          return cfg.greeting || `Hi, I'm ${persona} — how can I help?`;
+          return agentOf(agentKey).greeting || cfg.greeting || `Hi, I'm ${persona} — how can I help?`;
       }
     };
     const contextualTeaser = () => {
@@ -1585,6 +1592,80 @@
     let greeted = false;
     let open = false;
 
+    // ── Agent picker (Bari / Biba) ──────────────────────────────────────────
+    // Renders a chooser as the first thing in the panel. Picking a persona sets
+    // `agentKey`, updates the header, and greets in that voice. A small header
+    // control lets the visitor switch mid-session.
+    const renderPicker = () => {
+      form.hidden = true; // no composer until they've chosen who to talk to
+      const wrap = document.createElement("div");
+      wrap.className = "dock-picker";
+      const h = document.createElement("p");
+      h.className = "dock-picker-h";
+      h.textContent = "Who would you like to chat with?";
+      wrap.appendChild(h);
+      PERSONAS.forEach((p) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "dock-agent dock-agent--" + p.key;
+        const av = document.createElement("span");
+        av.className = "dock-agent-av";
+        av.textContent = (p.name || "?").charAt(0);
+        const tx = document.createElement("span");
+        tx.className = "dock-agent-t";
+        const nm = document.createElement("strong");
+        nm.textContent = p.name;
+        const tg = document.createElement("small");
+        tg.textContent = p.tagline || "";
+        tx.appendChild(nm); tx.appendChild(tg);
+        b.appendChild(av); b.appendChild(tx);
+        b.addEventListener("click", () => chooseAgent(p.key));
+        wrap.appendChild(b);
+      });
+      msgs.appendChild(wrap);
+      msgs.scrollTop = msgs.scrollHeight;
+    };
+
+    const chooseAgent = (key) => {
+      const p = agentOf(key);
+      agentKey = p.key;
+      persona = p.name;
+      if (nameEl) nameEl.textContent = p.name;
+      if (status) status.textContent = live ? `Online — ${p.name}` : `${p.name} · Safetyline`;
+      dock.dataset.agent = p.key; // avatar/theme hook
+      if (switchBtn) switchBtn.hidden = PERSONAS.length < 2;
+      try { sessionStorage.setItem("sl-agent", p.key); } catch {}
+      msgs.querySelectorAll(".dock-picker").forEach((el) => el.remove());
+      form.hidden = false;
+      add(contextualGreeting(), "bot");
+      if (!live) addQuick();
+      setTimeout(() => input && input.focus(), 60);
+    };
+
+    // "Switch" control injected into the header (before the close button).
+    let switchBtn = null;
+    (() => {
+      const head = panel.querySelector(".dock-head");
+      const closeBtn = document.getElementById("dock-close");
+      if (!head || PERSONAS.length < 2) return;
+      switchBtn = document.createElement("button");
+      switchBtn.type = "button";
+      switchBtn.className = "dock-switch";
+      switchBtn.hidden = true;
+      switchBtn.setAttribute("aria-label", "Switch agent");
+      switchBtn.textContent = "⇄";
+      head.insertBefore(switchBtn, closeBtn || null);
+      switchBtn.addEventListener("click", () => {
+        agentKey = null;
+        switchBtn.hidden = true;
+        if (nameEl) nameEl.textContent = "Safetyline";
+        if (status) status.textContent = live ? "Online — Safetyline" : "Safetyline assistant";
+        msgs.innerHTML = "";
+        renderConsent();
+        renderPicker();
+      });
+    })();
+
     const setOpen = (next) => {
       open = next;
       btn.setAttribute("aria-expanded", String(next));
@@ -1596,8 +1677,11 @@
         if (!greeted) {
           greeted = true;
           renderConsent();
-          add(contextualGreeting(), "bot");
-          if (!live) addQuick();
+          let saved = null;
+          try { saved = sessionStorage.getItem("sl-agent"); } catch {}
+          if (saved && PERSONAS.some((p) => p.key === saved)) chooseAgent(saved);
+          else if (PERSONAS.length > 1) renderPicker();
+          else chooseAgent(PERSONAS[0].key);
         }
         setTimeout(() => input?.focus(), 250);
       } else {
@@ -1827,6 +1911,7 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               message: text,
+              agent: agentKey || DEFAULT_AGENT,
               page: pageContext(),
               contact_time: honeypot ? honeypot.value : ""
             })
