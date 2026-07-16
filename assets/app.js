@@ -473,7 +473,7 @@
             const body = composeEnquiry();
             status.textContent = "That didn't go through — send it directly instead: ";
             const mail = document.createElement("a");
-            mail.href = "mailto:hello@safetyline.africa?subject=" +
+            mail.href = "mailto:hello@safetyline.com.ng?subject=" +
               encodeURIComponent("Consultation request — Safetyline website") +
               "&body=" + encodeURIComponent(body);
             mail.textContent = "email your enquiry";
@@ -1680,7 +1680,7 @@
     };
 
     // Hardcoded (non-model) error/degrade copy — safe to render as HTML.
-    const ERROR_HTML = "I'm having trouble reaching the agent right now. You can always email <a href='mailto:hello@safetyline.africa'>hello@safetyline.africa</a> or <a href='#contact'>book a consultation</a>.";
+    const ERROR_HTML = "I'm having trouble reaching the agent right now. You can always email <a href='mailto:hello@safetyline.com.ng'>hello@safetyline.com.ng</a> or <a href='#contact'>book a consultation</a>.";
 
     const waHref = () => {
       const num = cfg.waNumber || "2348102354786";
@@ -2219,7 +2219,7 @@
       if (/farm|ufms|poultry/.test(t)) {
         return "UFMS is our farm operations system — daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='#products'>Use Cases</a>.";
       }
-      return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or email <a href='mailto:hello@safetyline.africa'>hello@safetyline.africa</a>.`;
+      return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or email <a href='mailto:hello@safetyline.com.ng'>hello@safetyline.com.ng</a>.`;
     };
 
     // Offline scripted responder (also the graceful fallback when the live

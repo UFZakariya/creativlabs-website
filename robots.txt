@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://safetyline.africa/sitemap.xml
+Sitemap: https://safetyline.com.ng/sitemap.xml

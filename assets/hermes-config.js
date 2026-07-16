@@ -5,7 +5,7 @@
 
    WIRE CONTRACT v1 (Milestone 2 web widget)
    -----------------------------------------
-   `endpoint` is the POST /web/chat URL, e.g. "https://hermes.safetyline.africa/web/chat".
+   `endpoint` is the POST /web/chat URL, e.g. "https://hermes.safetyline.com.ng/web/chat".
    The dock POSTs { message, page } with credentials:"include" and reads the
    response as a Server-Sent-Events stream on the SAME response (fetch +
    ReadableStream — NOT EventSource, which can't POST a body). Named events:
