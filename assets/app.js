@@ -253,6 +253,8 @@
     const caption = document.querySelector("[data-uc-caption]");
     const laptopVp = stage.querySelector('[data-uc-viewport="laptop"]');
     const phoneVp = stage.querySelector('[data-uc-viewport="phone"]');
+    const laptopHint = stage.querySelector('[data-uc-hint="laptop"]');
+    const phoneHint = stage.querySelector('[data-uc-hint="phone"]');
     const NATIVE = { laptop: 1280, phone: 390 };
     const CAPTIONS = {
       ufms: "UFMS — running daily at Universal Farms, our founder’s own poultry operation.",
@@ -270,6 +272,21 @@
         const native = wProp ? parseFloat(wProp) : NATIVE[k];
         vp.style.setProperty("--uc-zoom", (vp.clientWidth / native).toFixed(4));
       });
+      updateHint(laptopVp, laptopHint);
+      updateHint(phoneVp, phoneHint);
+    };
+
+    // The device screens hide their scrollbar to look like real hardware, so
+    // when the (real, working) content runs taller than the screen, nothing
+    // tells a visitor there's more below — it just reads as cut off. Fade the
+    // bottom edge + a bouncing chevron whenever there's unseen content, and
+    // hide it again once they've scrolled to the end (or there's nothing to
+    // scroll at all — e.g. this app fits the screen, or reduced-height stage).
+    const updateHint = (vp, hint) => {
+      if (!vp || !hint) return;
+      const hasMore = vp.scrollHeight - vp.clientHeight > 4 &&
+        vp.scrollTop < vp.scrollHeight - vp.clientHeight - 4;
+      hint.classList.toggle("is-visible", hasMore);
     };
 
     const moveIndicator = (tab) => {
@@ -293,6 +310,18 @@
       stage.dataset.device = tab.dataset.device;
       stage.querySelectorAll(".uc-app").forEach((v) => v.classList.toggle("is-active", v.dataset.appView === app));
       if (caption && CAPTIONS[app]) caption.textContent = CAPTIONS[app];
+      // Both laptop apps (UFMS / TruckVille OS / Labour Party) share ONE
+      // scrolling viewport — without this, switching tabs after scrolling
+      // down in one app opened the next one already scrolled partway (or
+      // past its own content), looking blank/broken instead of starting
+      // fresh at the top.
+      const activeVp = tab.dataset.device === "phone" ? phoneVp : laptopVp;
+      if (activeVp) activeVp.scrollTop = 0;
+      // keep the tapped/keyboard-focused tab visible in the horizontally
+      // scrollable mobile tab strip (no-op when it isn't scrollable)
+      if (tabsWrap.scrollWidth > tabsWrap.clientWidth) {
+        tab.scrollIntoView({ inline: "nearest", block: "nearest", behavior: reducedMotion ? "auto" : "smooth" });
+      }
       requestAnimationFrame(fitZoom);
     };
 
@@ -325,6 +354,9 @@
       const ro = new ResizeObserver(() => fitZoom());
       [laptopVp, phoneVp].forEach((vp) => { if (vp) ro.observe(vp); });
     }
+    // live-update the scroll hint as the visitor scrolls each device screen
+    laptopVp && laptopVp.addEventListener("scroll", () => updateHint(laptopVp, laptopHint), { passive: true });
+    phoneVp && phoneVp.addEventListener("scroll", () => updateHint(phoneVp, phoneHint), { passive: true });
   })();
 
   /* ============================================================
@@ -411,7 +443,19 @@
         app.querySelectorAll("[data-ufms-goto]").forEach((n) => n.classList.toggle("is-active", n === nav));
         app.querySelectorAll("[data-ufms-page]").forEach((p) => p.classList.toggle("is-active", p.dataset.ufmsPage === key));
         const vp = app.closest(".uc-viewport");
-        if (vp) vp.scrollTop = 0;
+        if (!vp) return;
+        vp.scrollTop = 0;
+        // Dashboard ↔ Records differ in height — refresh the "more below"
+        // hint for this new page too (module 6b owns the same check for
+        // top-level tab switches; this internal nav has its own scroll
+        // reset and needs the same follow-up).
+        const hint = vp.parentElement && vp.parentElement.querySelector(".uc-scroll-hint");
+        if (hint) {
+          requestAnimationFrame(() => {
+            const hasMore = vp.scrollHeight - vp.clientHeight > 4;
+            hint.classList.toggle("is-visible", hasMore);
+          });
+        }
       });
     });
     // ?ufms=<page> forces a UFMS in-app page on load — QA/screenshot hook

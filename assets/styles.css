@@ -4407,6 +4407,44 @@ main > .statement {
   -ms-overflow-style: none;
 }
 .uc-viewport::-webkit-scrollbar { display: none; }
+
+/* fade + bouncing hint shown over the bottom edge of a device screen
+   whenever its content runs taller than the visible viewport — the real
+   content still scrolls (scrollbars are just hidden to look like a real
+   device), so without this the cut-off content reads as broken rather
+   than "swipe for more". Toggled by JS (updateHint in app.js 6b). */
+.uc-scroll-hint {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 30%;
+  min-height: 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 6px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.94) 76%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+  z-index: 4;
+}
+.uc-scroll-hint.is-visible { opacity: 1; }
+.uc-scroll-hint span {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  box-shadow: 0 4px 10px rgba(8, 60, 255, 0.32);
+  animation: uc-hint-bounce 1.5s ease-in-out infinite;
+}
+.uc-scroll-hint span::before {
+  content: "";
+  display: block;
+  width: 100%; height: 100%;
+  background: no-repeat center/9px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+@keyframes uc-hint-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .uc-scroll-hint span { animation: none; } }
 .uc-app { display: none; position: relative; min-height: 100%; }
 .uc-app.is-active { display: block; }
 .uc-app-inner {
@@ -4440,10 +4478,98 @@ main > .statement {
 .uc-caption strong { color: var(--ink); font-weight: 600; }
 
 @media (max-width: 700px) {
+  /* 4 tabs don't fit one row at this width; wrapping stranded the 4th tab
+     alone on its own centered row (looked broken). A horizontal swipeable
+     strip is the standard mobile pattern for a segmented control instead. */
+  .uc-tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .uc-tabs::-webkit-scrollbar { display: none; }
   .uc-tab { padding: 0.5rem 0.82rem; font-size: 0.78rem; }
-  .uc-stage { --stage-h: clamp(300px, 52vh, 460px); }
-  .uc-laptop { width: min(97%, calc(1.6 * var(--stage-h) - 50px)); }
   .uc-laptop-lid { padding: 7px 7px 9px; border-radius: 12px 12px 5px 5px; }
+
+  /* On phones the "laptop" apps render as a PHONE: a portrait device frame
+     with each dashboard reflowed to a single readable column that scrolls
+     vertically — a real mobile app view, not a shrunk-down desktop screenshot
+     (a 16:10 laptop screen on a narrow phone is only ~200px tall, so the full
+     dashboard was cropped and janky). Ordering App is already a phone, so it
+     is untouched. #products + !important on the stage height so the fit-engine
+     tier classes (.s-snug/.s-tight/.s-tighter) can't silently shrink it back
+     (see [[feedback-density-engine-vs-mobile-overrides]]). */
+  #products .uc-stage { --stage-h: clamp(460px, 72vh, 600px) !important; }
+  #products .uc-laptop {
+    position: absolute;
+    width: min(84%, 320px);
+    height: 100%;
+    display: flex;
+  }
+  #products .uc-laptop-lid {
+    flex: 1;
+    display: flex;
+    padding: 11px;
+    border-radius: 40px;
+    background: linear-gradient(155deg, #262931, #14161c 58%, #2b2e36);
+  }
+  #products .uc-laptop-screen {
+    flex: 1;
+    aspect-ratio: auto;
+    height: auto;
+    border-radius: 30px;
+    display: flex;
+  }
+  #products .uc-laptop-base { display: none; }
+  #products .uc-cam { top: 8px; width: 40px; height: 5px; border-radius: 999px; }
+  #products .uc-viewport { flex: 1; border-radius: 30px; overflow-x: hidden; }
+  #products .uc-laptop .uc-app-inner { width: 100%; min-width: 0; zoom: 1; }
+
+  /* --- reflow each dashboard to one readable phone column --- */
+  /* UFMS */
+  #products .ufms-side { display: none; }
+  #products .ufms-search, #products .ufms-topright { display: none; }
+  #products .ufms-top { height: auto; padding: 11px 13px; }
+  #products .ufms-main { padding: 14px 13px; gap: 12px; }
+  #products .ufms-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  #products .ufms-kpi { min-width: 0; }
+  #products .ufms-grid { grid-template-columns: 1fr; }
+  #products .ufms-setup-cards { grid-template-columns: 1fr; }
+  #products .ufms-pagehead { flex-direction: column; align-items: flex-start; gap: 6px; }
+  /* TruckVille OS */
+  #products .tvos-side { display: none; }
+  #products .tvos-top { flex-wrap: wrap; height: auto; gap: 8px; padding: 12px 14px; }
+  #products .tvos-content { padding: 14px 13px; gap: 14px; }
+  #products .tvos-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  #products .tvos-stat, #products .tvos-card { min-width: 0; }
+  #products .tvos-grid2 { grid-template-columns: 1fr; }
+  #products .tvos-hero { flex-wrap: wrap; gap: 8px; }
+  #products .tvos-hero-r { width: 100%; }
+  #products .tvos-table { font-size: 10px; }
+  /* Labour Party */
+  #products .lp-nav { display: none; }
+  #products .lp-header { min-height: 56px; padding: 0 14px; }
+  #products .lp-shell { width: calc(100% - 1.1rem); margin: 12px auto 14px; }
+  #products .lp-layout { grid-template-columns: 1fr; }
+  #products .lp-sidebar { display: none; }
+  #products .lp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  #products .lp-stat { min-width: 0; }
+  #products .lp-card { padding: 16px 14px; }
+  /* the physical "membership slip" is a fixed-size card graphic that can't
+     shrink cleanly — drop it on phones; the dashboard above it is the point */
+  #products .lp-slip, #products .lp-slip-div, #products .lp-slip-foot { display: none; }
+  #products .lp-main, #products .lp-main > * { min-width: 0; max-width: 100%; }
+  /* wide desktop tables compress to fit the phone (fixed layout truncates
+     cells rather than pushing the frame wide) */
+  #products .ufms-table, #products .tvos-table { table-layout: fixed; width: 100%; font-size: 11px; }
+  #products .ufms-table th, #products .ufms-table td,
+  #products .tvos-table th, #products .tvos-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* backstop: nothing in the phone frame may pan sideways */
+  #products .uc-viewport { overflow-x: hidden; }
 }
 
 /* short/landscape viewports: shrink the whole stage so devices never
