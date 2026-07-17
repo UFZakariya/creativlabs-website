@@ -1878,7 +1878,7 @@ body.fx-enter .hero > .title-split { animation: none; }
   .card-icon { width: 34px; height: 34px; margin-bottom: 9px; border-radius: 12px; }
   .card-icon svg { width: 17px; height: 17px; }
   .glass-card h3 { margin-bottom: 4px; font-size: 0.82rem; line-height: 1.3; }
-  .glass-card p { font-size: 0.74rem; line-height: 1.4; }
+  .glass-card p { font-size: 0.8rem; line-height: 1.4; }
 
   .key-message { gap: 14px; padding: 18px; }
   .key-message blockquote { font-size: 1.1rem; }
@@ -1999,7 +1999,7 @@ body.fx-enter .hero > .title-split { animation: none; }
   .step { padding: 12px 14px; grid-template-columns: 34px 1fr; }
   .step .step-num { width: 34px; height: 34px; font-size: 0.85rem; }
   .step h3 { font-size: 0.88rem; margin: 0 0 3px; }
-  .step p { font-size: 0.72rem; }
+  .step p { font-size: 0.8rem; }
   .process-track { gap: 10px; }
   .process-track::before { left: 31px; }
 
@@ -2013,7 +2013,7 @@ body.fx-enter .hero > .title-split { animation: none; }
   .impact-rail { gap: 8px; }
   .impact-item { padding: 12px 14px; }
   .impact-item strong { margin-bottom: 0; }
-  .impact-item span { font-size: 0.7rem; }
+  .impact-item span { font-size: 0.8rem; }
 
   /* faq */
   .faq-list { gap: 8px; }
@@ -3924,7 +3924,7 @@ body.fx-enter .hero > .title-split { animation: none; }
 .s-snug .glass-card h3 { margin-bottom: 3px; font-size: clamp(0.76rem, 1.8vh, 0.95rem); }
 
 .s-snug .glass-card p {
-  font-size: clamp(0.66rem, 1.5vh, 0.8rem);
+  font-size: clamp(0.8rem, 1.6vh, 0.85rem);
   line-height: 1.35;
 }
 
@@ -3983,7 +3983,7 @@ body.fx-enter .hero > .title-split { animation: none; }
 .s-snug .step { padding: 9px 12px; }
 .s-snug .step h3 { font-size: 0.82rem; margin-bottom: 2px; }
 .s-snug .step p {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
 }
 .s-snug .step .step-num { width: 30px; height: 30px; font-size: 0.78rem; }
 .s-snug .process-track::before { left: 29px; }
@@ -3992,7 +3992,7 @@ body.fx-enter .hero > .title-split { animation: none; }
 .s-snug .impact-item { padding: 9px 12px; border-radius: 16px; }
 .s-snug .impact-item svg { width: 20px; height: 20px; }
 .s-snug .impact-item strong { font-size: 0.8rem; }
-.s-snug .impact-item span { font-size: 0.68rem; }
+.s-snug .impact-item span { font-size: 0.8rem; }
 
 /* faq */
 .s-snug .faq-list { gap: 7px; }
