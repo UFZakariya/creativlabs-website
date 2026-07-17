@@ -420,18 +420,35 @@
   })();
 
   /* ============================================================
-     7. Contact form (Netlify). On hosts without a form backend
-        (e.g. GitHub Pages returns 405 for POST) the submission is
-        NOT lost: the failure path rebuilds the whole enquiry into a
-        prefilled email + WhatsApp link so the visitor can still send.
+     7. Contact form → the Safetyline lead intake (POST /web/lead on
+        the same backend as the chat). The submission lands in the
+        SAME lead pipeline as chat leads — scored, alerted to the
+        team's WhatsApp, and in the morning digest. If the network
+        fails, the whole enquiry is rebuilt into a prefilled WhatsApp
+        link so nothing the visitor typed is lost.
      ============================================================ */
   (() => {
+    const LEAD_URL = (() => {
+      const ep = (window.HERMES && window.HERMES.endpoint) || "";
+      return ep ? ep.replace(/\/chat\/?$/, "/lead") : "";
+    })();
     document.querySelectorAll(".contact-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const track = window.SL_TRACK || (() => {});
         const button = form.querySelector('button[type="submit"]');
         const status = form.querySelector(".form-status");
         const original = button ? button.textContent : "";
+        const v = (name) => (((form.querySelector(`[name="${name}"]`) || {}).value) || "").trim();
+
+        // One reachable channel required (mirror of the server rule) — checked
+        // before the button flips so the visitor gets an instant, clear ask.
+        if (!v("phone") && !v("email")) {
+          if (status) status.textContent = "Add a WhatsApp number or an email so we can reach you.";
+          const ph = form.querySelector('[name="phone"]');
+          if (ph) ph.focus();
+          return;
+        }
 
         if (button) {
           button.textContent = button.dataset.submittingLabel || "Sending…";
@@ -439,12 +456,12 @@
         }
         if (status) status.textContent = "";
 
-        // compose the enquiry as plain text (used by the fallback links)
+        // compose the enquiry as plain text (used by the WhatsApp fallback)
         const composeEnquiry = () => {
-          const v = (name) => (form.querySelector(`[name="${name}"]`) || {}).value || "";
           const parts = [
             `Name: ${v("name")}`,
-            `Email: ${v("email")}`,
+            v("phone") ? `WhatsApp: ${v("phone")}` : null,
+            v("email") ? `Email: ${v("email")}` : null,
             v("company") ? `Company: ${v("company")}` : null,
             v("focus") ? `Wants to systemize: ${v("focus")}` : null,
             v("readiness_score") ? `Readiness score: ${v("readiness_score")}` : null
@@ -452,39 +469,58 @@
           return parts.join("\n") + "\n\n" + v("message");
         };
 
-        try {
-          const res = await fetch(form.getAttribute("action") || "/", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams(new FormData(form)).toString()
-          });
-          if (!res.ok) throw new Error(`Submit failed: ${res.status}`);
-          form.reset();
-          if (button) button.textContent = button.dataset.successLabel || "Sent";
-          if (status) status.textContent = form.dataset.successMessage || "Thank you — we will be in touch.";
-        } catch (err) {
+        const restore = () => {
           if (button) {
             button.textContent = original;
             button.disabled = false;
           }
+        };
+
+        try {
+          if (!LEAD_URL) throw new Error("offline");
+          const res = await fetch(LEAD_URL, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: v("name"),
+              phone: v("phone"),
+              email: v("email"),
+              business: [v("company"), v("focus")].filter(Boolean).join(" — "),
+              need: v("message"),
+              readiness_score: v("readiness_score"),
+              "bot-field": v("bot-field")
+            })
+          });
+          if (res.status === 400) {
+            // The server's reason is customer-safe by contract — show it.
+            let msg = "";
+            try { msg = String((await res.json()).error || ""); } catch (_) {}
+            if (status) status.textContent = msg || "Please check your contact details and try again.";
+            restore();
+            track("form_error", { status: "400" });
+            return;
+          }
+          if (!res.ok) throw new Error(`Submit failed: ${res.status}`);
+          form.reset();
+          if (button) button.textContent = button.dataset.successLabel || "Sent";
+          if (status) status.textContent = form.dataset.successMessage || "Thank you — we will be in touch.";
+          track("form_submit", { status: "ok" });
+        } catch (err) {
+          restore();
+          track("form_error", { status: String((err && err.message) || "network").slice(0, 80) });
           if (status) {
-            // build the fallback links from the visitor's own entries so
-            // nothing they typed is lost (DOM nodes, no innerHTML)
+            // rebuild the enquiry into a prefilled WhatsApp link so nothing
+            // the visitor typed is lost (DOM nodes, no innerHTML)
             const body = composeEnquiry();
-            status.textContent = "That didn't go through — send it directly instead: ";
-            const mail = document.createElement("a");
-            mail.href = "mailto:hello@safetyline.com.ng?subject=" +
-              encodeURIComponent("Consultation request — Safetyline website") +
-              "&body=" + encodeURIComponent(body);
-            mail.textContent = "email your enquiry";
-            const or = document.createTextNode(" or ");
+            status.textContent = "That didn't go through — ";
             const wa = document.createElement("a");
             wa.href = "https://wa.me/2348102354786?text=" +
               encodeURIComponent("Hi Safetyline, consultation request:\n\n" + body);
             wa.target = "_blank";
             wa.rel = "noopener";
-            wa.textContent = "send it on WhatsApp";
-            status.append(mail, or, wa, document.createTextNode("."));
+            wa.textContent = "send it on WhatsApp instead";
+            status.append(wa, document.createTextNode(" (your details are already filled in)."));
           }
         }
       });
@@ -1078,8 +1114,11 @@
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     };
 
-    if (reducedMotion) {
-      // respect the motion preference: same ribbons, one still frame
+    if (reducedMotion || !finePointer) {
+      // Reduced motion OR a touch device: same ribbons, one still frame.
+      // On phones the permanent 60fps full-viewport shader costs real battery
+      // and main-thread time, and its pointer-reactive energy has no pointer
+      // to react to — the still backdrop is visually identical behind blur.
       const drawStill = () => draw(STILL_TIME);
       window.addEventListener("resize", drawStill);
       document.addEventListener("visibilitychange", () => {
@@ -1283,6 +1322,14 @@
         els.options.appendChild(btn);
       });
       els.back.hidden = step === 0;
+      // Keyboard/SR continuity: rebuilding the option list destroys the button
+      // the user just activated, dropping focus to <body>. Move focus to the
+      // first option of the new question (skip on the very first paint so we
+      // don't yank focus before the user has engaged).
+      if (step > 0) {
+        const first = els.options.querySelector(".bar-option");
+        if (first) first.focus({ preventScroll: true });
+      }
     };
 
     const finish = () => {
@@ -1310,6 +1357,15 @@
       const field = document.getElementById("readiness-score-field");
       if (field) field.value = `${score}/100 — ${tier.name}`;
       try { sessionStorage.setItem("bar-score", String(score)); } catch {}
+      (window.SL_TRACK || (() => {}))("quiz_complete", { score: String(score), tier: tier.name });
+
+      // keyboard/SR users: land focus on the verdict so score + tier + the
+      // next-step CTAs are announced (render() destroyed the focused option)
+      const verdictH = result.querySelector(".bar-verdict h3");
+      if (verdictH) {
+        verdictH.setAttribute("tabindex", "-1");
+        setTimeout(() => verdictH.focus({ preventScroll: true }), 50);
+      }
 
       // animate count + gauge
       const C = 326.7;
@@ -1334,6 +1390,13 @@
         step -= 1;
         render();
       }
+    });
+
+    // Quiz completers are the hottest leads on the page — hand them into the
+    // chat, whose greeting is already score-aware (sessionStorage bar-score).
+    const chatBtn = document.querySelector("[data-bar-chat]");
+    if (chatBtn) chatBtn.addEventListener("click", () => {
+      if (window.SL_DOCK) window.SL_DOCK.open();
     });
 
     els.retake.addEventListener("click", () => {
@@ -1381,6 +1444,9 @@
     // First-party analytics — fire-and-forget POST to the /t ingest endpoint,
     // only when the live backend is configured. Never blocks the UI or throws.
     const trackUrl = live ? cfg.endpoint.replace(/\/chat\/?$/, "/t") : "";
+    // Durable lead intake (same backend) — the lead card posts here FIRST so a
+    // captured lead survives even if the conversational turn fails.
+    const leadUrl = live ? cfg.endpoint.replace(/\/chat\/?$/, "/lead") : "";
     const track = (kind, extra) => {
       if (!trackUrl) return;
       try {
@@ -1393,6 +1459,10 @@
         }).catch(() => {});
       } catch (_) {}
     };
+    // Shared with the page modules (contact form, quiz) so the whole funnel
+    // reports into one place. Defined here because only the dock knows the
+    // ingest URL.
+    try { window.SL_TRACK = track; } catch (_) {}
     // Honeypot: a hidden field humans never fill; bots autofill it. Its value
     // rides the chat POST body so the backend can drop bot traffic.
     let honeypot = null;
@@ -1680,7 +1750,7 @@
     };
 
     // Hardcoded (non-model) error/degrade copy — safe to render as HTML.
-    const ERROR_HTML = "I'm having trouble reaching the agent right now. You can always email <a href='mailto:hello@safetyline.com.ng'>hello@safetyline.com.ng</a> or <a href='#contact'>book a consultation</a>.";
+    const ERROR_HTML = "I'm having trouble reaching the agent right now. You can always <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a> or <a href='#contact'>book a consultation</a>.";
 
     const waHref = () => {
       const num = cfg.waNumber || "2348102354786";
@@ -1716,38 +1786,28 @@
     // Renders a chooser as the first thing in the panel. Picking a persona sets
     // `agentKey`, updates the header, and greets in that voice. A small header
     // control lets the visitor switch mid-session.
-    const renderPicker = () => {
-      form.hidden = true; // no composer until they've chosen who to talk to
-      hideTools();
-      const wrap = document.createElement("div");
-      wrap.className = "dock-picker";
-      const h = document.createElement("p");
-      h.className = "dock-picker-h";
-      h.textContent = "Who would you like to chat with?";
-      wrap.appendChild(h);
-      PERSONAS.forEach((p) => {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "dock-agent dock-agent--" + p.key;
-        const av = document.createElement("span");
-        av.className = "dock-agent-av";
-        av.textContent = (p.name || "?").charAt(0);
-        const tx = document.createElement("span");
-        tx.className = "dock-agent-t";
-        const nm = document.createElement("strong");
-        nm.textContent = p.name;
-        const tg = document.createElement("small");
-        tg.textContent = p.tagline || "";
-        tx.appendChild(nm); tx.appendChild(tg);
-        b.appendChild(av); b.appendChild(tx);
-        b.addEventListener("click", () => chooseAgent(p.key));
-        wrap.appendChild(b);
-      });
-      msgs.appendChild(wrap);
-      msgs.scrollTop = msgs.scrollHeight;
+    // Auto-start with the default persona — a decision screen ("who would you
+    // like to chat with?") about two names a first-time visitor has never met
+    // costs a full step before any value. Instead the greeting lands instantly
+    // and a one-line divider offers the handover to the other persona (the
+    // existing seamless-switch mechanism).
+    const offerSwitchLine = () => {
+      if (PERSONAS.length < 2) return;
+      const other = PERSONAS.find((x) => x.key !== agentKey);
+      if (!other) return;
+      const div = document.createElement("div");
+      div.className = "dock-divider";
+      div.appendChild(document.createTextNode(`You're with ${persona} · `));
+      const sw = document.createElement("button");
+      sw.type = "button";
+      sw.className = "dock-divider-link";
+      sw.textContent = `prefer ${other.tagline ? other.tagline.toLowerCase() : "the other style"}? Chat with ${other.name} ⇄`;
+      sw.addEventListener("click", () => { div.remove(); switchBtn && switchBtn.click(); });
+      div.appendChild(sw);
+      msgs.appendChild(div);
     };
 
-    const chooseAgent = (key) => {
+    const chooseAgent = (key, opts) => {
       const p = agentOf(key);
       agentKey = p.key;
       persona = p.name;
@@ -1756,12 +1816,13 @@
       dock.dataset.agent = p.key; // avatar/theme hook
       if (switchBtn) switchBtn.hidden = PERSONAS.length < 2;
       try { sessionStorage.setItem("sl-agent", p.key); } catch {}
-      msgs.querySelectorAll(".dock-picker").forEach((el) => el.remove());
       form.hidden = false;
       add(contextualGreeting(), "bot");
+      if (opts && opts.offerSwitch) offerSwitchLine();
       addStarters();
       showTools();
-      setTimeout(() => input && input.focus(), 60);
+      scheduleFirstNudge();
+      if (finePointer) setTimeout(() => input && input.focus(), 60);
     };
 
     // "Switch" control injected into the header (before the close button).
@@ -1921,6 +1982,7 @@
       try { sessionStorage.setItem("bar-score", String(score)); } catch {}
       const field = document.getElementById("readiness-score-field");
       if (field) field.value = `${score}/100 — ${tier.name}`;
+      track("quiz_complete", { score: String(score), tier: tier.name, target: "dock" });
 
       const msg = add("", "bot");
       msg.classList.add("dock-result");
@@ -2016,6 +2078,21 @@
       }, 32000);
     };
 
+    // Zero-message nudge — the biggest chat drop-off is "opened, read the
+    // greeting, stalled". One soft re-offer of the starters, once per session.
+    let firstNudged = false, firstNudgeTimer = null;
+    const clearFirstNudge = () => { if (firstNudgeTimer) { clearTimeout(firstNudgeTimer); firstNudgeTimer = null; } };
+    const scheduleFirstNudge = () => {
+      if (firstNudged) return;
+      clearFirstNudge();
+      firstNudgeTimer = setTimeout(() => {
+        if (firstNudged || !open || exchanges > 0 || leadCardOpen || quizActive || composerSwapped) return;
+        firstNudged = true;
+        add("No pressure — most people start with the 60-second readiness check, or just tell me what your business does.", "bot");
+        addStarters();
+      }, 40000);
+    };
+
     // Use-case gallery card — a rich, tappable showcase of what we've built.
     const USE_CASES = [
       { emoji: "🐔", name: "UFMS", desc: "Poultry farm system", q: "Tell me about UFMS, the farm system." },
@@ -2066,15 +2143,43 @@
       const wantI = document.createElement("input"); wantI.type = "text"; wantI.placeholder = "What you'd like to build (optional)"; wantI.setAttribute("aria-label", "What you'd like to build");
       const submit = document.createElement("button");
       submit.type = "button"; submit.className = "dock-action dock-action--primary dock-lead-send"; submit.textContent = "Send my details";
-      submit.addEventListener("click", () => {
+      submit.addEventListener("click", async () => {
         const name = nameI.value.trim(), phone = phoneI.value.trim(), want = wantI.value.trim();
         if (!name || !phone) { box.classList.add("is-error"); (name ? phoneI : nameI).focus(); return; }
         box.querySelectorAll("input,button").forEach((x) => { x.disabled = true; });
         leadCardOpen = false;
+        track("lead_submit", {});
+        // Durable capture FIRST (deterministic lead store + team alert); the
+        // confirmation is only shown once it actually lands — no false "Sent".
+        let saved = false;
+        if (leadUrl) {
+          try {
+            const res = await fetch(leadUrl, {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, phone, need: want })
+            });
+            saved = res.ok;
+          } catch (_) { /* fall through to the WhatsApp fallback */ }
+        }
         const done = document.createElement("p"); done.className = "dock-leadform-done";
-        done.textContent = "✓ Sent — the team will reach out. Thank you!";
-        box.appendChild(done);
-        sendText(`Please have the team follow up with me. Name: ${name}. WhatsApp: ${phone}.${want ? " I'd like to build: " + want + "." : ""}`);
+        if (saved) {
+          done.textContent = "✓ Sent — the team will reach out. Thank you!";
+          box.appendChild(done);
+          // Conversational context for the agent (best-effort; lead is safe).
+          sendText(`Please have the team follow up with me. Name: ${name}. WhatsApp: ${phone}.${want ? " I'd like to build: " + want + "." : ""}`);
+        } else {
+          done.textContent = "Couldn't send just now — tap below and your details are ready to go:";
+          box.appendChild(done);
+          const wa = document.createElement("a");
+          wa.className = "dock-action dock-action--wa";
+          wa.href = "https://wa.me/" + (cfg.waNumber || "2348102354786") + "?text=" +
+            encodeURIComponent(`Hi Safetyline! Please follow up with me. Name: ${name}. WhatsApp: ${phone}.${want ? " I'd like to build: " + want + "." : ""}`);
+          wa.target = "_blank"; wa.rel = "noopener";
+          wa.textContent = "Send on WhatsApp";
+          box.appendChild(wa);
+        }
       });
       [nameI, phoneI, wantI, submit].forEach((x) => box.appendChild(x));
       msg.appendChild(box);
@@ -2129,15 +2234,16 @@
             let saved = null;
             try { saved = sessionStorage.getItem("sl-agent"); } catch {}
             if (saved && PERSONAS.some((p) => p.key === saved)) chooseAgent(saved);
-            else if (PERSONAS.length > 1) renderPicker();
-            else chooseAgent(PERSONAS[0].key);
+            else chooseAgent(DEFAULT_AGENT, { offerSwitch: true });
           }
         }
-        setTimeout(() => input?.focus(), 250);
+        track("dock_opened", {});
+        if (finePointer) setTimeout(() => input?.focus(), 250);
       } else {
         panel.classList.remove("open");
         quizActive = false;   // don't leave the Readiness tool latched off
         clearNudge();
+        clearFirstNudge();
         setTimeout(() => { panel.hidden = true; }, 220);
       }
     };
@@ -2219,7 +2325,7 @@
       if (/farm|ufms|poultry/.test(t)) {
         return "UFMS is our farm operations system — daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='#products'>Use Cases</a>.";
       }
-      return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or email <a href='mailto:hello@safetyline.com.ng'>hello@safetyline.com.ng</a>.`;
+      return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a>.`;
     };
 
     // Offline scripted responder (also the graceful fallback when the live
@@ -2229,7 +2335,21 @@
       setTimeout(() => {
         t2.remove();
         add(scripted(text), "bot", true);
+        scheduleNudge(); // degraded conversations still get the soft close
       }, reducedMotion ? 50 : 700);
+    };
+
+    // Degraded-mode honesty: apologise ONCE per outage (not on every failed
+    // turn) and stop claiming "Online" while unreachable; recover on success.
+    let degradedShown = false;
+    const showDegraded = () => {
+      if (!degradedShown && cfg.degradedCopy) { add(cfg.degradedCopy, "bot"); degradedShown = true; }
+      if (status) status.textContent = `${persona} · offline — WhatsApp is fastest`;
+    };
+    const clearDegraded = () => {
+      if (!degradedShown) return;
+      degradedShown = false;
+      if (status) status.textContent = live ? `Online — ${persona}` : `${persona} · Safetyline`;
     };
 
     // SSE-over-fetch client. Reads response.body as a stream, parses SSE frames
@@ -2277,6 +2397,14 @@
           renderBotMessage(ensureBubble(), text);
           addSuggestions(text, parseMarkers(text));
           answered = true;
+          // Announce the COMPLETED reply once to screen readers. The streaming
+          // bubble is no longer a live region (it rewrote textContent ~58×/s,
+          // which queued dozens of re-announcements per message); a dedicated
+          // hidden live region gets the final text a single time.
+          try {
+            const liveEl = document.getElementById("dock-live");
+            if (liveEl) liveEl.textContent = cleanStreaming(text);
+          } catch (_) {}
         }
         scheduleNudge();
         resolveReveal();
@@ -2446,14 +2574,15 @@
           // a stream that ends without ever producing an answer must still
           // fall back rather than leave the message unanswered
           const produced = await streamLive(res, t);
+          if (produced) clearDegraded();
           if (!produced && !composerSwapped) {
-            if (cfg.degradedCopy) add(cfg.degradedCopy, "bot");
+            showDegraded();
             offlineReply(text);
           }
         } catch {
           if (t.parentNode) t.remove();
           if (!composerSwapped) {
-            if (cfg.degradedCopy) add(cfg.degradedCopy, "bot");
+            showDegraded();
             offlineReply(text);
           }
         } finally {
@@ -2464,6 +2593,11 @@
         offlineReply(text);
       }
     });
+
+    // Page-level hook: lets the on-page readiness quiz (an earlier module)
+    // hand its completers into the chat — the greeting is already score-aware
+    // via window.SL_BAR.
+    try { window.SL_DOCK = { open: () => setOpen(true), isOpen: () => open }; } catch (_) {}
   })();
 
   /* ============================================================
