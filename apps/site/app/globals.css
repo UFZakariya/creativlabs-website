@@ -60,9 +60,18 @@
     radial-gradient(160% 130% at 50% 0%, var(--color-blue) 20%, var(--color-navy) 68%, var(--color-navy-deep) 100%);
 }
 
-/* gradient text for accent phrases */
+/* gradient text for accent phrases — on light surfaces */
 @utility text-dawn-gradient {
   background: linear-gradient(92deg, var(--color-cyan), var(--color-azure) 38%, var(--color-blue) 75%, var(--color-violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* brighter variant for DARK bands — deep blues/violets vanish against the
+   azure-dawn background, so this one stays in the light end of the ramp */
+@utility text-dawn-gradient-bright {
+  background: linear-gradient(92deg, #eafcff, var(--color-cyan) 40%, #9ec5ff 78%, #cdb8ff);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
