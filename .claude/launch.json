@@ -2,11 +2,11 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "safetyline-v2",
-      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["preview-server.mjs"],
-      "port": 8767,
-      "autoPort": true
+      "name": "sardauna-site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "apps/site",
+      "port": 3010
     }
   ]
 }

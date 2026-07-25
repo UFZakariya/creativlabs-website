@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* ── Sardauna design tokens (brief §4) ─────────────────────────────────────
+   Viktor-class design language, Safetyline palette. Original implementation.
+   Light canvas ↔ deep-navy dark bands; azure-dawn gradient instead of their
+   peach sunrise; glass system tinted to our blues.                          */
+@theme {
+  /* palette */
+  --color-canvas: #f6f8ff;      /* light page background            */
+  --color-ink: #10142a;         /* primary text / solid buttons     */
+  --color-ink-soft: #3c4258;    /* secondary body text on light     */
+  --color-navy: #040b34;        /* dark-section base                */
+  --color-navy-deep: #02061f;   /* darkest gradient stop            */
+  --color-blue: #083cff;        /* Safetyline accent-1              */
+  --color-azure: #38bdf8;       /* mid gradient stop                */
+  --color-cyan: #7ef2ff;        /* dawn hotspot / warm-glow role    */
+  --color-violet: #7b2ff7;      /* existing brand secondary accent  */
+  --color-mist: #aab3d6;        /* muted text on dark               */
+
+  /* type — Geist wired via next/font in layout.tsx */
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
+
+  /* radii rhythm (their 24/32 + big section corners) */
+  --radius-card: 1.5rem;        /* 24px */
+  --radius-card-lg: 2rem;       /* 32px */
+  --radius-band: 3rem;          /* rounded-bottom hero bands (48px) */
+
+  /* motion */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-swap: cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* fluid display scale — clamps interpolate 390→1280px, tight tracking */
+@utility text-display-1 {
+  font-size: clamp(2.5rem, 1.4rem + 4.6vw, 5rem);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+}
+@utility text-display-2 {
+  font-size: clamp(1.875rem, 1.1rem + 3.2vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+@utility text-display-3 {
+  font-size: clamp(1.4rem, 1rem + 1.8vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+/* the azure-dawn band: cyan hotspot top-center melting through azure and
+   Safetyline blue into deep navy — our answer to their sunrise gradient */
+@utility bg-azure-dawn {
+  background:
+    radial-gradient(120% 90% at 50% -10%, var(--color-cyan) 0%, transparent 32%),
+    radial-gradient(140% 110% at 50% -20%, var(--color-azure) 8%, transparent 55%),
+    radial-gradient(160% 130% at 50% 0%, var(--color-blue) 20%, var(--color-navy) 68%, var(--color-navy-deep) 100%);
+}
+
+/* gradient text for accent phrases */
+@utility text-dawn-gradient {
+  background: linear-gradient(92deg, var(--color-cyan), var(--color-azure) 38%, var(--color-blue) 75%, var(--color-violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* glass chrome: blurred surface + 1px gradient hairline ring (mask trick) */
+@utility glass-surface {
+  position: relative;
+  background: color-mix(in srgb, #ffffff 10%, transparent);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+.glass-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.12) 40%, rgba(126, 242, 255, 0.35));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
