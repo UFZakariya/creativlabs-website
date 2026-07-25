@@ -15,6 +15,10 @@ export interface ShowMessage {
   card?: { title: string; lines: string[]; cta?: string };
   /** subtle status line, e.g. "logged to CRM · receipt sent" */
   status?: string;
+  /** render a product-photo message (IG demo) */
+  image?: { label: string; gradient: string };
+  /** emoji reaction pinned to this bubble */
+  reaction?: string;
   time: string;
 }
 
@@ -24,6 +28,8 @@ export interface ShowThread {
   agent: string;         // responsible agent
   emoji: string;         // avatar stand-in
   preview: string;       // sidebar last-message preview
+  rowTime: string;       // sidebar row timestamp
+  unread?: number;       // sidebar green badge
   messages: ShowMessage[];
 }
 
@@ -34,6 +40,7 @@ export const WHATSAPP_THREADS: ShowThread[] = [
     agent: "Sardauna",
     emoji: "🎩",
     preview: "Morning brief ready — one approval waiting",
+    rowTime: "07:04",
     messages: [
       {
         id: "b1", from: "agent", name: "Sardauna", time: "07:00",
@@ -64,6 +71,8 @@ export const WHATSAPP_THREADS: ShowThread[] = [
     agent: "Kola · Operations",
     emoji: "⚙️",
     preview: "Order #1042 confirmed — ₦18,400 received",
+    rowTime: "10:18",
+    unread: 2,
     messages: [
       { id: "o1", from: "customer", time: "10:12", text: "Do you deliver to Gwarinpa? I want 2 cartons." },
       {
@@ -88,6 +97,7 @@ export const WHATSAPP_THREADS: ShowThread[] = [
     agent: "Zara · Comms",
     emoji: "✉️",
     preview: "Replacement booked — delivery credit added",
+    rowTime: "14:06",
     messages: [
       { id: "s1", from: "customer", time: "14:03", text: "My order arrived with one carton missing 😡" },
       { id: "s2", from: "agent", name: "Zara", time: "14:03", text: "So sorry about that — checking order #1029 now." },
@@ -109,6 +119,8 @@ export const WHATSAPP_THREADS: ShowThread[] = [
     agent: "Ngozi · Finance",
     emoji: "💰",
     preview: "INV-208 reminder sent · VAT pack ready",
+    rowTime: "09:11",
+    unread: 1,
     messages: [
       {
         id: "f1", from: "agent", name: "Ngozi", time: "09:00",
@@ -132,6 +144,7 @@ export const WHATSAPP_THREADS: ShowThread[] = [
     agent: "Tunde · Growth",
     emoji: "📈",
     preview: "New lead qualified — added to pipeline",
+    rowTime: "16:55",
     messages: [
       {
         id: "g1", from: "agent", name: "Tunde", time: "16:40",
@@ -157,21 +170,27 @@ export const INSTAGRAM_THREAD: ShowThread = {
   agent: "Sardauna",
   emoji: "📸",
   preview: "Comment → order, handled in DMs",
+  rowTime: "12:09",
   messages: [
-    { id: "i1", from: "system", time: "", text: "Replying to a comment on your post" },
-    { id: "i2", from: "customer", time: "12:02", text: "Is this available in blue? 😍" },
+    { id: "i1", from: "system", time: "", text: "Replied to your post" },
     {
-      id: "i3", from: "agent", name: "Sardauna", time: "12:02",
-      text: "It is! Two left in blue — I can hold one for you for 24 hours. Want the payment link?",
+      id: "i2", from: "customer", time: "12:02",
+      image: { label: "Aso-oke tote — new drop", gradient: "linear-gradient(135deg,#0b1f6b,#083cff 55%,#38bdf8)" },
     },
-    { id: "i4", from: "customer", time: "12:05", text: "Yes please!" },
+    { id: "i3", from: "customer", time: "12:02", text: "Is this available in blue? 😍" },
     {
-      id: "i5", from: "agent", name: "Sardauna", time: "12:05",
-      card: { title: "Your order", lines: ["1 × Blue — held till tomorrow 12:00", "Delivery or pickup — your choice"], cta: "Pay securely" },
+      id: "i4", from: "agent", name: "Sardauna", time: "12:02",
+      text: "It is! Two left in blue — I can hold one for you till tomorrow. Want the payment link?",
+      reaction: "❤️",
+    },
+    { id: "i5", from: "customer", time: "12:05", text: "Yes please!" },
+    {
+      id: "i6", from: "agent", name: "Sardauna", time: "12:05",
+      card: { title: "Your order — ₦24,500", lines: ["1 × Aso-oke tote (blue)", "Held till tomorrow 12:00", "Delivery or pickup — your choice"], cta: "Pay securely" },
     },
     {
-      id: "i6", from: "agent", name: "Sardauna", time: "12:09",
-      text: "Payment received — thank you! Your order is confirmed and updates will land right here. 🎉",
+      id: "i7", from: "agent", name: "Sardauna", time: "12:09",
+      text: "Payment received — thank you! 🎉 Your order is confirmed and delivery updates will land right here.",
       status: "logged to CRM · owner dashboard updated",
     },
   ],
