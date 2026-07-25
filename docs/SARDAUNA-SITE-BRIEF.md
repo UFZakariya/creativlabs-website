@@ -53,8 +53,10 @@
 **OFFERED (owner's sell-then-build decision — presented as available):**
 - Facebook, Instagram, X, Teams, Slack channels; LinkedIn draft-assist
 
-**DROPPED unless owner shows code:** "knowledge graphs" (no repo evidence; replaced by the
-live-aware/business-context story). Owner may overrule at copy review.
+**OWNER-DIRECTED (2026-07-25):** "knowledge graphs" stays in the copy — owner's explicit
+call ("mention we use KG, I'll wire it later"). Phrase it as technology/architecture
+("built on agentic engineering, knowledge graphs and workflow optimization"), never as a
+checkable product feature with specifics.
 
 **Demo honesty line:** WhatsApp demo mirrors real proven flows; Instagram demo is equal-polish
 product vision with specifics kept generic (nothing checkably false).
@@ -155,9 +157,29 @@ across operations, finance, growth and support — on the WhatsApp your business
    phone → iterate → explicit owner sign-off → deliberate cutover. **Live site untouched
    until then.** Old static site archived in-repo (tag + folder), not deleted.
 
-## 8. Open items owner owes
+## 8. Resolutions (2026-07-25 round 3)
 
-- Pricing model + naira numbers for /pricing
-- Team/founder photo for /about
-- Verdicts on hero/comparison copy options (§6)
-- (Optional) KG code pointer if "knowledge graphs" should return to claims
+- **Pricing model (found in suite repo, `apps/web/lib/seed.ts` Growth-agent mandate):**
+  free AI Readiness Audit → paid build (₦300k–₦2M) → managed retainer (₦40k–₦400k/mo).
+  ICP: 10–100 staff or ₦5M+/mo revenue; micro-businesses under ₦300k/mo politely
+  disqualified. /pricing adapts Viktor's page design to this 3-step ladder; owner confirms
+  exact figures at copy review.
+- **/about ships with placeholders** (photo + bios) until the end; owner supplies later.
+- **§6 copy options all rejected — new round below (§9). Owner picks at homepage review.**
+- **KG claim: owner-directed in (see §3).**
+
+## 9. Hero + comparison copy — round 2 (original; working copy = option A until owner picks)
+
+**Hero H1:**
+- A. "Every department. One agent away."
+- B. "Run the company. Skip the busywork."
+- C. "Your whole back office, reporting for duty."
+- D. "Delegate everything. Approve what matters."
+- E. "Business has a new org chart."
+- F. "A full staff, in the chat you already use."
+
+**Comparison band:**
+- A. "A reply is not a result."
+- B. "Others answer. Sardauna executes."
+- C. "Chatbots wait to be asked. Sardauna clears the desk."
+- D. "Talk is instant. Done is Sardauna."
