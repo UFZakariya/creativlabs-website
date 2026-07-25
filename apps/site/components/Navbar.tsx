@@ -14,10 +14,11 @@ const LINKS = [
   { href: "/pricing", label: "Pricing" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ onLight = false }: { onLight?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const dark = !scrolled && !onLight; // white text only over dark heroes
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
@@ -37,7 +38,7 @@ export default function Navbar() {
           <img src="/logo-128.png" alt="" width={30} height={32} />
           <span
             className={`text-[15px] font-bold tracking-tight ${
-              scrolled ? "text-[var(--color-ink)]" : "text-white"
+              !dark ? "text-[var(--color-ink)]" : "text-white"
             }`}
           >
             Safetyline
@@ -50,7 +51,7 @@ export default function Navbar() {
               key={l.href}
               href={l.href}
               className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
-                scrolled
+                !dark
                   ? "text-[var(--color-ink-soft)] hover:text-[var(--color-blue)]"
                   : "text-white/80 hover:text-white"
               }`}
@@ -72,7 +73,7 @@ export default function Navbar() {
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             className={`grid h-10 w-10 place-items-center rounded-full md:hidden ${
-              scrolled ? "text-[var(--color-ink)]" : "text-white"
+              !dark ? "text-[var(--color-ink)]" : "text-white"
             }`}
           >
             <span className="flex flex-col gap-[5px]">
