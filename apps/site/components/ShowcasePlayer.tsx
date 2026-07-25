@@ -333,7 +333,7 @@ export default function ShowcasePlayer() {
             </span>
             <div className="min-w-0 leading-tight">
               <div className="flex items-center gap-1 text-[14px] font-semibold">
-                safetyline.ng {I.verified()}
+                sardauna {I.verified()}
               </div>
               <div className="text-[11.5px] text-black/50">Active now</div>
             </div>

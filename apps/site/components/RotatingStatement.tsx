@@ -2,9 +2,10 @@
 
 /* Rotating positioning statement on the light wave background: the sentence
    ending cycles through three phrasings with an opacity+blur+lift transition.
-   A visually-hidden static sentence carries the full meaning for screen
-   readers; an invisible ghost containing every variant reserves the widest
-   footprint so the line never causes layout shift. */
+   The rotating segment is a full-width centered block with absolutely stacked
+   variants, so every ending — short or long — is perfectly centered and the
+   line never causes layout shift (an invisible ghost reserves the tallest
+   variant's height). A visually-hidden static sentence serves screen readers. */
 
 import { useEffect, useState } from "react";
 
@@ -39,22 +40,22 @@ export default function RotatingStatement() {
 
         {/* full sentence for assistive tech */}
         <h2 className="sr-only">
-          Sardauna is the house of agents that does the work you can&apos;t get
-          to, can&apos;t justify a hire for, or shouldn&apos;t be doing
-          yourself.
+          Sardauna is the AI business assistant that does the work you
+          can&apos;t get to, can&apos;t justify a hire for, or shouldn&apos;t
+          be doing yourself.
         </h2>
 
         <p aria-hidden className="text-display-2 text-[var(--color-ink)]">
-          Sardauna is the house of agents that does the work you{" "}
-          <span className="relative inline-grid w-full justify-items-center align-top sm:w-auto sm:justify-items-start">
-            {/* ghost sizing: reserves the widest/tallest variant */}
-            <span className="invisible col-start-1 row-start-1 whitespace-nowrap max-sm:whitespace-normal">
+          Sardauna is the AI Business Assistant that does the work you
+          <span className="relative mt-1 block w-full">
+            {/* ghost sizing: reserves the tallest variant's footprint */}
+            <span className="invisible block">
               {ENDINGS.reduce((a, b) => (a.length >= b.length ? a : b))}
             </span>
             {ENDINGS.map((e, i) => (
               <span
                 key={e}
-                className="text-dawn-gradient col-start-1 row-start-1 whitespace-nowrap transition-all duration-500 max-sm:whitespace-normal"
+                className="text-dawn-gradient absolute inset-0 flex items-center justify-center transition-all duration-500"
                 style={{
                   transitionTimingFunction: "cubic-bezier(0.645, 0.045, 0.355, 1)",
                   opacity: i === idx ? 1 : 0,

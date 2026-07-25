@@ -14,11 +14,6 @@ export default function Hero() {
   return (
     <section className="bg-azure-dawn rounded-b-[var(--radius-band)] px-4 pb-16 pt-32 sm:pb-24 sm:pt-40">
       <div className="mx-auto max-w-5xl text-center">
-        <p className="glass-surface glass-ring mx-auto mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-white/90">
-          <span className="inline-block h-2 w-2 rounded-full bg-[var(--color-cyan)]" />
-          Sardauna — the House of Agents, by Safetyline
-        </p>
-
         <h1 className="text-display-1 mx-auto max-w-3xl text-white">
           Every department.{" "}
           <span className="text-dawn-gradient-bright">One agent away.</span>
