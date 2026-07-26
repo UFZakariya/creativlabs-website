@@ -5,17 +5,16 @@
 > Everything else on the site is already grounded in the claims register
 > (docs/SARDAUNA-SITE-BRIEF.md §3) and needs no decision.
 
-## 1. Hero H1 (homepage)
+## 1. Hero H1 (homepage) — ✅ DECIDED (2026-07-26)
 
-**Live working copy:** "Every department. One agent away." (option A)
+**Live:** "A whole business, in your pocket." — owner's pick, with an animated
+shimmer on "in your pocket". Sub = the work-ON-not-IN grind framing (owner's
+draft, tightened; variations offered).
 
-Your round-2 options (brief §9) — pick one or write your own:
-- A. "Every department. One agent away." ← currently live
-- B. "Run the company. Skip the busywork."
-- C. "Your whole back office, reporting for duty."
-- D. "Delegate everything. Approve what matters."
-- E. "Business has a new org chart."
-- F. "A full staff, in the chat you already use."
+**Open echo to resolve:** the CTA band still says "Put a full staff in your
+pocket." — two "pocket" headlines on one page. Proposed CTA replacements
+(owner picks): "Give the grind away." / "Every great house has a Sardauna."
+/ "Stop grinding. Start directing."
 
 ## 2. Comparison-band headline (homepage)
 

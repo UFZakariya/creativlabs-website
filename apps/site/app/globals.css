@@ -133,6 +133,19 @@ body {
 
 /* ── aurora beam layer (adapted from the aurora-background component,
      brand palette, dark-band variant) */
+/* animated liquid-gradient headline accent — continuous shimmer sweep */
+@keyframes text-shimmer {
+  to { background-position: 200% center; }
+}
+.text-shimmer {
+  background: linear-gradient(90deg, #eafcff 0%, var(--color-cyan) 22%, #9ec5ff 48%, #cdb8ff 72%, #eafcff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-shimmer 4s linear infinite;
+}
+
 @keyframes orbit {
   to { transform: rotate(360deg); }
 }

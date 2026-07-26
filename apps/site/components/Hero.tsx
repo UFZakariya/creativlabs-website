@@ -18,15 +18,15 @@ export default function Hero() {
         <div className="aurora-beams" aria-hidden />
         <div className="relative mx-auto max-w-5xl text-center">
           <h1 className="text-display-1 mx-auto max-w-3xl text-white">
-            Every department.{" "}
-            <span className="text-dawn-gradient-bright">One agent away.</span>
+            A whole business,{" "}
+            <span className="text-shimmer whitespace-nowrap">in your pocket.</span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/75">
-            Think, ideate, plan — while the agents do the dirty work. Sardauna is
-            your chief of staff, running departments of specialist agents across
-            sales, support, finance and growth — on the WhatsApp your business
-            already uses.
+            Work on your business, not in it. Most businesses don&apos;t fail
+            for lack of a great product — they drown in the unending grind of
+            daily operations. Sardauna, our AI business assistant, takes the
+            grind off your hands.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
