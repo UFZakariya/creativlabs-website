@@ -23,10 +23,13 @@ export default function Hero() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/75">
-            Work on your business, not in it. Most businesses don&apos;t fail
-            for lack of a great product — they fail because the owner spends
-            every day running the shop instead of growing it. Sardauna, our AI
-            business assistant, runs the day-to-day for you.
+            Work on your business, not in it. Every owner really runs two
+            businesses: the one they dreamed of, and the one that eats their
+            day. Somewhere along the way, the owner becomes their own
+            hardest-working employee.{" "}
+            <span className="text-shimmer font-semibold">Sardauna</span>, our
+            AI business assistant, takes that job — so you can go back to
+            being the owner.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
