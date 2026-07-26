@@ -1,4 +1,4 @@
-﻿/* Legacy Safetyline dock module — extracted verbatim from the old site's app.js (section 11); outer-scope dep shimmed */
+/* Legacy Safetyline dock module — extracted verbatim from the LIVE site's app.js (section 11); outer-scope dep shimmed */
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   (() => {
     const dock = document.getElementById("hermes-dock");
@@ -24,12 +24,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     let persona = agentOf(DEFAULT_AGENT).name;  // current display name (used by greeting copy)
     const nameEl = document.getElementById("dock-name");
     if (nameEl) nameEl.textContent = PERSONAS.length > 1 ? "Safetyline" : persona;
-    if (status) status.textContent = live ? "Online â€” Safetyline" : "Safetyline assistant";
+    if (status) status.textContent = live ? "Online — Safetyline" : "Safetyline assistant";
 
-    // First-party analytics â€” fire-and-forget POST to the /t ingest endpoint,
+    // First-party analytics — fire-and-forget POST to the /t ingest endpoint,
     // only when the live backend is configured. Never blocks the UI or throws.
     const trackUrl = live ? cfg.endpoint.replace(/\/chat\/?$/, "/t") : "";
-    // Durable lead intake (same backend) â€” the lead card posts here FIRST so a
+    // Durable lead intake (same backend) — the lead card posts here FIRST so a
     // captured lead survives even if the conversational turn fails.
     const leadUrl = live ? cfg.endpoint.replace(/\/chat\/?$/, "/lead") : "";
     const track = (kind, extra) => {
@@ -85,7 +85,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       catch { return ""; }
     };
 
-    // â”€â”€ Conversation persistence (returning-visitor continuity) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Conversation persistence (returning-visitor continuity) ─────────────
     // The plain-text transcript is saved to localStorage so a reload / return
     // visit resumes the chat. The backend session (httpOnly sl_sid cookie)
     // persists in parallel, so the agent keeps the full context too.
@@ -99,7 +99,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     };
     const record = (who, text, time) => {
       // skip during restore, and during the in-chat quiz (its Q/A/result render
-      // as rich cards that don't round-trip cleanly â€” persisting only the bare
+      // as rich cards that don't round-trip cleanly — persisting only the bare
       // answers would restore an incoherent history).
       if (restoring || quizActive || !text) return;
       transcript.push({ who, text, time: time || fmtTime() });
@@ -113,7 +113,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (who === "user") {
         const tick = document.createElement("i");
         tick.className = "dock-tick";
-        tick.textContent = "âœ“"; // âœ“ sent â†’ âœ“âœ“ once the agent responds
+        tick.textContent = "✓"; // ✓ sent → ✓✓ once the agent responds
         meta.appendChild(tick);
       }
       el.appendChild(meta);
@@ -121,7 +121,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     // Once the agent responds, upgrade the visitor's ticks to "read".
     const markRead = () => {
       msgs.querySelectorAll(".dock-tick:not(.read)").forEach((t) => {
-        t.textContent = "âœ“âœ“";
+        t.textContent = "✓✓";
         t.classList.add("read");
       });
     };
@@ -148,7 +148,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       return svg;
     };
 
-    // Linkify inline URLs safely â€” DOM nodes only, never innerHTML on model
+    // Linkify inline URLs safely — DOM nodes only, never innerHTML on model
     // output; hrefs are forced to http(s). Returns el.
     const LINK_RE = /(https?:\/\/[^\s<>]+|www\.[^\s<>]+)/gi;
     const renderRich = (el, text) => {
@@ -184,7 +184,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 
     // Render a bot message as rich content: the text (with inline links) plus a
     // dedicated ACTIONS row. A wa.me handoff link is lifted OUT of the prose and
-    // turned into a proper "Continue on WhatsApp" button on its own row â€” never a
+    // turned into a proper "Continue on WhatsApp" button on its own row — never a
     // raw URL or an oversized chip jammed mid-sentence.
     const WA_IN_TEXT = /\bhttps?:\/\/wa\.me\/[^\s<>]+|\bwa\.me\/[^\s<>]+/i;
     const renderBotMessage = (el, text, time) => {
@@ -198,7 +198,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         waHrefStr = /^https?:/i.test(wm[0]) ? wm[0] : "https://" + wm[0];
         text = text.replace(wm[0], "")
                    .replace(/[ \t]{2,}/g, " ")
-                   .replace(/[ \t]*[:\-â€”][ \t]*(?=\n|$)/g, "")  // drop dangling "here:" lead-ins
+                   .replace(/[ \t]*[:\-—][ \t]*(?=\n|$)/g, "")  // drop dangling "here:" lead-ins
                    .replace(/\n{3,}/g, "\n\n").trim();
       }
       const body = document.createElement("div");
@@ -227,7 +227,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       return el;
     };
 
-    // NDPA consent line â€” rendered once inside the panel on first open. Only
+    // NDPA consent line — rendered once inside the panel on first open. Only
     // privacy surface in the widget for Milestone 2.
     const renderConsent = () => {
       if (!cfg.consentText) return;
@@ -237,20 +237,20 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       msgs.appendChild(el);
     };
 
-    // Transient "workingâ€¦" line for tool.activity. The backend (M4) sends a
+    // Transient "working…" line for tool.activity. The backend (M4) sends a
     // customer-safe phrase (never a raw tool name) which we render here; falls
     // back to a generic label if none is supplied.
     const addWorking = (label) => {
       const el = document.createElement("div");
       el.className = "dock-working";
-      el.textContent = label || "workingâ€¦";
+      el.textContent = label || "working…";
       msgs.appendChild(el);
       msgs.scrollTop = msgs.scrollHeight;
       return el;
     };
 
     // Lightweight first-touch UTM + referrer capture (none existed before). The
-    // single-page site has no path/UTM richness â€” see SPEC Â§1/C10.
+    // single-page site has no path/UTM richness — see SPEC §1/C10.
     const utmParams = (() => {
       let utm = {};
       try {
@@ -282,7 +282,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       return ctx;
     };
 
-    // Context-aware openers (M4 â€” visible agency). Tailor the greeting and the
+    // Context-aware openers (M4 — visible agency). Tailor the greeting and the
     // teaser to what the visitor was actually looking at, using the same page
     // signals sent with every turn. Deterministic maps, no network; founder can
     // tune the copy. Falls back to the generic config lines.
@@ -293,48 +293,48 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       labour: "the membership portal"
     };
     const USE_CASE_TEASER = {
-      ufms: "Curious about UFMS? Ask me â†’",
-      os: "Questions on the ops system? â†’",
-      order: "How the ordering app works? â†’",
-      labour: "About the membership portal? â†’"
+      ufms: "Curious about UFMS? Ask me →",
+      os: "Questions on the ops system? →",
+      order: "How the ordering app works? →",
+      labour: "About the membership portal? →"
     };
     // A use-case tab is ALWAYS active by default (its tabs live in the
     // "products" section), so only treat it as a signal when the visitor is
-    // actually in that section â€” otherwise everyone gets the UFMS opener.
+    // actually in that section — otherwise everyone gets the UFMS opener.
     const activeUseCase = (ctx) => (ctx.section === "products" ? ctx.use_case : null);
     const contextualGreeting = () => {
       const ctx = pageContext();
       const uc = activeUseCase(ctx);
       if (uc && USE_CASE_LABEL[uc]) {
-        return `Hi, I'm ${persona}. Saw you looking at ${USE_CASE_LABEL[uc]} â€” want the quick version of how it works, or something specific?`;
+        return `Hi, I'm ${persona}. Saw you looking at ${USE_CASE_LABEL[uc]} — want the quick version of how it works, or something specific?`;
       }
       if (typeof ctx.readiness_score === "number") {
-        return `Hi, I'm ${persona} â€” nice, you took the readiness test. Want to talk through what your score means for your business?`;
+        return `Hi, I'm ${persona} — nice, you took the readiness test. Want to talk through what your score means for your business?`;
       }
       switch (ctx.section) {
         case "products":
         case "systems":
-          return `Hi, I'm ${persona}. Looked like you were exploring what we build â€” want the short version, or is there something specific in mind?`;
+          return `Hi, I'm ${persona}. Looked like you were exploring what we build — want the short version, or is there something specific in mind?`;
         case "agents":
-          return `Hi, I'm ${persona}. The agents are the part people ask about most â€” want to see how one would work for your business?`;
+          return `Hi, I'm ${persona}. The agents are the part people ask about most — want to see how one would work for your business?`;
         case "readiness":
-          return `Hi, I'm ${persona}. Curious how ready your business is for an agent? I can walk you through it â€” or take the 60-second test above.`;
+          return `Hi, I'm ${persona}. Curious how ready your business is for an agent? I can walk you through it — or take the 60-second test above.`;
         case "contact":
           return `Hi, I'm ${persona}. Thinking of reaching out? Ask me a quick question first, or I'll point you to the right next step.`;
         default:
-          return agentOf(agentKey).greeting || cfg.greeting || `Hi, I'm ${persona} â€” how can I help?`;
+          return agentOf(agentKey).greeting || cfg.greeting || `Hi, I'm ${persona} — how can I help?`;
       }
     };
     const contextualTeaser = () => {
       const ctx = pageContext();
       const uc = activeUseCase(ctx);
       if (uc && USE_CASE_TEASER[uc]) return USE_CASE_TEASER[uc];
-      if (typeof ctx.readiness_score === "number") return "Want to talk through your score? â†’";
-      if (ctx.section === "contact") return "Have a quick question first? â†’";
-      return cfg.teaserText || "Questions? Ask me â†’";
+      if (typeof ctx.readiness_score === "number") return "Want to talk through your score? →";
+      if (ctx.section === "contact") return "Have a quick question first? →";
+      return cfg.teaserText || "Questions? Ask me →";
     };
 
-    // Hardcoded (non-model) error/degrade copy â€” safe to render as HTML.
+    // Hardcoded (non-model) error/degrade copy — safe to render as HTML.
     const ERROR_HTML = "I'm having trouble reaching the agent right now. You can always <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a> or <a href='#contact'>book a consultation</a>.";
 
     const waHref = () => {
@@ -367,11 +367,11 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     let greeted = false;
     let open = false;
 
-    // â”€â”€ Agent picker (Bari / Biba) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Agent picker (Bari / Biba) ──────────────────────────────────────────
     // Renders a chooser as the first thing in the panel. Picking a persona sets
     // `agentKey`, updates the header, and greets in that voice. A small header
     // control lets the visitor switch mid-session.
-    // Auto-start with the default persona â€” a decision screen ("who would you
+    // Auto-start with the default persona — a decision screen ("who would you
     // like to chat with?") about two names a first-time visitor has never met
     // costs a full step before any value. Instead the greeting lands instantly
     // and a one-line divider offers the handover to the other persona (the
@@ -382,11 +382,11 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (!other) return;
       const div = document.createElement("div");
       div.className = "dock-divider";
-      div.appendChild(document.createTextNode(`You're with ${persona} Â· `));
+      div.appendChild(document.createTextNode(`You're with ${persona} · `));
       const sw = document.createElement("button");
       sw.type = "button";
       sw.className = "dock-divider-link";
-      sw.textContent = `prefer ${other.tagline ? other.tagline.toLowerCase() : "the other style"}? Chat with ${other.name} â‡„`;
+      sw.textContent = `prefer ${other.tagline ? other.tagline.toLowerCase() : "the other style"}? Chat with ${other.name} ⇄`;
       sw.addEventListener("click", () => { div.remove(); switchBtn && switchBtn.click(); });
       div.appendChild(sw);
       msgs.appendChild(div);
@@ -397,7 +397,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       agentKey = p.key;
       persona = p.name;
       if (nameEl) nameEl.textContent = p.name;
-      if (status) status.textContent = live ? `Online â€” ${p.name}` : `${p.name} Â· Safetyline`;
+      if (status) status.textContent = live ? `Online — ${p.name}` : `${p.name} · Safetyline`;
       dock.dataset.agent = p.key; // avatar/theme hook
       if (switchBtn) switchBtn.hidden = PERSONAS.length < 2;
       try { sessionStorage.setItem("sl-agent", p.key); } catch {}
@@ -421,10 +421,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       switchBtn.className = "dock-switch";
       switchBtn.hidden = true;
       switchBtn.setAttribute("aria-label", "Switch agent");
-      switchBtn.textContent = "â‡„";
+      switchBtn.textContent = "⇄";
       head.insertBefore(switchBtn, closeBtn || null);
       switchBtn.addEventListener("click", () => {
-        // Seamless handover to the next persona â€” KEEP the whole conversation and
+        // Seamless handover to the next persona — KEEP the whole conversation and
         // context; the backend + strengthened identity rule make the new persona
         // take over cleanly (no restart, no lost history).
         const idx = PERSONAS.findIndex((x) => x.key === agentKey);
@@ -436,7 +436,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         persona = p.name;
         quizActive = false; leadCardOpen = false; // handover resets transient flows
         if (nameEl) nameEl.textContent = p.name;
-        if (status) status.textContent = live ? `Online â€” ${p.name}` : `${p.name} Â· Safetyline`;
+        if (status) status.textContent = live ? `Online — ${p.name}` : `${p.name} · Safetyline`;
         dock.dataset.agent = p.key;
         try { sessionStorage.setItem("sl-agent", p.key); } catch {}
         const div = document.createElement("div");
@@ -444,14 +444,14 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         div.innerHTML = ""; // built via DOM below
         div.appendChild(document.createTextNode(`${fromName} handed you over to ${p.name}`));
         msgs.appendChild(div);
-        add(p.handover || `Hi, I'm ${p.name} â€” I've got everything from your chat so far. How can I help?`, "bot");
+        add(p.handover || `Hi, I'm ${p.name} — I've got everything from your chat so far. How can I help?`, "bot");
         msgs.scrollTop = msgs.scrollHeight;
         setTimeout(() => input && input.focus(), 60);
       });
     })();
 
-    // â”€â”€ In-chat quick actions (WhatsApp / Telegram style) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // Programmatic send â€” lets chips and the tool bar drive the conversation.
+    // ── In-chat quick actions (WhatsApp / Telegram style) ───────────────────
+    // Programmatic send — lets chips and the tool bar drive the conversation.
     const sendText = (t) => {
       if (composerSwapped || !t) return;
       input.value = t;
@@ -461,7 +461,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     // One-tap suggestion chips shown after the greeting to get people talking.
     const STARTERS = [
       { label: "How does it work?", send: "How does it work?" },
-      { label: "ðŸ§® Check my AI readiness", quiz: true },
+      { label: "🧮 Check my AI readiness", quiz: true },
       { label: "What would it cost?", send: "What would it cost?" },
     ];
     const runStarter = (a, wrap) => {
@@ -484,7 +484,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       msgs.scrollTop = msgs.scrollHeight;
     };
 
-    // Persistent quick-actions bar pinned above the composer â€” always-available
+    // Persistent quick-actions bar pinned above the composer — always-available
     // tools, like a messaging app's reply keyboard.
     let toolsBar = null;
     const TOOLS = [
@@ -515,10 +515,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     };
     const hideTools = () => { if (toolsBar) toolsBar.hidden = true; };
 
-    // â”€â”€ In-chat AI Readiness test â€” interactive, button-driven, inline â”€â”€â”€â”€â”€â”€
+    // ── In-chat AI Readiness test — interactive, button-driven, inline ──────
     // Runs the SAME 7-question quiz as the page (window.SL_BAR), rendered as
     // tappable option buttons in the chat (WhatsApp/Telegram style). Feeds the
-    // score into the agent's context (sessionStorage bar-score â†’ page.readiness).
+    // score into the agent's context (sessionStorage bar-score → page.readiness).
     let quizActive = false;
     const startReadinessQuiz = () => {
       const BAR = window.SL_BAR;
@@ -529,7 +529,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         return;
       }
       quizActive = true;
-      add("Let's do a quick readiness check â€” 7 short questions, about a minute. Just tap your answer for each.", "bot");
+      add("Let's do a quick readiness check — 7 short questions, about a minute. Just tap your answer for each.", "bot");
       const answers = [];
       const askQ = (i) => {
         if (i >= BAR.questions.length) return finishQuiz(answers);
@@ -566,7 +566,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const tier = BAR.tierFor(score);
       try { sessionStorage.setItem("bar-score", String(score)); } catch {}
       const field = document.getElementById("readiness-score-field");
-      if (field) field.value = `${score}/100 â€” ${tier.name}`;
+      if (field) field.value = `${score}/100 — ${tier.name}`;
       track("quiz_complete", { score: String(score), tier: tier.name, target: "dock" });
 
       const msg = add("", "bot");
@@ -595,26 +595,26 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       acts.className = "dock-msg-actions";
       acts.appendChild(makeAction(
         tier.cta || "Book my free consultation", "#i-clock", "dock-action--primary",
-        () => sendText(`I just did the readiness test â€” I scored ${score}/100 (${tier.name}). I'd like to book my free consultation.`)
+        () => sendText(`I just did the readiness test — I scored ${score}/100 (${tier.name}). I'd like to book my free consultation.`)
       ));
       msg.appendChild(acts);
       msgs.scrollTop = msgs.scrollHeight;
       quizActive = false;
     };
 
-    // â”€â”€ Contextual action suggestions (best-of-WhatsApp/Telegram smart replies) â”€â”€
-    // After an agent reply, offer up to 3 tappable next-steps â€” from explicit
+    // ── Contextual action suggestions (best-of-WhatsApp/Telegram smart replies) ──
+    // After an agent reply, offer up to 3 tappable next-steps — from explicit
     // [[actions: ...]] markers the agent may emit AND client-side intent
     // detection of the reply. Only shows on a real signal (never spammy), and
     // always points toward a next step / CTA.
     const ACTION_DEFS = {
-      readiness: { label: "ðŸ§® Check my readiness", run: () => startReadinessQuiz() },
-      book:      { label: "ðŸ“… Leave my details",   run: () => openLeadCard() },
-      usecases:  { label: "ðŸ“‚ See our work",       run: () => showUseCaseGallery() },
-      whatsapp:  { label: "ðŸ’¬ WhatsApp",           run: () => window.open(waHref(), "_blank", "noopener") },
+      readiness: { label: "🧮 Check my readiness", run: () => startReadinessQuiz() },
+      book:      { label: "📅 Leave my details",   run: () => openLeadCard() },
+      usecases:  { label: "📂 See our work",       run: () => showUseCaseGallery() },
+      whatsapp:  { label: "💬 WhatsApp",           run: () => window.open(waHref(), "_blank", "noopener") },
     };
     const detectActions = (text) => {
-      // Tight patterns â€” only fire on a genuine signal so chips never feel spammy.
+      // Tight patterns — only fire on a genuine signal so chips never feel spammy.
       const t = (text || "").toLowerCase();
       const keys = [];
       if (/\breadiness\b|readiness (test|check)|where you stand|how ready is your|60[ -]second/.test(t)) keys.push("readiness");
@@ -658,12 +658,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       nudgeTimer = setTimeout(() => {
         if (nudged || !open || leadCardOpen || quizActive || composerSwapped) return;
         nudged = true;
-        add("Whenever you're ready, I can set up a quick call or connect you on WhatsApp â€” no pressure at all.", "bot");
+        add("Whenever you're ready, I can set up a quick call or connect you on WhatsApp — no pressure at all.", "bot");
         addSuggestions("", ["book", "whatsapp"]);
       }, 32000);
     };
 
-    // Zero-message nudge â€” the biggest chat drop-off is "opened, read the
+    // Zero-message nudge — the biggest chat drop-off is "opened, read the
     // greeting, stalled". One soft re-offer of the starters, once per session.
     let firstNudged = false, firstNudgeTimer = null;
     const clearFirstNudge = () => { if (firstNudgeTimer) { clearTimeout(firstNudgeTimer); firstNudgeTimer = null; } };
@@ -673,23 +673,23 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       firstNudgeTimer = setTimeout(() => {
         if (firstNudged || !open || exchanges > 0 || leadCardOpen || quizActive || composerSwapped) return;
         firstNudged = true;
-        add("No pressure â€” most people start with the 60-second readiness check, or just tell me what your business does.", "bot");
+        add("No pressure — most people start with the 60-second readiness check, or just tell me what your business does.", "bot");
         addStarters();
       }, 40000);
     };
 
-    // Use-case gallery card â€” a rich, tappable showcase of what we've built.
+    // Use-case gallery card — a rich, tappable showcase of what we've built.
     const USE_CASES = [
-      { emoji: "ðŸ”", name: "UFMS", desc: "Poultry farm system", q: "Tell me about UFMS, the farm system." },
-      { emoji: "ðŸ”", name: "TruckVille OS", desc: "Food-venue operations", q: "Tell me about TruckVille OS." },
-      { emoji: "ðŸ“±", name: "Ordering App", desc: "Customer ordering", q: "Tell me about the TruckVille ordering app." },
-      { emoji: "ðŸ—³ï¸", name: "Labour Party", desc: "Membership portal", q: "Tell me about the Labour Party membership portal." },
+      { emoji: "🐔", name: "UFMS", desc: "Poultry farm system", q: "Tell me about UFMS, the farm system." },
+      { emoji: "🍔", name: "TruckVille OS", desc: "Food-venue operations", q: "Tell me about TruckVille OS." },
+      { emoji: "📱", name: "Ordering App", desc: "Customer ordering", q: "Tell me about the TruckVille ordering app." },
+      { emoji: "🗳️", name: "Labour Party", desc: "Membership portal", q: "Tell me about the Labour Party membership portal." },
     ];
     const showUseCaseGallery = () => {
       const msg = add("", "bot");
       const t = document.createElement("div");
       t.className = "dock-msg-text";
-      t.textContent = "Here's some of what we've built â€” tap any to hear more:";
+      t.textContent = "Here's some of what we've built — tap any to hear more:";
       msg.appendChild(t);
       const grid = document.createElement("div");
       grid.className = "dock-gallery";
@@ -710,7 +710,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       msgs.scrollTop = msgs.scrollHeight;
     };
 
-    // Inline lead-capture card â€” a strong, low-friction conversion CTA.
+    // Inline lead-capture card — a strong, low-friction conversion CTA.
     let leadCardOpen = false;
     const openLeadCard = () => {
       if (leadCardOpen || composerSwapped) return;
@@ -719,7 +719,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const msg = add("", "bot");
       const t = document.createElement("div");
       t.className = "dock-msg-text";
-      t.textContent = "Leave your details and the team will reach out â€” no obligation.";
+      t.textContent = "Leave your details and the team will reach out — no obligation.";
       msg.appendChild(t);
       const box = document.createElement("div");
       box.className = "dock-leadform";
@@ -735,7 +735,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         leadCardOpen = false;
         track("lead_submit", {});
         // Durable capture FIRST (deterministic lead store + team alert); the
-        // confirmation is only shown once it actually lands â€” no false "Sent".
+        // confirmation is only shown once it actually lands — no false "Sent".
         let saved = false;
         if (leadUrl) {
           try {
@@ -750,12 +750,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         }
         const done = document.createElement("p"); done.className = "dock-leadform-done";
         if (saved) {
-          done.textContent = "âœ“ Sent â€” the team will reach out. Thank you!";
+          done.textContent = "✓ Sent — the team will reach out. Thank you!";
           box.appendChild(done);
           // Conversational context for the agent (best-effort; lead is safe).
           sendText(`Please have the team follow up with me. Name: ${name}. WhatsApp: ${phone}.${want ? " I'd like to build: " + want + "." : ""}`);
         } else {
-          done.textContent = "Couldn't send just now â€” tap below and your details are ready to go:";
+          done.textContent = "Couldn't send just now — tap below and your details are ready to go:";
           box.appendChild(done);
           const wa = document.createElement("a");
           wa.className = "dock-action dock-action--wa";
@@ -779,13 +779,13 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       agentKey = p.key;
       persona = p.name;
       if (nameEl) nameEl.textContent = p.name;
-      if (status) status.textContent = live ? `Online â€” ${p.name}` : `${p.name} Â· Safetyline`;
+      if (status) status.textContent = live ? `Online — ${p.name}` : `${p.name} · Safetyline`;
       dock.dataset.agent = p.key;
       if (switchBtn) switchBtn.hidden = PERSONAS.length < 2;
       try { sessionStorage.setItem("sl-agent", p.key); } catch {}
       const div = document.createElement("div");
       div.className = "dock-divider";
-      div.appendChild(document.createTextNode("Welcome back â€” picking up where we left off"));
+      div.appendChild(document.createTextNode("Welcome back — picking up where we left off"));
       msgs.appendChild(div);
       (saved.msgs || []).forEach((m) => {
         if (m.who === "user") add(m.text, "user", false, m.time);
@@ -839,9 +839,9 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (e.key === "Escape" && open) setOpen(false);
     });
 
-    // Teaser state â€” a one-line bubble beside the closed button, shown once per
+    // Teaser state — a one-line bubble beside the closed button, shown once per
     // session, dismissible, that opens the dock on tap. (Proactive dwell-trigger
-    // openers are backend Milestone 4 â€” no timers here.)
+    // openers are backend Milestone 4 — no timers here.)
     let teaserEl = null;
     const dismissTeaser = () => {
       if (!teaserEl) return;
@@ -864,7 +864,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       x.type = "button";
       x.className = "dock-teaser-x";
       x.setAttribute("aria-label", "Dismiss");
-      x.textContent = "âœ•";
+      x.textContent = "✕";
       teaserEl.appendChild(label);
       teaserEl.appendChild(x);
       dock.appendChild(teaserEl);
@@ -899,22 +899,22 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const scripted = (text) => {
       const t = text.toLowerCase();
       if (/price|cost|how much|pay/.test(t)) {
-        return "Pricing depends on the size of the system and agent you need â€” most projects are scoped in the free consultation so you get a real number, not a guess. <a href='#contact'>Book one here</a>.";
+        return "Pricing depends on the size of the system and agent you need — most projects are scoped in the free consultation so you get a real number, not a guess. <a href='#contact'>Book one here</a>.";
       }
       if (/whatsapp|agent|bot/.test(t)) {
-        return "Every system we build ships with an AI agent your team talks to on WhatsApp â€” it records data, runs reports, and asks for confirmation before saving anything. See it in action in the <a href='#agents'>Agents section</a>.";
+        return "Every system we build ships with an AI agent your team talks to on WhatsApp — it records data, runs reports, and asks for confirmation before saving anything. See it in action in the <a href='#agents'>Agents section</a>.";
       }
       if (/ready|test|score|quiz/.test(t)) {
-        return "The Business Agentic Readiness test takes about a minute â€” seven questions, instant score. <a href='#readiness'>Take it here</a>.";
+        return "The Business Agentic Readiness test takes about a minute — seven questions, instant score. <a href='#readiness'>Take it here</a>.";
       }
       if (/farm|ufms|poultry/.test(t)) {
-        return "UFMS is our farm operations system â€” daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='#products'>Use Cases</a>.";
+        return "UFMS is our farm operations system — daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='#products'>Use Cases</a>.";
       }
       return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a>.`;
     };
 
     // Offline scripted responder (also the graceful fallback when the live
-    // agent is unreachable) â€” keeps the widget from ever dead-ending.
+    // agent is unreachable) — keeps the widget from ever dead-ending.
     const offlineReply = (text) => {
       const t2 = typing();
       setTimeout(() => {
@@ -929,12 +929,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     let degradedShown = false;
     const showDegraded = () => {
       if (!degradedShown && cfg.degradedCopy) { add(cfg.degradedCopy, "bot"); degradedShown = true; }
-      if (status) status.textContent = `${persona} Â· offline â€” WhatsApp is fastest`;
+      if (status) status.textContent = `${persona} · offline — WhatsApp is fastest`;
     };
     const clearDegraded = () => {
       if (!degradedShown) return;
       degradedShown = false;
-      if (status) status.textContent = live ? `Online â€” ${persona}` : `${persona} Â· Safetyline`;
+      if (status) status.textContent = live ? `Online — ${persona}` : `${persona} · Safetyline`;
     };
 
     // SSE-over-fetch client. Reads response.body as a stream, parses SSE frames
@@ -942,7 +942,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     // Returns true if a terminal event (assistant.completed | limit | error) was
     // rendered, so the caller knows the turn produced a real answer.
     // Hide code-y bits WHILE streaming so the visitor never sees a raw handoff
-    // URL or [[actions:...]] marker mid-type â€” they resolve into a clean button
+    // URL or [[actions:...]] marker mid-type — they resolve into a clean button
     // / text only at the end. Handles complete AND trailing-partial fragments.
     const cleanStreaming = (text) => text
       .replace(/\[\[[^\]]*\]\]/g, "")
@@ -962,7 +962,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       let workingEl = null;
       let terminal = false, streamEnded = false, finalized = false, answered = false;
 
-      // Typewriter reveal â€” a pleasant, slightly-slow ChatGPT/Claude-style type-out.
+      // Typewriter reveal — a pleasant, slightly-slow ChatGPT/Claude-style type-out.
       let revealed = 0, rafId = 0, lastT = 0, resolveReveal;
       const revealDone = new Promise((r) => { resolveReveal = r; });
       const CPS = 58; // characters per second
@@ -983,7 +983,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
           addSuggestions(text, parseMarkers(text));
           answered = true;
           // Announce the COMPLETED reply once to screen readers. The streaming
-          // bubble is no longer a live region (it rewrote textContent ~58Ã—/s,
+          // bubble is no longer a live region (it rewrote textContent ~58×/s,
           // which queued dozens of re-announcements per message); a dedicated
           // hidden live region gets the final text a single time.
           try {
@@ -1019,12 +1019,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         try { data = dataStr ? JSON.parse(dataStr) : {}; } catch { data = {}; }
         switch (name) {
           case "session":
-            break; // session id lives in the httpOnly sl_sid cookie â€” store nothing
+            break; // session id lives in the httpOnly sl_sid cookie — store nothing
           case "assistant.delta":
             clearWorking();
             if (typeof data.text === "string" && data.text) {
               acc += data.text;
-              ensureBubble();  // the typewriter reveals cleaned text â€” never raw code
+              ensureBubble();  // the typewriter reveals cleaned text — never raw code
               startReveal();
             }
             break;
@@ -1034,7 +1034,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
             if (data.phase === "completed" || data.phase === "failed") {
               clearWorking();
             } else if (!bubble) {
-              const label = (typeof data.text === "string" && data.text) ? data.text : "workingâ€¦";
+              const label = (typeof data.text === "string" && data.text) ? data.text : "working…";
               if (workingEl) workingEl.textContent = label;
               else workingEl = addWorking(label);
             }
@@ -1051,7 +1051,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
             clearWorking();
             if (bubble && acc) finalize(); else if (!finalized) { finalized = true; resolveReveal(); }
             clearTyping();
-            add(data.message || "You've reached the limit for this chat â€” let's continue on WhatsApp.", "bot");
+            add(data.message || "You've reached the limit for this chat — let's continue on WhatsApp.", "bot");
             swapComposerToWhatsApp();
             terminal = true; answered = true;
             break;
@@ -1059,7 +1059,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
             clearWorking();
             if (bubble && acc) finalize(); else if (!finalized) { finalized = true; resolveReveal(); }
             clearTyping();
-            add(ERROR_HTML, "bot", true); // hardcoded, non-model copy â€” HTML is safe
+            add(ERROR_HTML, "bot", true); // hardcoded, non-model copy — HTML is safe
             terminal = true; answered = true;
             break;
           case "done":
@@ -1099,7 +1099,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       } catch {
         // mid-stream network drop (common on mobile): finalize whatever partial
         // answer was shown; if nothing rendered, surface the standard error line.
-        // Either way the turn is "handled" â€” return true so the caller never
+        // Either way the turn is "handled" — return true so the caller never
         // stacks a second fallback beneath a partial reply.
         clearTyping();
         if (bubble && acc) { finalize(); }
@@ -1118,15 +1118,15 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       return answered || terminal || Boolean(bubble);
     };
 
-    // Telegram-style header status: "{persona} is typingâ€¦" during a live turn.
+    // Telegram-style header status: "{persona} is typing…" during a live turn.
     const setTyping = (on) => {
       if (!status) return;
       status.textContent = on
-        ? `${persona} is typingâ€¦`
-        : (live ? `Online â€” ${persona}` : `${persona} Â· Safetyline`);
+        ? `${persona} is typing…`
+        : (live ? `Online — ${persona}` : `${persona} · Safetyline`);
     };
 
-    let sending = false; // one live turn at a time â€” no concurrent streams
+    let sending = false; // one live turn at a time — no concurrent streams
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (composerSwapped || sending) return;
@@ -1154,7 +1154,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
               contact_time: honeypot ? honeypot.value : ""
             })
           });
-          // 429 / non-200 / missing body â†’ degrade to the offline scripted path
+          // 429 / non-200 / missing body → degrade to the offline scripted path
           if (!res.ok || !res.body) throw new Error("http " + res.status);
           // a stream that ends without ever producing an answer must still
           // fall back rather than leave the message unanswered
@@ -1180,7 +1180,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     });
 
     // Page-level hook: lets the on-page readiness quiz (an earlier module)
-    // hand its completers into the chat â€” the greeting is already score-aware
+    // hand its completers into the chat — the greeting is already score-aware
     // via window.SL_BAR.
     try { window.SL_DOCK = { open: () => setOpen(true), isOpen: () => open }; } catch (_) {}
   })();

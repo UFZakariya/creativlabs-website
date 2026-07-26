@@ -1,5 +1,4 @@
-﻿/* Legacy Safetyline dock — extracted verbatim from the old site's styles.css */
-
+/* Legacy Safetyline dock — extracted verbatim from the LIVE site's styles.css */
 :root {
   --bg: #ffffff;
   --text: #061027;
@@ -21,7 +20,7 @@
     radial-gradient(120% 90% at 90% 100%, rgba(51, 242, 255, 0.14), transparent 46%),
     linear-gradient(120deg, rgba(255, 255, 255, 0.52), rgba(240, 251, 255, 0.26) 46%, rgba(51, 242, 255, 0.12));
   --glass-border: rgba(255, 255, 255, 0.65);
-  /* liquid-glass rim: masked 1.4px gradient stroke â€” bright specular top edge,
+  /* liquid-glass rim: masked 1.4px gradient stroke — bright specular top edge,
      fading through a faint blue mid, glowing azure at the bottom edge */
   --glass-rim: linear-gradient(180deg,
     rgba(255, 255, 255, 0.98) 0%,
@@ -44,7 +43,7 @@
 * { box-sizing: border-box; }
 /* ============================================================
    LIQUID GLASS CORE
-   Layered recipe: refraction (backdrop) â†’ fill â†’ rim light â†’ sheen
+   Layered recipe: refraction (backdrop) → fill → rim light → sheen
    ============================================================ */
 
 .glass-panel,
@@ -62,7 +61,7 @@
     var(--glass-shadow);
 }
 
-/* full refraction only where surfaces float over content â€” keeps paint cost low */
+/* full refraction only where surfaces float over content — keeps paint cost low */
 .glass-btn,
 .mobile-menu {
   -webkit-backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
@@ -75,7 +74,7 @@
   backdrop-filter: blur(6px) saturate(140%);
 }
 
-/* large panels skip the backdrop pass â€” over white it is invisible but it
+/* large panels skip the backdrop pass — over white it is invisible but it
    forces the compositor to re-raster a huge region (mobile GPUs included) */
 .glass-panel {
   -webkit-backdrop-filter: none;
@@ -92,7 +91,7 @@
   backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
 }
 
-/* the liquid-glass rim â€” a masked gradient stroke instead of a flat border.
+/* the liquid-glass rim — a masked gradient stroke instead of a flat border.
    (light curve that used to live here is folded into --glass-fill) */
 .glass-panel::before,
 .glass-card::before,
@@ -203,8 +202,9 @@
   padding: 0.9rem 2rem;
   font-size: 0.98rem;
 }
+
 /* ============================================================
-   HERMES DOCK â€” site assistant (plugs into the real agent later)
+   HERMES DOCK — site assistant (plugs into the real agent later)
    ============================================================ */
 
 .dock {
@@ -336,7 +336,7 @@
 /* when the switch button is present, it takes the auto margin; close sits after it */
 .dock-switch + .dock-close { margin-left: 6px; }
 
-/* agent picker â€” two persona cards shown before the chat starts */
+/* agent picker — two persona cards shown before the chat starts */
 .dock-picker { display: flex; flex-direction: column; gap: 10px; padding: 4px 2px 2px; }
 .dock-picker-h {
   margin: 2px 2px 2px;
@@ -404,7 +404,7 @@
   word-break: break-word;
 }
 
-/* messages spring in â€” gives the chat a lively, human rhythm */
+/* messages spring in — gives the chat a lively, human rhythm */
 @media (prefers-reduced-motion: no-preference) {
   .dock-msg,
   .dock-quick,
@@ -502,7 +502,7 @@
 .dock-chip:hover { background: rgba(8, 60, 255, 0.08); border-color: rgba(8, 60, 255, 0.5); transform: translateY(-1px); }
 .dock-chip:active { transform: translateY(0) scale(0.97); }
 
-/* persistent quick-actions tool bar â€” pinned above the composer */
+/* persistent quick-actions tool bar — pinned above the composer */
 .dock-tools {
   display: flex;
   gap: 7px;
@@ -561,7 +561,7 @@
 }
 
 /* inline action inside a divider (e.g. "prefer straight to business? Chat
-   with Bari â‡„") â€” reads as a link, sized for a fingertip */
+   with Bari ⇄") — reads as a link, sized for a fingertip */
 .dock-divider-link {
   display: inline;
   min-height: 24px;
@@ -598,7 +598,7 @@
   letter-spacing: 0.02em;
 }
 
-/* in-chat readiness quiz â€” tappable option buttons */
+/* in-chat readiness quiz — tappable option buttons */
 .dock-quiz-opts {
   display: flex;
   flex-direction: column;
@@ -729,7 +729,7 @@
 .dock-lead-send { justify-content: center; width: 100%; }
 .dock-leadform-done { margin: 2px 0 0; font-size: 0.8rem; font-weight: 700; color: #16a34a; }
 
-/* message meta â€” timestamp + sent/read ticks (WhatsApp style) */
+/* message meta — timestamp + sent/read ticks (WhatsApp style) */
 .dock-meta {
   display: block;
   margin-top: 3px;
@@ -790,7 +790,7 @@
   border-top: 1px solid rgba(8, 60, 255, 0.1);
 }
 /* the display:flex above overrides the UA [hidden] rule, so hide explicitly
-   (e.g. while the agent picker is up â€” no composer until a persona is chosen) */
+   (e.g. while the agent picker is up — no composer until a persona is chosen) */
 .dock-form[hidden] { display: none; }
 
 .dock-form input {
@@ -812,7 +812,7 @@
   padding: 0.4rem 0.9rem;
 }
 
-/* NDPA consent line â€” muted, once per panel */
+/* NDPA consent line — muted, once per panel */
 .dock-consent {
   margin: 0 0 2px;
   padding: 8px 12px;
@@ -823,7 +823,7 @@
   line-height: 1.45;
 }
 
-/* transient neutral "workingâ€¦" line for tool.activity */
+/* transient neutral "working…" line for tool.activity */
 .dock-working {
   align-self: flex-start;
   padding: 4px 4px;
@@ -833,7 +833,7 @@
   opacity: 0.85;
 }
 
-/* limit â†’ continue on WhatsApp affordance in the composer slot */
+/* limit → continue on WhatsApp affordance in the composer slot */
 .dock-form--wa { justify-content: center; }
 
 .dock-wa-btn {
@@ -848,7 +848,7 @@
   font-size: 0.84rem;
 }
 
-/* teaser bubble â€” sits to the LEFT of the closed button so it never collides
+/* teaser bubble — sits to the LEFT of the closed button so it never collides
    with the WhatsApp FAB (which stacks vertically above the dock button) */
 .dock-teaser {
   position: absolute;
