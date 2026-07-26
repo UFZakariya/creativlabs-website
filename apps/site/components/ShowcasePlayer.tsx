@@ -182,8 +182,8 @@ function IgBubble({ m }: { m: ShowMessage }) {
 }
 
 /* ── thread panes ── */
-function WaThread({ thread }: { thread: ShowThread }) {
-  const shown = useScriptPlayback(thread, true);
+function WaThread({ thread, enabled }: { thread: ShowThread; enabled: boolean }) {
+  const shown = useScriptPlayback(thread, enabled);
   const scroller = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -220,8 +220,8 @@ function WaThread({ thread }: { thread: ShowThread }) {
   );
 }
 
-function IgThread({ thread }: { thread: ShowThread }) {
-  const shown = useScriptPlayback(thread, true);
+function IgThread({ thread, enabled }: { thread: ShowThread; enabled: boolean }) {
+  const shown = useScriptPlayback(thread, enabled);
   const scroller = useRef<HTMLDivElement>(null);
   const done = shown.length === thread.messages.length;
 
@@ -255,6 +255,28 @@ function IgThread({ thread }: { thread: ShowThread }) {
 export default function ShowcasePlayer() {
   const [skin, setSkin] = useState<Skin>("whatsapp");
   const [activeKey, setActiveKey] = useState(WHATSAPP_THREADS[0].key);
+  // the simulation starts on hover; touch devices (no hover) start in-view
+  const [engaged, setEngaged] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (engaged) return;
+    if (!window.matchMedia("(hover: hover)").matches) {
+      const el = cardRef.current;
+      if (!el) return;
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            setEngaged(true);
+            io.disconnect();
+          }
+        },
+        { threshold: 0.35 }
+      );
+      io.observe(el);
+      return () => io.disconnect();
+    }
+  }, [engaged]);
 
   const active = useMemo(
     () =>
@@ -273,8 +295,10 @@ export default function ShowcasePlayer() {
             <button
               key={s}
               onClick={() => setSkin(s)}
-              className="relative z-10 rounded-full px-5 py-2 transition-colors"
-              style={{ color: skin === s ? "#10142a" : "rgba(255,255,255,.85)" }}
+              aria-label={s === "whatsapp" ? "WhatsApp" : "Instagram"}
+              title={s === "whatsapp" ? "WhatsApp" : "Instagram"}
+              className="relative isolate z-10 grid place-items-center rounded-full px-5 py-2 transition-colors"
+              style={{ color: skin === s ? (s === "whatsapp" ? "#25d366" : "#d62976") : "rgba(255,255,255,.9)" }}
             >
               {skin === s && (
                 <motion.span
@@ -283,14 +307,29 @@ export default function ShowcasePlayer() {
                   transition={{ type: "spring", stiffness: 400, damping: 32 }}
                 />
               )}
-              {s === "whatsapp" ? "WhatsApp" : "Instagram"}
+              {s === "whatsapp" ? (
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" aria-hidden>
+                  <path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L4 20l1-4.6A8.5 8.5 0 1 1 21 11.5Z" />
+                  <path d="M8.8 9.2c.3 1.9 2.1 3.8 4 4.2l1.3-1c.9.3 1.6.7 1.9 1.3" strokeWidth="1.6" />
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" aria-hidden>
+                  <rect x="3" y="3" width="18" height="18" rx="5.5" />
+                  <circle cx="12" cy="12" r="4.2" />
+                  <circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none" />
+                </svg>
+              )}
             </button>
           ))}
         </div>
       </div>
 
-      {/* device card */}
-      <div className="glass-ring relative overflow-hidden rounded-3xl bg-white text-left shadow-[0_40px_80px_rgba(2,6,31,0.45)]">
+      {/* device card — hovering it starts the simulation */}
+      <div
+        ref={cardRef}
+        onMouseEnter={() => setEngaged(true)}
+        className="glass-ring relative overflow-hidden rounded-3xl bg-white text-left shadow-[0_40px_80px_rgba(2,6,31,0.45)] transition-shadow duration-500 hover:shadow-[0_50px_100px_rgba(2,6,31,0.55)]"
+      >
         {skin === "whatsapp" ? (
           /* ── WhatsApp Web-style header ── */
           <div className="flex items-center gap-3 border-b border-black/5 bg-[#f0f2f5] px-4 py-2.5 text-[#111b21]">
@@ -413,9 +452,9 @@ export default function ShowcasePlayer() {
                   transition={{ duration: 0.25 }}
                 >
                   {skin === "whatsapp" ? (
-                    <WaThread thread={active} />
+                    <WaThread thread={active} enabled={engaged} />
                   ) : (
-                    <IgThread thread={active} />
+                    <IgThread thread={active} enabled={engaged} />
                   )}
                 </motion.div>
               </AnimatePresence>
