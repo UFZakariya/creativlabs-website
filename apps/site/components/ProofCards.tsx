@@ -158,11 +158,12 @@ export default function ProofCards() {
   return (
     <section className="mx-auto max-w-5xl px-5 py-20 sm:py-28">
       <div className="mb-12 text-center">
-        <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.16em] text-[var(--color-blue)]">
+        <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
           Staff, not software
         </p>
-        <h2 className="text-display-3 mx-auto max-w-2xl">
-          Why it feels like a team — not another app to manage
+        <h2 className="text-display-2 mx-auto max-w-3xl">
+          Why it feels like <span className="text-dawn-gradient">a team</span> —
+          not another app
         </h2>
       </div>
 
@@ -173,12 +174,14 @@ export default function ProofCards() {
             className="glass-ring overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
           >
             <div className="bg-azure-dawn relative m-3 flex min-h-[264px] flex-col justify-between overflow-hidden rounded-3xl p-5">
-              <div className="flex items-baseline gap-2 text-[13.5px]">
-                <span className="font-bold text-[var(--color-cyan)]">{agent}</span>
-                <span className="rounded bg-white/15 px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-white/80">
-                  Agent
-                </span>
-                <span className="min-w-0 text-white/90">{msg}</span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[15px] font-bold text-[var(--color-cyan)]">{agent}</span>
+                  <span className="rounded bg-white/15 px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-white/80">
+                    Agent
+                  </span>
+                </div>
+                <p className="mt-1 text-[16px] font-medium leading-snug text-white/95">{msg}</p>
               </div>
               <div className="pb-1 pt-6">
                 <Art />

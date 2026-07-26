@@ -15,10 +15,10 @@ export default function OrgChart() {
   return (
     <section className="bg-azure-dawn rounded-[var(--radius-band)] mx-3 px-5 py-20 sm:py-28">
       <div className="mx-auto max-w-5xl text-center">
-        <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.16em] text-[var(--color-cyan)]">
+        <p className="mb-4 inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)]">
           The House of Agents
         </p>
-        <h2 className="text-display-3 mx-auto max-w-2xl text-white">
+        <h2 className="text-display-2 mx-auto max-w-3xl text-white">
           One chief of staff. Six departments. Your org chart, staffed.
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">

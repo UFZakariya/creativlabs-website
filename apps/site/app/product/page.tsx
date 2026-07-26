@@ -86,11 +86,11 @@ export default function ProductPage() {
       {/* the dashboard */}
       <section className="mx-auto max-w-5xl px-5 pb-20 text-center sm:pb-28">
         <div className="glass-ring rounded-[32px] bg-white px-6 py-12 shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:px-12">
-          <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.16em] text-[var(--color-blue)]">
+          <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Mission control
           </p>
-          <h2 className="text-display-3 mx-auto max-w-2xl">
-            A dashboard where you watch the house work
+          <h2 className="text-display-2 mx-auto max-w-3xl">
+            A dashboard where you <span className="text-dawn-gradient">watch the house work</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--color-ink-soft)]">
             Chat with Sardauna, track every department, review approvals and

@@ -38,11 +38,11 @@ export default function CapabilitiesGrid() {
   return (
     <section className="mx-auto max-w-5xl px-5 py-20 sm:py-28">
       <div className="mb-12 text-center">
-        <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.16em] text-[var(--color-blue)]">
+        <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
           What the house runs
         </p>
-        <h2 className="text-display-3 mx-auto max-w-2xl">
-          The day-to-day, handled end to end
+        <h2 className="text-display-2 mx-auto max-w-3xl">
+          The day-to-day, <span className="text-dawn-gradient">handled end to end</span>
         </h2>
       </div>
 

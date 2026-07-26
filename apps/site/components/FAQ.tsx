@@ -36,7 +36,7 @@ export default function FAQ() {
     <section className="mx-auto max-w-5xl px-5 py-20 sm:py-28">
       <div className="grid gap-10 md:grid-cols-[1fr_1.6fr]">
         <div className="md:sticky md:top-28 md:self-start">
-          <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.16em] text-[var(--color-blue)]">
+          <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Straight answers
           </p>
           <h2 className="text-display-3">Questions owners ask</h2>
