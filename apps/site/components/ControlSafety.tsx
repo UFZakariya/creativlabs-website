@@ -36,7 +36,7 @@ export default function ControlSafety() {
         {CONTROLS.map((c) => (
           <div
             key={c.title}
-            className="glass-ring rounded-3xl bg-white p-6 shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
+            className="liquid-glass glass-ring rounded-3xl p-6 shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(8,60,255,0.16)]"
           >
             <span className="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-[var(--color-blue)]/8 text-xl">
               {c.icon}

@@ -55,7 +55,7 @@ export default function RotatingStatement() {
             {ENDINGS.map((e, i) => (
               <span
                 key={e}
-                className="text-dawn-gradient absolute inset-0 flex items-center justify-center transition-all duration-500"
+                className="text-shimmer-ink absolute inset-0 flex items-center justify-center transition-all duration-500"
                 style={{
                   transitionTimingFunction: "cubic-bezier(0.645, 0.045, 0.355, 1)",
                   opacity: i === idx ? 1 : 0,

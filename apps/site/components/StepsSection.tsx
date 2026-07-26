@@ -4,8 +4,8 @@
 const STEPS = [
   {
     n: "1",
-    title: "Say hello on WhatsApp",
-    body: "Start with the free readiness audit — a short conversation, no installs, no card. You'll know the same day what Sardauna can take off your plate.",
+    title: "Say hello to Bari or Biba",
+    body: "Start with the free readiness audit — a short conversation, no installs, no card. You'll get an instant Readiness Report (free), and what Sardauna can take off your plate.",
   },
   {
     n: "2",
@@ -25,7 +25,7 @@ export default function StepsSection() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-12 text-center">
           <p className="mb-4 inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)]">
-            Up and running in days, not months
+            Up and running in minutes, not months
           </p>
           <h2 className="text-display-2 mx-auto max-w-2xl text-white">
             Three steps to a staffed business

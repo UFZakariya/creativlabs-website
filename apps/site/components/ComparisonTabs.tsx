@@ -85,8 +85,9 @@ export default function ComparisonTabs() {
         A reply is <span className="text-dawn-gradient">not a result.</span>
       </h2>
       <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[var(--color-ink-soft)]">
-        Ask an AI tool and you get instructions. Ask Sardauna and the work
-        comes back finished — with receipts.
+        Chatbots reply. Sardauna gives results. Ask an AI tool and you get
+        instructions — ask Sardauna and the work comes back finished, with
+        receipts.
       </p>
 
       {/* tab pill row */}
@@ -98,7 +99,7 @@ export default function ComparisonTabs() {
               <button
                 key={t.key}
                 onClick={() => setKey(t.key)}
-                className="relative flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-semibold transition-colors"
+                className="relative isolate flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-semibold transition-colors"
                 style={{ color: active ? "#fff" : "var(--color-ink-soft)" }}
               >
                 {active && (

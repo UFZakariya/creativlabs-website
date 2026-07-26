@@ -133,6 +133,23 @@ body {
 
 /* ── aurora beam layer (adapted from the aurora-background component,
      brand palette, dark-band variant) */
+/* true liquid glass: near-transparent gradient fill, deep blur + saturation */
+.liquid-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.1));
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  backdrop-filter: blur(28px) saturate(1.6);
+}
+
+/* light-background shimmer: animated sweep across the brand ink gradient */
+.text-shimmer-ink {
+  background: linear-gradient(90deg, var(--color-blue) 0%, var(--color-azure) 30%, var(--color-violet) 55%, var(--color-blue) 80%, var(--color-azure) 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-shimmer 5s linear infinite;
+}
+
 /* animated liquid-gradient headline accent — continuous shimmer sweep */
 @keyframes text-shimmer {
   to { background-position: 200% center; }
