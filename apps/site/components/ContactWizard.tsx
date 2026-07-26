@@ -9,6 +9,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { slTrack } from "@/lib/track";
 
 const LEAD_URL =
   process.env.NEXT_PUBLIC_LEAD_URL || "https://chat.safetyline.com.ng/web/lead";
@@ -115,11 +116,14 @@ export default function ContactWizard() {
           kind: "error",
           message: msg || "Please check your contact details and try again.",
         });
+        slTrack("form_error", { status: "400" });
         return;
       }
       if (!res.ok) throw new Error(`Submit failed: ${res.status}`);
       setStatus({ kind: "sent" });
+      slTrack("form_submit", { status: "ok" });
     } catch {
+      slTrack("form_error", { status: "network" });
       setStatus({
         kind: "error",
         message: "That didn't go through — ",
