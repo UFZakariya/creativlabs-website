@@ -7,8 +7,10 @@ export const CHAT_ENDPOINT =
 const TRACK_URL = CHAT_ENDPOINT ? CHAT_ENDPOINT.replace(/\/chat\/?$/, "/t") : "";
 
 export function slTrack(kind: string, extra?: Record<string, string>) {
-  // never report dev/staging traffic into the live funnel
+  // never report dev/staging traffic into the live funnel — staging builds
+  // set NEXT_PUBLIC_DISABLE_TRACK=1 (baked in at build time)
   if (process.env.NODE_ENV !== "production") return;
+  if (process.env.NEXT_PUBLIC_DISABLE_TRACK === "1") return;
   if (!TRACK_URL || typeof window === "undefined") return;
   try {
     fetch(TRACK_URL, {
