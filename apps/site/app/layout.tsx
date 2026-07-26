@@ -41,6 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable} ${robotoMono.variable}`}>
       <body>
+        <div className="page-bg" aria-hidden />
         {children}
         <Analytics />
         <HermesDock />

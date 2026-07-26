@@ -1,6 +1,7 @@
-/* Hero band: badge, display headline (working copy = brief §9 option A until
-   owner picks), trust chips, CTAs, and the showcase player. Server component
-   wrapping client islands. */
+/* Hero band: aurora beams over a vivid-blue dawn gradient (no navy tail —
+   the band cuts off just past the showcase header, per owner direction).
+   The showcase player overlaps out of the band onto the light canvas.
+   Server component wrapping client islands. */
 
 import ShowcasePlayer from "./ShowcasePlayer";
 
@@ -12,48 +13,54 @@ const TRUST_CHIPS = [
 
 export default function Hero() {
   return (
-    <section className="bg-azure-dawn rounded-b-[var(--radius-band)] px-4 pb-16 pt-32 sm:pb-24 sm:pt-40">
-      <div className="mx-auto max-w-5xl text-center">
-        <h1 className="text-display-1 mx-auto max-w-3xl text-white">
-          Every department.{" "}
-          <span className="text-dawn-gradient-bright">One agent away.</span>
-        </h1>
+    <>
+      <section className="bg-azure-dawn-hero relative overflow-hidden rounded-b-[var(--radius-band)] px-4 pb-44 pt-32 sm:pb-48 sm:pt-40">
+        <div className="aurora-beams" aria-hidden />
+        <div className="relative mx-auto max-w-5xl text-center">
+          <h1 className="text-display-1 mx-auto max-w-3xl text-white">
+            Every department.{" "}
+            <span className="text-dawn-gradient-bright">One agent away.</span>
+          </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/75">
-          Think, ideate, plan — while the agents do the dirty work. Sardauna is
-          your chief of staff, running departments of specialist agents across
-          sales, support, finance and growth — on the WhatsApp your business
-          already uses.
-        </p>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/75">
+            Think, ideate, plan — while the agents do the dirty work. Sardauna is
+            your chief of staff, running departments of specialist agents across
+            sales, support, finance and growth — on the WhatsApp your business
+            already uses.
+          </p>
 
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <a
-            href="/contact"
-            className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
-          >
-            Start with a free readiness audit
-          </a>
-          <a
-            href="#showcase"
-            className="glass-surface glass-ring rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            Watch the agents work
-          </a>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="/contact"
+              className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
+            >
+              Start with a free readiness audit
+            </a>
+            <a
+              href="#showcase"
+              className="glass-surface glass-ring rounded-full px-7 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Watch the agents work
+            </a>
+          </div>
+
+          <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] text-white/60">
+            {TRUST_CHIPS.map((c) => (
+              <li key={c} className="flex items-center gap-1.5">
+                <span aria-hidden className="text-[var(--color-cyan)]">✓</span>
+                {c}
+              </li>
+            ))}
+          </ul>
         </div>
+      </section>
 
-        <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] text-white/60">
-          {TRUST_CHIPS.map((c) => (
-            <li key={c} className="flex items-center gap-1.5">
-              <span aria-hidden className="text-[var(--color-cyan)]">✓</span>
-              {c}
-            </li>
-          ))}
-        </ul>
-
-        <div id="showcase">
+      {/* showcase rides out of the band — its header sits on the boundary */}
+      <div id="showcase" className="relative z-10 -mt-36 px-4 sm:-mt-40">
+        <div className="mx-auto max-w-5xl text-center">
           <ShowcasePlayer />
         </div>
       </div>
-    </section>
+    </>
   );
 }

@@ -187,13 +187,12 @@ export default function HermesDock() {
           setOpen((v) => !v);
           if (!open) slTrack("dock_open", { path: window.location.pathname });
         }}
-        className="fixed bottom-5 right-5 z-[60] flex items-center gap-2.5 rounded-full bg-[var(--color-ink)] py-2.5 pl-3 pr-5 text-white shadow-[0_18px_45px_rgba(2,6,31,0.45)] transition-transform hover:-translate-y-0.5"
+        className="glass-ring fixed bottom-5 right-5 z-[60] flex items-center gap-2.5 rounded-full bg-white/60 py-2.5 pl-3 pr-5 shadow-[0_18px_45px_rgba(2,6,31,0.3)] backdrop-blur-xl transition-transform hover:-translate-y-0.5"
       >
-        <span className="flex -space-x-2">
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--color-blue)] text-[12.5px] font-bold ring-2 ring-[var(--color-ink)]">B</span>
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--color-violet)] text-[12.5px] font-bold ring-2 ring-[var(--color-ink)]">B</span>
+        <img src="/logo-128.png" alt="" className="h-8 w-8" />
+        <span className="text-[13.5px] font-semibold text-[var(--color-ink)]">
+          {open ? "Close" : "Chat with us"}
         </span>
-        <span className="text-[13.5px] font-semibold">{open ? "Close" : "Chat with us"}</span>
       </button>
 
       {/* panel */}

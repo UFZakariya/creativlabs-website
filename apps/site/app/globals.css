@@ -95,10 +95,75 @@
 }
 
 body {
-  background: var(--color-canvas);
+  background: #ffffff;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ── page background — ported from the old site: white base, blueprint grid,
+     cyan halo. Sits behind the wave canvas (which multiply-blends over it). */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -20;
+  pointer-events: none;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(to right, rgba(14, 116, 144, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(14, 116, 144, 0.09) 1px, transparent 1px);
+  background-size: 6rem 4rem;
+}
+.page-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle 560px at 50% 180px, rgba(147, 219, 255, 0.62), transparent 70%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 78%);
+}
+
+/* ── hero band gradient without the navy tail — stays vivid blue */
+@utility bg-azure-dawn-hero {
+  background:
+    radial-gradient(120% 90% at 50% -10%, var(--color-cyan) 0%, transparent 32%),
+    radial-gradient(140% 110% at 50% -20%, var(--color-azure) 8%, transparent 55%),
+    linear-gradient(180deg, var(--color-blue) 0%, #0a34d6 62%, #0d2fb8 100%);
+}
+
+/* ── aurora beam layer (adapted from the aurora-background component,
+     brand palette, dark-band variant) */
+@keyframes orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes aurora {
+  from { background-position: 50% 50%, 50% 50%; }
+  to   { background-position: 350% 50%, 350% 50%; }
+}
+.aurora-beams {
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+  opacity: 0.5;
+  --aurora: repeating-linear-gradient(100deg, var(--color-blue) 10%, var(--color-azure) 15%, var(--color-cyan) 20%, #cdb8ff 25%, var(--color-azure) 30%);
+  --stripes: repeating-linear-gradient(100deg, #000 0%, #000 7%, transparent 10%, transparent 12%, #000 16%);
+  background-image: var(--stripes), var(--aurora);
+  background-size: 300% 200%;
+  background-position: 50% 50%, 50% 50%;
+  filter: blur(12px);
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 25%, transparent 78%);
+  mask-image: radial-gradient(ellipse at 50% 0%, black 25%, transparent 78%);
+}
+.aurora-beams::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--stripes), var(--aurora);
+  background-size: 200% 100%;
+  background-attachment: fixed;
+  mix-blend-mode: difference;
+  animation: aurora 60s linear infinite;
 }
 
 /* ── messaging-app chrome for the showcase (hand-built) ─────────────────── */

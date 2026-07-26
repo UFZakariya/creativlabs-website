@@ -9,6 +9,7 @@ import ControlSafety from "@/components/ControlSafety";
 import FAQ from "@/components/FAQ";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
+import Reveal from "@/components/Reveal";
 
 export default function Home() {
   return (
@@ -25,19 +26,29 @@ export default function Home() {
       <ProofCards />
 
       {/* chatbot vs Sardauna, tabbed */}
-      <ComparisonTabs />
+      <Reveal>
+        <ComparisonTabs />
+      </Reveal>
 
       {/* three steps to onboard */}
-      <StepsSection />
+      <Reveal>
+        <StepsSection />
+      </Reveal>
 
       {/* control & safety — tiered autonomy */}
-      <ControlSafety />
+      <Reveal>
+        <ControlSafety />
+      </Reveal>
 
       {/* FAQ split accordion */}
-      <FAQ />
+      <Reveal>
+        <FAQ />
+      </Reveal>
 
       {/* closing ask */}
-      <CTABand />
+      <Reveal>
+        <CTABand />
+      </Reveal>
 
       <Footer />
     </main>
