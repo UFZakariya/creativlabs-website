@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Roboto_Mono } from "next/font/google";
 import "./globals.css";
+import "./legacy-dock.css";
 import Analytics from "@/components/Analytics";
-import HermesDock from "@/components/HermesDock";
+import LegacyDock from "@/components/LegacyDock";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -44,7 +45,7 @@ export default function RootLayout({
         <div className="page-bg" aria-hidden />
         {children}
         <Analytics />
-        <HermesDock />
+        <LegacyDock />
       </body>
     </html>
   );
