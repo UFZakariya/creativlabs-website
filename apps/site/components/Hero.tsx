@@ -24,9 +24,9 @@ export default function Hero() {
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/75">
             Work on your business, not in it. Most businesses don&apos;t fail
-            for lack of a great product — they drown in the unending grind of
-            daily operations. Sardauna, our AI business assistant, takes the
-            grind off your hands.
+            for lack of a great product — they fail because the owner spends
+            every day running the shop instead of growing it. Sardauna, our AI
+            business assistant, runs the day-to-day for you.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
