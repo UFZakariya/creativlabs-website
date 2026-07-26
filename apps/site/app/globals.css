@@ -138,9 +138,10 @@ body {
   to { background-position: 200% center; }
 }
 .text-shimmer {
-  /* warm metallic gold — complementary to the blue band, so the animated
-     words read as a different material, not a shade of the background */
-  background: linear-gradient(90deg, #fff3d6 0%, #ffd977 26%, #f4b843 50%, #ffe9a8 74%, #fff3d6 100%);
+  /* brand cyan sweep over white, lifted off the band by a glyph-shaped
+     cyan glow — separation by luminance, palette stays in-family */
+  filter: drop-shadow(0 2px 22px rgba(126, 242, 255, 0.55));
+  background: linear-gradient(90deg, #8df3ff 0%, #e8fdff 25%, var(--color-cyan) 50%, #ffffff 72%, #8df3ff 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
