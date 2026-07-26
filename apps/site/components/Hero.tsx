@@ -17,8 +17,9 @@ export default function Hero() {
       <section className="bg-azure-dawn-hero relative overflow-hidden rounded-b-[var(--radius-band)] px-4 pb-44 pt-32 sm:pb-48 sm:pt-40">
         <div className="aurora-beams" aria-hidden />
         <div className="relative mx-auto max-w-5xl text-center">
-          <h1 className="text-display-1 mx-auto max-w-3xl text-white">
-            A whole business,{" "}
+          <h1 className="text-display-1 mx-auto text-white">
+            A whole business running
+            <br className="hidden sm:block" />{" "}
             <span className="text-shimmer whitespace-nowrap">in your pocket.</span>
           </h1>
 

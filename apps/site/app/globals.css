@@ -138,7 +138,9 @@ body {
   to { background-position: 200% center; }
 }
 .text-shimmer {
-  background: linear-gradient(90deg, #eafcff 0%, var(--color-cyan) 22%, #9ec5ff 48%, #cdb8ff 72%, #eafcff 100%);
+  /* stays in bright whites/cyans — mid-blue and violet tones sink into the
+     band's background */
+  background: linear-gradient(90deg, #ffffff 0%, #c3f8ff 28%, var(--color-cyan) 50%, #dffbff 72%, #ffffff 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
