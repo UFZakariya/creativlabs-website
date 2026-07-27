@@ -95,7 +95,7 @@ function OrbitArt({ run }: { run: number }) {
     },
   ];
   const SPARKS_OUT = [70, 300];
-  const SPARKS_IN = [30, 150, 270];
+  const SPARKS_IN = [30, 270]; // clear of the Finance satellite at 130°
   const pop = (i: number) => ({
     hide: { opacity: 0, scale: 0.5 },
     show: { opacity: 1, scale: 1, transition: { delay: 0.2 + i * 0.14, duration: 0.4, ease: EASE } },
@@ -106,14 +106,14 @@ function OrbitArt({ run }: { run: number }) {
       <span aria-hidden className="absolute inset-0 rounded-full border border-white/25" />
       <span aria-hidden className="absolute inset-[34px] rounded-full border border-white/20" />
 
-      {/* outer ring — glass department satellites + a couple of sparks */}
-      <div aria-hidden className="absolute inset-0 [animation:orbit_22s_linear_infinite] group-hover:[animation-duration:8s]">
-        {DEPT.map(({ key, angle, icon }, i) => (
+      {/* outer ring (26s) — Ops + Growth satellites and cyan sparks */}
+      <div aria-hidden className="absolute inset-0 [animation:orbit_26s_linear_infinite] group-hover:[animation-duration:9s]">
+        {[DEPT[0], DEPT[2]].map(({ key, angle, icon }, i) => (
           <span key={key} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${angle}deg) translateY(-95px)` }}>
-            <span className="block [animation:orbit_22s_linear_infinite_reverse] group-hover:[animation-duration:8s]">
+            <span className="block [animation:orbit_26s_linear_infinite_reverse] group-hover:[animation-duration:9s]">
               <motion.span
                 variants={pop(i)}
-                className="grid h-9 w-9 place-items-center rounded-full border border-white/40 bg-white/15 shadow-[0_6px_16px_rgba(2,6,31,0.3)] backdrop-blur-sm"
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/40 bg-white/15 shadow-[0_6px_16px_rgba(2,6,31,0.3)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-110"
                 style={{ margin: -18 }}
               >
                 {icon}
@@ -128,8 +128,19 @@ function OrbitArt({ run }: { run: number }) {
         ))}
       </div>
 
-      {/* inner ring — counter-rotating sparks */}
-      <div aria-hidden className="absolute inset-0 [animation:orbit_13s_linear_infinite_reverse] group-hover:[animation-duration:5s]">
+      {/* inner ring (14s, counter-rotating) — Finance satellite + sparks */}
+      <div aria-hidden className="absolute inset-0 [animation:orbit_14s_linear_infinite_reverse] group-hover:[animation-duration:6s]">
+        <span className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${DEPT[1].angle}deg) translateY(-61px)` }}>
+          <span className="block [animation:orbit_14s_linear_infinite] group-hover:[animation-duration:6s]">
+            <motion.span
+              variants={pop(2)}
+              className="grid h-8 w-8 place-items-center rounded-full border border-white/40 bg-white/15 shadow-[0_6px_16px_rgba(2,6,31,0.3)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-110"
+              style={{ margin: -16 }}
+            >
+              {DEPT[1].icon}
+            </motion.span>
+          </span>
+        </span>
         {SPARKS_IN.map((a, i) => (
           <span key={a} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${a}deg) translateY(-61px)` }}>
             <span
@@ -140,9 +151,9 @@ function OrbitArt({ run }: { run: number }) {
         ))}
       </div>
 
-      {/* centre — bare mark with a halo, no white tile */}
+      {/* centre — bare mark, breathing halo */}
       <motion.span variants={pop(0)} className="relative grid place-items-center">
-        <span aria-hidden className="absolute -inset-5 rounded-full bg-[var(--color-cyan)]/30 blur-xl" />
+        <span aria-hidden className="absolute -inset-5 rounded-full bg-[var(--color-cyan)]/30 blur-xl [animation:halo-pulse_3.5s_ease-in-out_infinite]" />
         <img src="/logo-128.png" alt="" className="relative h-11 w-11 drop-shadow-[0_8px_18px_rgba(2,6,31,0.5)]" />
       </motion.span>
     </motion.div>

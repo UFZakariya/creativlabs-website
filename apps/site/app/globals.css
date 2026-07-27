@@ -170,6 +170,11 @@ body {
   to { transform: rotate(360deg); }
 }
 
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+
 /* messaging typing-dots (Instagram-style bubble) */
 @keyframes dot-bounce {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
