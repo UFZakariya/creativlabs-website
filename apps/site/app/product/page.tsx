@@ -5,6 +5,7 @@ import OrgChart from "@/components/OrgChart";
 import CapabilitiesGrid from "@/components/CapabilitiesGrid";
 import StepsSection from "@/components/StepsSection";
 import ControlSafety from "@/components/ControlSafety";
+import SuiteDashboard from "@/components/SuiteDashboard";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 
@@ -13,16 +14,6 @@ export const metadata: Metadata = {
   description:
     "Sardauna is a house of agents: a chief of staff running six departments of specialist AI agents for your business — on WhatsApp, with a dashboard, under your approval.",
 };
-
-const MODULES = [
-  "Chief-of-Staff chat",
-  "Operations",
-  "Finance",
-  "Marketing & CRM",
-  "Projects",
-  "Messages",
-  "Agents & evals",
-];
 
 export default function ProductPage() {
   return (
@@ -83,9 +74,9 @@ export default function ProductPage() {
       {/* what the house runs */}
       <CapabilitiesGrid />
 
-      {/* the dashboard */}
-      <section className="mx-auto max-w-5xl px-5 pb-20 text-center sm:pb-28">
-        <div className="glass-ring rounded-[32px] bg-white px-6 py-12 shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:px-12">
+      {/* the dashboard — Business Suite showcase */}
+      <section className="mx-auto max-w-5xl px-5 pb-20 sm:pb-28">
+        <div className="mb-10 text-center">
           <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Mission control
           </p>
@@ -93,20 +84,11 @@ export default function ProductPage() {
             A dashboard where you <span className="text-dawn-gradient">watch the house work</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--color-ink-soft)]">
-            Chat with Sardauna, track every department, review approvals and
-            see each agent&apos;s performance — seven modules, one place.
+            The Safetyline Business Suite: chat with Sardauna, clear approvals
+            and watch every department work — seven modules, one place.
           </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
-            {MODULES.map((m) => (
-              <span
-                key={m}
-                className="rounded-full border border-[var(--color-blue)]/20 bg-[var(--color-blue)]/5 px-4 py-2 text-[13px] font-semibold text-[var(--color-blue)]"
-              >
-                {m}
-              </span>
-            ))}
-          </div>
         </div>
+        <SuiteDashboard />
       </section>
 
       {/* onboarding + control + close */}
