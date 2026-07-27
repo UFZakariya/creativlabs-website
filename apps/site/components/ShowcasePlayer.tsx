@@ -60,6 +60,23 @@ const I = {
   ),
 };
 
+/* WhatsApp's real double-check: one drawn glyph, checks overlapping */
+function Ticks({ read }: { read: boolean }) {
+  return (
+    <svg
+      width="15"
+      height="10"
+      viewBox="0 0 16 11"
+      fill="none"
+      aria-hidden
+      className={read ? "text-[#53bdeb]" : "text-[#8696a0]"}
+    >
+      <path d="M11.3 1 5.6 8.1 3.1 5.7" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15 1 9.3 8.1l-1-.95" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function useScriptPlayback(
   thread: ShowThread,
   enabled: boolean,
@@ -140,7 +157,7 @@ function WaBubble({ m, first, read }: { m: ShowMessage; first: boolean; read: bo
   return (
     <div className={`flex ${outgoing ? "justify-end" : "justify-start"} px-[6%]`}>
       <div
-        className={`relative max-w-[82%] rounded-lg px-2.5 py-1.5 text-[13.2px] leading-[1.35] text-[#111b21] shadow-[0_1px_.5px_rgba(11,20,26,.13)] ${
+        className={`relative max-w-[82%] rounded-[7.5px] px-2 py-[5px] text-[13.2px] leading-[1.35] text-[#111b21] shadow-[0_1px_.5px_rgba(11,20,26,.13)] ${
           outgoing ? "bg-[#d9fdd3]" : "bg-white"
         } ${first ? (outgoing ? "wa-tail-out rounded-tr-none" : "wa-tail-in rounded-tl-none") : ""}`}
       >
@@ -169,11 +186,9 @@ function WaBubble({ m, first, read }: { m: ShowMessage; first: boolean; read: bo
         {m.status && (
           <div className="mt-1 border-t border-black/8 pt-1 text-[10.3px] text-black/45">{m.status}</div>
         )}
-        <span className="float-right ml-2 mt-1 flex translate-y-[3px] items-center gap-0.5 text-[10.2px] text-[#667781]">
+        <span className="float-right ml-1.5 flex translate-y-[4px] items-center gap-[3px] text-[10.5px] leading-none text-[#667781]">
           {m.time}
-          {outgoing && (
-            <span className={read ? "text-[#53bdeb]" : "text-[#8696a0]"}>✓✓</span>
-          )}
+          {outgoing && <Ticks read={read} />}
         </span>
       </div>
     </div>
@@ -431,38 +446,64 @@ export default function ShowcasePlayer() {
         className="glass-ring relative overflow-hidden rounded-3xl bg-white text-left shadow-[0_40px_80px_rgba(2,6,31,0.45)] transition-shadow duration-500 hover:shadow-[0_50px_100px_rgba(2,6,31,0.55)]"
       >
         {skin === "whatsapp" ? (
-          /* ── WhatsApp Web-style header ── */
-          <div className="flex items-center gap-3 border-b border-black/5 bg-[#f0f2f5] px-4 py-2.5 text-[#111b21]">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-[#083cff]/10 text-base">
-              {active.emoji}
-            </span>
-            <div className="min-w-0 leading-tight">
-              <div className="truncate text-[14.5px] font-semibold">
-                {active.label} · Safetyline
+          <>
+            {/* ── WhatsApp Web header (tablet/desktop two-pane) ── */}
+            <div className="hidden items-center gap-3 border-b border-black/5 bg-[#f0f2f5] px-4 py-2.5 text-[#111b21] md:flex">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-[#083cff]/10 text-base">
+                {active.emoji}
+              </span>
+              <div className="min-w-0 leading-tight">
+                <div className="truncate text-[14.5px] font-semibold">
+                  {active.label} · Safetyline
+                </div>
+                <div className="text-[11.5px] text-[#667781]">
+                  {waTyping === "in" ? "typing…" : `${active.agent} · online`}
+                </div>
               </div>
-              <div className="text-[11.5px] text-[#667781]">
-                {waTyping === "in" ? "typing…" : `${active.agent} · online`}
+              <div className="ml-auto flex items-center gap-4 text-[#54656f]">
+                <span>{I.video()}</span>
+                <span>{I.phone()}</span>
+                <span>{I.search()}</span>
+                <span>{I.kebab()}</span>
               </div>
             </div>
-            <div className="ml-auto flex items-center gap-4 text-[#54656f]">
-              <span className="hidden sm:block">{I.video()}</span>
-              <span className="hidden sm:block">{I.phone()}</span>
-              <span>{I.search()}</span>
-              <span>{I.kebab()}</span>
+
+            {/* ── WhatsApp phone-app header ── */}
+            <div className="flex items-center gap-2.5 border-b border-black/5 bg-white px-2.5 py-2 text-[#111b21] md:hidden">
+              <span className="text-[#54656f]">{I.back()}</span>
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#083cff]/10 text-[15px]">
+                {active.emoji}
+              </span>
+              <div className="min-w-0 leading-tight">
+                <div className="truncate text-[15px] font-semibold">{active.label}</div>
+                <div className="text-[11.5px] text-[#667781]">
+                  {waTyping === "in" ? "typing…" : "online"}
+                </div>
+              </div>
+              <div className="ml-auto flex items-center gap-4 text-[#54656f]">
+                <span>{I.video()}</span>
+                <span>{I.phone()}</span>
+                <span>{I.kebab()}</span>
+              </div>
             </div>
-            <select
-              aria-label="Switch conversation"
-              value={activeKey}
-              onChange={(e) => setActiveKey(e.target.value)}
-              className="rounded-lg bg-black/5 px-2 py-1 text-xs font-medium md:hidden"
-            >
+
+            {/* phone thread switcher — chips, since the app has no sidebar */}
+            <div className="flex gap-1.5 overflow-x-auto border-b border-black/5 bg-white px-2.5 py-1.5 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
               {WHATSAPP_THREADS.map((t) => (
-                <option key={t.key} value={t.key}>
+                <button
+                  key={t.key}
+                  onClick={() => setActiveKey(t.key)}
+                  className={`shrink-0 rounded-full px-3 py-1 text-[12px] font-semibold ${
+                    t.key === activeKey
+                      ? "bg-[#00a884]/12 text-[#008069]"
+                      : "bg-black/5 text-[#54656f]"
+                  }`}
+                >
                   {t.label}
-                </option>
+                </button>
               ))}
-            </select>
-          </div>
+            </div>
+          </>
         ) : (
           /* ── Instagram DM header ── */
           <div className="flex items-center gap-3 border-b border-black/10 bg-white px-4 py-2.5 text-black">
@@ -575,14 +616,29 @@ export default function ShowcasePlayer() {
 
             {/* composer */}
             {skin === "whatsapp" ? (
-              <div className="flex items-center gap-3 border-t border-black/5 bg-[#f0f2f5] px-3 py-2 text-[#54656f]">
-                {I.smile()}
-                {I.plus()}
-                <div className="h-9 flex-1 rounded-lg bg-white px-3 text-[13px] leading-9 text-black/40">
-                  Type a message
+              <>
+                {/* Web composer */}
+                <div className="hidden items-center gap-3 border-t border-black/5 bg-[#f0f2f5] px-3 py-2 text-[#54656f] md:flex">
+                  {I.smile()}
+                  {I.plus()}
+                  <div className="h-9 flex-1 rounded-lg bg-white px-3 text-[13px] leading-9 text-black/40">
+                    Type a message
+                  </div>
+                  {I.mic()}
                 </div>
-                {I.mic()}
-              </div>
+                {/* phone composer — pill input over the wallpaper + green mic */}
+                <div className="flex items-center gap-1.5 bg-[#f0ece4] px-1.5 py-1.5 md:hidden">
+                  <div className="flex h-10 flex-1 items-center gap-2 rounded-full bg-white px-3 text-[#54656f] shadow-sm">
+                    {I.smile()}
+                    <span className="flex-1 text-[13.5px] text-black/40">Message</span>
+                    {I.plus()}
+                    {I.camera()}
+                  </div>
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#00a884] text-white shadow-sm">
+                    {I.mic("#fff")}
+                  </span>
+                </div>
+              </>
             ) : (
               <div className="flex items-center gap-2.5 border-t border-black/10 bg-white px-3 py-2">
                 <span className="grid h-8 w-8 place-items-center rounded-full bg-[#3797f0] text-white">
