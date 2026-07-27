@@ -1,12 +1,14 @@
 "use client";
 
-/* The House of Agents org chart — the section only Sardauna can show:
-   a real chief of staff commanding real department heads. The bare glowing
-   mark sits on top; animated SVG connectors draw down and flow into six
-   frosted-glass department nodes on the azure-dawn band. Variants-based,
-   whileInView-triggered, replays on hover via keyed remount. */
+/* The House of Agents org chart — a clean org TREE. The bare glowing mark
+   sits top-centre; ONE trunk draws down to a horizontal rail that sweeps out
+   from the centre; six rounded-elbow connectors drop into six frosted
+   department nodes. After the draw, glowing pulses travel from Sardauna along
+   a random connector every ~2.5s. Variants-based, whileInView-triggered,
+   replays on hover via keyed remount. Connectors render at lg+ only, where
+   the grid is a fixed 896px; below lg a stem + per-card top-ticks stand in. */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -77,13 +79,64 @@ const DEPARTMENTS = [
   },
 ];
 
-/* fan geometry — on lg the grid below is always exactly max-w-4xl (896px)
-   wide with 6 columns and gap-3, so the drop points are the column centres */
-const FAN_W = 896;
-const FAN_H = 80;
+/* ---------- lg geometry ----------
+   On lg the grid below is always exactly max-w-4xl (896px) wide with six
+   columns and gap-3, so drop points are the column centres. Every connector
+   is computed from these constants — lines always land on nodes. */
+const W = 896;
+const H = 128;
+const CX = W / 2; // trunk x
+const TOP = 2; // trunk start y
+const RAIL_Y = 56; // rail y
+const BOT = 127; // connector landing y (card top edge)
+const R = 12; // elbow corner radius
 const DROPS = [69.7, 221, 372.3, 523.7, 675, 826.3];
-const fanPath = (x: number) =>
-  `M${FAN_W / 2} 2 C${FAN_W / 2} 44, ${x} 30, ${x} ${FAN_H - 2}`;
+
+const TRUNK_PATH = `M${CX} ${TOP} L${CX} ${RAIL_Y}`;
+/* rail drawn as two halves so pathLength sweeps it out from the centre */
+const RAIL_LEFT = `M${CX} ${RAIL_Y} L${DROPS[0] + R} ${RAIL_Y}`;
+const RAIL_RIGHT = `M${CX} ${RAIL_Y} L${DROPS[5] - R} ${RAIL_Y}`;
+
+/* rounded elbow: leaves the rail tangentially, quarter-turn, straight drop */
+const elbowPath = (x: number) => {
+  const sx = x < CX ? x + R : x - R;
+  return `M${sx} ${RAIL_Y} Q${x} ${RAIL_Y} ${x} ${RAIL_Y + R} L${x} ${BOT}`;
+};
+
+/* ---------- pulse tracks ----------
+   Each track is the full route Sardauna → trunk → rail → elbow → node,
+   sampled at uniform arc length so a linear keyframe animation over the
+   cx/cy arrays moves the pulse at constant speed (robust everywhere —
+   no offset-path support worries). */
+const buildTrack = (x: number) => {
+  const sx = x < CX ? x + R : x - R;
+  const segs = [RAIL_Y - TOP, Math.abs(sx - CX), R * 1.57, BOT - RAIL_Y - R];
+  const total = segs.reduce((a, b) => a + b, 0);
+  const pointAt = (s: number): [number, number] => {
+    let d = s;
+    if (d <= segs[0]) return [CX, TOP + d];
+    d -= segs[0];
+    if (d <= segs[1]) return [CX + (sx - CX) * (d / segs[1]), RAIL_Y];
+    d -= segs[1];
+    if (d <= segs[2]) {
+      const u = d / segs[2];
+      const k = 1 - (1 - u) * (1 - u);
+      return [sx + (x - sx) * k, RAIL_Y + u * u * R];
+    }
+    d -= segs[2];
+    return [x, RAIL_Y + R + d];
+  };
+  const N = 28;
+  const cx: number[] = [];
+  const cy: number[] = [];
+  for (let k = 0; k <= N; k++) {
+    const [px, py] = pointAt((k / N) * total);
+    cx.push(Math.round(px * 10) / 10);
+    cy.push(Math.round(py * 10) / 10);
+  }
+  return { cx, cy, dur: total / 420 };
+};
+const TRACKS = DROPS.map(buildTrack);
 
 /* ---------- variants ---------- */
 
@@ -96,22 +149,49 @@ const chiefV = {
   },
 };
 
-/* faint solid guide draws itself down… */
-const drawV = {
+const trunkV = {
+  hide: { pathLength: 0, opacity: 0 },
+  show: {
+    pathLength: 1,
+    opacity: 1,
+    transition: { delay: 0.3, duration: 0.4, ease: EASE },
+  },
+};
+
+const railV = {
+  hide: { pathLength: 0, opacity: 0 },
+  show: {
+    pathLength: 1,
+    opacity: 1,
+    transition: { delay: 0.62, duration: 0.4, ease: EASE },
+  },
+};
+
+const jointV = {
+  hide: { opacity: 0 },
+  show: {
+    opacity: 1,
+    r: [0, 4, 2.6],
+    transition: { delay: 0.62, duration: 0.35, times: [0, 0.6, 1], ease: EASE },
+  },
+};
+
+const elbowV = {
   hide: { pathLength: 0, opacity: 0 },
   show: (i: number) => ({
     pathLength: 1,
     opacity: 1,
-    transition: { delay: 0.3 + i * 0.07, duration: 0.55, ease: EASE },
+    transition: { delay: 0.9 + i * 0.07, duration: 0.38, ease: EASE },
   }),
 };
 
-/* …then the flowing dashed current fades in on top */
-const flowV = {
+const pulseV = {
   hide: { opacity: 0 },
   show: (i: number) => ({
-    opacity: 1,
-    transition: { delay: 0.85 + i * 0.07, duration: 0.4, ease: "easeOut" as const },
+    cx: TRACKS[i].cx,
+    cy: TRACKS[i].cy,
+    opacity: [0, 1, 1, 1, 0],
+    transition: { duration: TRACKS[i].dur, ease: "linear" as const },
   }),
 };
 
@@ -119,22 +199,45 @@ const stemV = {
   hide: { scaleY: 0, opacity: 0 },
   show: { scaleY: 1, opacity: 1, transition: { delay: 0.3, duration: 0.4, ease: EASE } },
 };
-const railV = {
-  hide: { scaleX: 0, opacity: 0 },
-  show: { scaleX: 1, opacity: 1, transition: { delay: 0.5, duration: 0.45, ease: EASE } },
-};
 
 const nodeV = (i: number) => ({
-  hide: { opacity: 0, y: 12, scale: 0.5 },
+  hide: { opacity: 0, y: 14, scale: 0.5 },
   show: {
     opacity: 1,
     y: 0,
     scale: [0.5, 1.15, 1],
-    transition: { delay: 0.7 + i * 0.1, duration: 0.45, times: [0, 0.6, 1], ease: EASE },
+    transition: { delay: 1.05 + i * 0.09, duration: 0.5, times: [0, 0.6, 1], ease: EASE },
   },
 });
 
+const DOT_DELAYS = [
+  "group-hover:delay-0",
+  "group-hover:delay-150",
+  "group-hover:delay-300",
+];
+
 function Chart({ run }: { run: number }) {
+  /* continuous life: after the draw, fire a pulse down a random connector
+     every ~2.5s (never the same connector twice in a row) */
+  const [pulse, setPulse] = useState({ id: 0, drop: 2 });
+  useEffect(() => {
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
+    let iv: number | undefined;
+    const fire = () =>
+      setPulse((p) => ({
+        id: p.id + 1,
+        drop: (p.drop + 1 + Math.floor(Math.random() * 5)) % 6,
+      }));
+    const t0 = window.setTimeout(() => {
+      fire();
+      iv = window.setInterval(fire, 2500);
+    }, 2200);
+    return () => {
+      window.clearTimeout(t0);
+      if (iv !== undefined) window.clearInterval(iv);
+    };
+  }, []);
+
   return (
     <motion.div key={run} initial="hide" animate="show" className="flex w-full flex-col items-center">
       {/* chief of staff — bare mark, breathing halo */}
@@ -156,55 +259,97 @@ function Chart({ run }: { run: number }) {
         </span>
       </motion.div>
 
-      {/* lg+: connectors draw down, then current flows along them */}
-      <div className="mt-2 hidden h-20 w-full max-w-4xl lg:block" aria-hidden>
-        <svg className="h-full w-full" viewBox={`0 0 ${FAN_W} ${FAN_H}`} fill="none">
+      {/* lg+: trunk → rail → rounded elbows, then travelling pulses */}
+      <div className="mt-2 hidden h-32 w-full max-w-4xl lg:block" aria-hidden>
+        <svg className="h-full w-full overflow-visible" viewBox={`0 0 ${W} ${H}`} fill="none">
+          <motion.path
+            variants={trunkV}
+            d={TRUNK_PATH}
+            stroke="rgba(255,255,255,0.42)"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+          <motion.path
+            variants={railV}
+            d={RAIL_LEFT}
+            stroke="rgba(255,255,255,0.3)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+          <motion.path
+            variants={railV}
+            d={RAIL_RIGHT}
+            stroke="rgba(255,255,255,0.3)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+          <motion.circle
+            variants={jointV}
+            cx={CX}
+            cy={RAIL_Y}
+            fill="rgba(255,255,255,0.75)"
+            style={{ filter: "drop-shadow(0 0 5px rgba(126,242,255,0.7))" }}
+          />
           {DROPS.map((x, i) => (
-            <g key={x}>
-              <motion.path
-                custom={i}
-                variants={drawV}
-                d={fanPath(x)}
-                stroke="rgba(255,255,255,0.25)"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-              />
-              <motion.path
-                custom={i}
-                variants={flowV}
-                d={fanPath(x)}
-                stroke="rgba(255,255,255,0.5)"
-                strokeWidth="1.6"
-                strokeDasharray="2 5"
-                strokeLinecap="round"
-                className="[animation:dash-flow_2.2s_linear_infinite]"
-              />
-            </g>
+            <motion.path
+              key={x}
+              custom={i}
+              variants={elbowV}
+              d={elbowPath(x)}
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           ))}
+          {pulse.id > 0 && (
+            <motion.circle
+              key={pulse.id}
+              custom={pulse.drop}
+              variants={pulseV}
+              initial="hide"
+              animate="show"
+              r={3.2}
+              style={{
+                fill: "var(--color-cyan)",
+                filter:
+                  "drop-shadow(0 0 5px rgba(126,242,255,0.95)) drop-shadow(0 0 12px rgba(126,242,255,0.5))",
+              }}
+            />
+          )}
         </svg>
       </div>
 
-      {/* below lg: simple stem + rail */}
+      {/* below lg: subtle stem; each card carries its own top-tick */}
       <div className="mt-3 flex w-full flex-col items-center lg:hidden" aria-hidden>
-        <motion.span variants={stemV} className="block h-6 w-px origin-top bg-white/40" />
-        <motion.span variants={railV} className="mt-0 hidden h-px w-[min(620px,86%)] bg-white/30 sm:block" />
+        <motion.span variants={stemV} className="block h-7 w-px origin-top rounded-full bg-white/40" />
       </div>
 
       {/* six frosted department nodes */}
-      <div className="mt-4 grid w-full max-w-4xl grid-cols-2 gap-3 sm:grid-cols-3 lg:mt-0 lg:grid-cols-6">
+      <div className="grid w-full max-w-4xl grid-cols-2 gap-3 sm:grid-cols-3 lg:mt-0 lg:grid-cols-6">
         {DEPARTMENTS.map((d, i) => (
           <motion.div
             key={d.name}
             variants={nodeV(i)}
-            className="flex flex-col items-center gap-2.5 rounded-2xl border border-white/40 bg-white/15 px-3 py-4 shadow-[0_10px_28px_rgba(2,6,31,0.25)] backdrop-blur-sm"
+            className="group flex flex-col items-center"
           >
-            <span className="grid h-10 w-10 place-items-center rounded-full border border-white/40 bg-white/15">
-              {d.icon}
-            </span>
-            <span className="text-center leading-tight">
-              <span className="block text-[14px] font-bold tracking-tight text-white">{d.name}</span>
-              <span className="block text-[11px] font-medium text-white/65">{d.role}</span>
-            </span>
+            <span aria-hidden className="mb-1.5 block h-3 w-px rounded-full bg-white/35 lg:hidden" />
+            <div className="flex w-full flex-1 flex-col items-center gap-2.5 rounded-2xl border border-white/40 bg-white/15 px-3 py-4 shadow-[0_10px_28px_rgba(2,6,31,0.25)] backdrop-blur-sm transition-colors duration-200 group-hover:bg-white/20">
+              <span className="grid h-10 w-10 place-items-center rounded-full border border-white/40 bg-white/15">
+                {d.icon}
+              </span>
+              <span className="text-center leading-tight">
+                <span className="block text-[14px] font-bold tracking-tight text-white">{d.name}</span>
+                <span className="block text-[11px] font-medium text-white/65">{d.role}</span>
+              </span>
+              <span className="mt-0.5 flex items-center gap-1.5" aria-hidden>
+                {DOT_DELAYS.map((delay) => (
+                  <span
+                    key={delay}
+                    className={`h-1.5 w-1.5 rounded-full bg-white/40 transition-[background-color,box-shadow] duration-200 group-hover:bg-[var(--color-cyan)] group-hover:shadow-[0_0_8px_rgba(126,242,255,0.85)] ${delay}`}
+                  />
+                ))}
+              </span>
+            </div>
           </motion.div>
         ))}
       </div>
