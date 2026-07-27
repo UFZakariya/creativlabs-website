@@ -8,7 +8,7 @@ import GlowingEffect from "@/components/GlowingEffect";
 export const metadata: Metadata = {
   title: "Pricing — Start free, scale when it works | Safetyline",
   description:
-    "Sardauna's ladder: a free AI readiness audit, a one-time build scoped to it (₦300k–₦2M), and a managed retainer (₦40k–₦400k/mo) that keeps the house running and improving.",
+    "Sardauna's four-tier ladder: get seen free with Presence, get answered 24/7, get your whole back office run, or get custom systems built for you. Naira-billed, WhatsApp-first, priced with you before you commit.",
 };
 
 const check = (
@@ -19,50 +19,67 @@ const check = (
 
 const TIERS = [
   {
-    name: "AI Readiness Audit",
+    name: "Presence",
     price: "Free",
-    priceSub: "one WhatsApp conversation",
+    priceSub: "tier 1 · get seen",
     blurb:
-      "We look at how your business actually runs and tell you what a house of agents would take off your plate first.",
+      "Get your business onto the platform and see it work — a clean website, a WhatsApp door for customers, and a mini-audit of what an AI employee would take off your plate.",
     features: [
-      "A conversation about your orders, money and busywork",
-      "A readiness report: what agents take over first, and why",
-      "A scoped build quote — no obligation",
-      "You keep the report either way",
+      "A professional business website — one clean template",
+      "AI-readiness & WhatsApp-response mini-audit",
+      "Basic contact capture, consent-gated",
+      "WhatsApp click-to-chat wired to your number",
     ],
-    cta: { label: "Start the free audit", href: "/contact" },
+    cta: { label: "Start free", href: "/contact" },
     featured: false,
   },
   {
-    name: "The Build",
-    price: "₦300k – ₦2M",
-    priceSub: "one-time · scoped by your audit",
+    name: "Answered",
+    price: "Monthly",
+    priceSub: "tier 2 · get answered · naira-billed",
     blurb:
-      "Your house configured and proven: the chief of staff, the departments you need, your data loaded, every agent tested before it touches a customer.",
+      "The core AI-employee promise: your business stops losing enquiries. Messages, calls, bookings and reviews — answered around the clock on your site and WhatsApp.",
     features: [
-      "Chief of staff + the department agents your audit calls for",
-      "WhatsApp wired in; other channels as agreed",
-      "Your catalogue, prices and processes loaded",
-      "Every agent run through evals before going live",
-      "Approvals set up so nothing leaves without you",
+      "AI chat that answers 24/7 — website and WhatsApp",
+      "Online booking and calendar",
+      "Missed-call text-back, so no enquiry rings out",
+      "Review automation",
+      "CRM, contacts and a lead pipeline",
+      "Basic content & social",
     ],
-    cta: { label: "Talk to us about a build", href: "/contact" },
+    cta: { label: "Get answered", href: "/contact" },
     featured: true,
   },
   {
-    name: "Managed Retainer",
-    price: "₦40k – ₦400k",
-    priceSub: "per month · sized to your house",
+    name: "Run",
+    price: "Monthly",
+    priceSub: "tier 3 · get run · naira-billed",
     blurb:
-      "We run, watch and improve the house for you — so it keeps getting better at your business instead of quietly going stale.",
+      "Your business isn't just answered — it's operated. The full back-office AI staff: money, follow-ups, funnels, compliance, content and a daily brief.",
     features: [
-      "The house monitored and tuned continuously",
-      "New agents added as your needs grow",
-      "A monthly review of what every agent did",
-      "Priority support from the Safetyline team",
-      "Cancel anytime — your data leaves with you",
+      "Follow-up sequences, nurture and a funnel builder",
+      "Unified inbox across your channels",
+      "Finance & invoicing — NGN, WHT/VAT-aware — plus proposals",
+      "Support tickets and multi-channel social",
+      "Compliance calendar (Nigeria), SOPs, operating plans and the daily brief",
+      "The full AI-staff org — voice AI receptionist as a premium add-on",
     ],
-    cta: { label: "Discuss a retainer", href: "/contact" },
+    cta: { label: "Talk about Run", href: "/contact" },
+    featured: false,
+  },
+  {
+    name: "Built for you",
+    price: "Per project",
+    priceSub: "tier 4 · on top of any tier",
+    blurb:
+      "A services engagement layered on any subscription: we design and build the custom AI systems your business needs, on a delivery board you can watch.",
+    features: [
+      "Custom AI systems and automation builds",
+      "A projects & delivery board with honest status",
+      "Scoped and quoted before any work starts",
+      "Layers on whichever tier you're on",
+    ],
+    cta: { label: "Scope a build", href: "/contact" },
     featured: false,
   },
 ];
@@ -83,23 +100,24 @@ export default function PricingPage() {
             Start free. <span className="text-dawn-gradient">Scale when it works.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-ink-soft)]">
-            No subscriptions to nowhere. A free audit tells you what agents can
-            do for your business; you pay once to build the house, and only
-            keep paying if you want it run and improved for you.
+            No subscriptions. No charges. That&apos;s how you start — Presence
+            is free. From there the ladder is a clean climb: get answered, get
+            run, get built for you — each step naira-billed, and only when you
+            choose it.
           </p>
         </div>
       </section>
 
-      {/* the three-step ladder */}
-      <section className="mx-auto max-w-6xl px-5 pb-8">
-        <div className="grid gap-5 md:grid-cols-3 md:items-stretch">
+      {/* the four-tier ladder */}
+      <section className="mx-auto max-w-7xl px-5 pb-8">
+        <div className="grid gap-5 md:grid-cols-2 md:items-stretch xl:grid-cols-4">
           {TIERS.map((t) => (
             <article
               key={t.name}
               className={
                 t.featured
-                  ? "bg-azure-dawn glass-ring relative flex flex-col overflow-hidden rounded-[32px] p-7 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)] sm:p-8"
-                  : "liquid-glass glass-ring relative flex flex-col rounded-[32px] p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:p-8"
+                  ? "bg-azure-dawn glass-ring relative flex flex-col overflow-hidden rounded-[32px] p-7 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)]"
+                  : "liquid-glass glass-ring relative flex flex-col rounded-[32px] p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
               }
             >
               {!t.featured && (
@@ -107,18 +125,18 @@ export default function PricingPage() {
               )}
               {t.featured && (
                 <span className="absolute right-6 top-6 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[11.5px] font-semibold text-[var(--color-cyan)]">
-                  Most businesses
+                  The core promise
                 </span>
               )}
               <h2 className={`text-[15px] font-bold ${t.featured ? "text-[var(--color-cyan)]" : "text-[var(--color-blue)]"}`}>
                 {t.name}
               </h2>
               <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="text-[38px] font-bold leading-none tracking-tight">{t.price}</span>
-                <span className={`text-[13px] font-medium ${t.featured ? "text-white/60" : "text-[var(--color-ink-soft)]"}`}>
-                  {t.priceSub}
-                </span>
+                <span className="text-[32px] font-bold leading-none tracking-tight">{t.price}</span>
               </div>
+              <p className={`mt-1.5 text-[13px] font-medium ${t.featured ? "text-white/60" : "text-[var(--color-ink-soft)]"}`}>
+                {t.priceSub}
+              </p>
               <p className={`mt-4 text-[14.5px] leading-relaxed ${t.featured ? "text-white/85" : "text-[var(--color-ink-soft)]"}`}>
                 {t.blurb}
               </p>
@@ -151,8 +169,9 @@ export default function PricingPage() {
           ))}
         </div>
         <p className="mt-5 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">
-          Ranges are indicative — your audit scopes the exact figure before you
-          commit to anything.
+          Price bands are being finalised. Until they&apos;re published, every
+          paid tier is priced with you on the intro call — real numbers, in
+          naira, before you commit to anything.
         </p>
       </section>
 
@@ -166,11 +185,11 @@ export default function PricingPage() {
             Built for businesses ready to delegate
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-soft)]">
-            Sardauna fits teams of roughly 10–100 staff, or businesses doing
-            ₦5M+ a month — enough moving parts that a house of agents pays for
-            itself. Smaller than that? Take the free audit anyway: we&apos;ll
-            tell you honestly if the numbers don&apos;t work for you yet,
-            and what to do in the meantime.
+            Sardauna&apos;s full staff pays for itself fastest in teams of
+            roughly 10–100 people, or businesses doing ₦5M+ a month — enough
+            moving parts for Run to earn its keep. Smaller than that? Start on
+            Presence — it&apos;s free — and climb the ladder when the
+            enquiries justify it.
           </p>
         </div>
       </section>

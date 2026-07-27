@@ -25,16 +25,29 @@ pocket." — two "pocket" headlines on one page. Proposed CTA replacements
 - C. "Chatbots wait to be asked. Sardauna clears the desk."
 - D. "Talk is instant. Done is Sardauna."
 
-## 3. Pricing figures (/pricing)
+## 3. Pricing structure (/pricing) — ✅ DECIDED (2026-07-27)
 
-Live now (from the suite seed, marked "indicative" on the page):
-- Audit: **Free**
-- Build: **₦300k – ₦2M** one-time
-- Retainer: **₦40k – ₦400k/mo**
-- ICP line: "10–100 staff, or ₦5M+ a month"
+**Source of truth:** `vault/product/tiers.md` in the suite repo (owner-approved
+2026-07-22, PIVOT-BRIEFING §2 with the 3 moves). The old audit → build →
+retainer model and its ₦ ranges are gone; the page now shows the four-tier
+ladder — get seen → get answered → get run → get built for you:
 
-**Decide:** confirm or adjust the ranges and the ICP line. If you want exact
-tiers instead of ranges, send the ladder and the page restructures to match.
+- **Tier 1 — Presence: Free** — website (1 template), AI-readiness /
+  WhatsApp-response mini-audit, consent-gated contact capture, click-to-chat
+- **Tier 2 — Answered: monthly, naira-billed** (entry paid; featured card) —
+  24/7 AI chat on site + WhatsApp, booking/calendar, review automation,
+  missed-call text-back, CRM + lead pipeline, basic content/social
+- **Tier 3 — Run: monthly, naira-billed** — full back-office AI staff
+  (nurture, unified inbox, funnels, NGN/WHT/VAT finance, proposals, tickets,
+  social, compliance calendar, SOPs, plans, daily brief; voice AI receptionist
+  as premium)
+- **Tier 4 — Built for you: per project**, layered on any subscription
+
+**Still open (one item):** the naira price bands per tier — tiers.md says
+"to draft on owner's nod". Until bands are published, the page and the FAQ say
+paid tiers are priced on the intro call. Send the bands and the cards get
+numbers. The ICP card ("10–100 staff, or ₦5M+ a month") is kept, but smaller
+businesses are now routed to free Presence instead of being disqualified.
 
 ## 4. Case-study numbers (/customers, /customers/ufms, /customers/truckville)
 
@@ -46,9 +59,10 @@ production, records processed, response times). Each one you supply upgrades a
 billboard. Also confirm: is the membership-portal client named publicly, or do
 we keep "a national organisation"?
 
-## 5. FAQ cost answer (homepage FAQ)
+## 5. FAQ cost answer (homepage FAQ) — ✅ aligned to §3
 
-The "what does it cost" answer stays soft until §3 above is confirmed.
+The "what does it cost" answer now states the four-tier ladder. Numbers land
+in it automatically once the §3 price bands are published.
 
 ## 6. About page (/about)
 
