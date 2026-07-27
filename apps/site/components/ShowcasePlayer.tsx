@@ -55,6 +55,15 @@ const I = {
   photo: (c = "currentColor") => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.7"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg>
   ),
+  pen: (c = "currentColor") => (
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8"><path d="M4 20h4.5L20 8.5a2.1 2.1 0 0 0-3-3L5.5 17 4 20Z"/><path d="m14.5 6 3 3"/></svg>
+  ),
+  funnel: (c = "currentColor") => (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8"><path d="M4 5h16l-6.3 7.5V19l-3.4 1.5v-8L4 5Z"/></svg>
+  ),
+  sticker: (c = "currentColor") => (
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.7"><path d="M3.5 8A4.5 4.5 0 0 1 8 3.5h8A4.5 4.5 0 0 1 20.5 8v5L13 20.5H8A4.5 4.5 0 0 1 3.5 16V8Z"/><path d="M20.5 13H17a4 4 0 0 0-4 4v3.5"/><circle cx="9" cy="10" r="1" fill={c} stroke="none"/><circle cx="15" cy="10" r="1" fill={c} stroke="none"/></svg>
+  ),
   verified: () => (
     <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#3797f0" d="M12 1.8 14.7 4l3.4-.4 1 3.3 3 1.7-1.3 3.2 1.3 3.2-3 1.7-1 3.3-3.4-.4L12 22l-2.7-2.2-3.4.4-1-3.3-3-1.7 1.3-3.2L1.9 8.8l3-1.7 1-3.3 3.4.4z"/><path fill="#fff" d="m10.6 15.6-2.8-2.8 1.2-1.2 1.6 1.6 4.4-4.4 1.2 1.2z"/></svg>
   ),
@@ -530,11 +539,40 @@ export default function ShowcasePlayer() {
           {/* WhatsApp sidebar — desktop only */}
           {skin === "whatsapp" && (
             <aside className="hidden w-[264px] shrink-0 flex-col border-r border-black/10 bg-white md:flex">
+              {/* WA Web sidebar top bar: profile, new chat, menu */}
+              <div className="flex items-center justify-between bg-[#f0f2f5] px-3 py-2">
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-white">
+                  <img src="/logo-128.png" alt="" className="h-6 w-6" />
+                </span>
+                <span className="flex items-center gap-4 text-[#54656f]">
+                  <button type="button" aria-label="New chat" className="hover:text-[#111b21]">{I.pen()}</button>
+                  <button type="button" aria-label="Menu" className="hover:text-[#111b21]">{I.kebab()}</button>
+                </span>
+              </div>
               <div className="flex items-center gap-2 px-3 py-2">
                 <div className="flex h-8 flex-1 items-center gap-2 rounded-lg bg-[#f0f2f5] px-3 text-[12.5px] text-[#667781]">
                   {I.search("#667781")}
                   Search or start a new chat
                 </div>
+                <button type="button" aria-label="Filter unread" className="text-[#54656f] hover:text-[#111b21]">
+                  {I.funnel()}
+                </button>
+              </div>
+              {/* WA Web filter chips */}
+              <div className="flex gap-1.5 px-3 pb-2">
+                {["All", "Unread", "Favourites", "Groups"].map((f, i) => (
+                  <button
+                    key={f}
+                    type="button"
+                    className={`rounded-full px-3 py-1 text-[12px] font-medium ${
+                      i === 0
+                        ? "bg-[#d9fdd3] text-[#008069]"
+                        : "bg-[#f0f2f5] text-[#54656f] hover:bg-black/8"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto">
                 {WHATSAPP_THREADS.map((t) => (
@@ -649,6 +687,8 @@ export default function ShowcasePlayer() {
                   <span className="flex items-center gap-2.5 text-black/70">
                     {I.mic()}
                     {I.photo()}
+                    {I.sticker()}
+                    {I.plus()}
                   </span>
                 </div>
               </div>
