@@ -4,6 +4,9 @@ import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
+import Reveal from "@/components/Reveal";
+import UcShowcase from "@/components/UcShowcase";
+import "../uc-demo.css";
 
 export const metadata: Metadata = {
   title: "Customers — Built on real operations, not demos | Safetyline",
@@ -71,6 +74,27 @@ export default function CustomersPage() {
             national member register, and our own front desk. These are the
             deployments we stand on.
           </p>
+        </div>
+      </section>
+
+      {/* live demos — the old site's device showcase, brought over whole */}
+      <section className="mx-auto max-w-5xl px-5 pb-20 sm:pb-24">
+        <Reveal className="text-center">
+          <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
+            Live demos
+          </p>
+          <h2 className="text-display-2 mx-auto max-w-3xl text-[var(--color-ink)]">
+            Click around <span className="text-dawn-gradient">the real thing.</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-soft)]">
+            The interfaces of the systems below, rebuilt for the browser — not
+            videos, not mockups. Switch apps, click through UFMS&apos;s pages,
+            scroll the screens, and pick the ordering app to watch the laptop
+            become a phone.
+          </p>
+        </Reveal>
+        <div className="mt-10">
+          <UcShowcase />
         </div>
       </section>
 
