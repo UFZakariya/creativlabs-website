@@ -4,6 +4,7 @@ import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
+import TiltCard from "@/components/TiltCard";
 import Reveal from "@/components/Reveal";
 import UcShowcase from "@/components/UcShowcase";
 import "../uc-demo.css";
@@ -145,22 +146,22 @@ export default function CustomersPage() {
           );
 
           return b.href ? (
-            <a
-              key={b.name}
-              href={b.href}
-              className="liquid-glass glass-ring relative block rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-transform hover:-translate-y-0.5"
-            >
-              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-              {inner}
-            </a>
+            <TiltCard key={b.name} maxTilt={4}>
+              <a
+                href={b.href}
+                className="liquid-glass glass-ring relative block rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-transform hover:-translate-y-0.5"
+              >
+                <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+                {inner}
+              </a>
+            </TiltCard>
           ) : (
-            <div
-              key={b.name}
-              className="liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
-            >
-              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-              {inner}
-            </div>
+            <TiltCard key={b.name} maxTilt={4}>
+              <div className="liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)]">
+                <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+                {inner}
+              </div>
+            </TiltCard>
           );
         })}
         <p className="mt-2 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">

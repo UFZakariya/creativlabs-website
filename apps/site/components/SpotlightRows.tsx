@@ -10,6 +10,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import GlowingEffect from "./GlowingEffect";
+import TiltCard from "./TiltCard";
 import Reveal from "./Reveal";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -256,8 +257,9 @@ function SpotCard({ Art, compact }: { Art: React.ComponentType<{ run: number }>;
     <motion.div
       onViewportEnter={() => setRun((r) => (r === 0 ? 1 : r))}
       onHoverStart={() => setRun((r) => r + 1)}
-      className="group liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_32px_80px_rgba(8,60,255,0.18)]"
     >
+      <TiltCard maxTilt={6}>
+      <div className="group liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_32px_80px_rgba(8,60,255,0.18)]">
       <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
       <div
         className={`bg-azure-dawn-hero relative m-3 grid place-items-center overflow-hidden rounded-3xl border border-white/10 p-6 ${
@@ -266,6 +268,8 @@ function SpotCard({ Art, compact }: { Art: React.ComponentType<{ run: number }>;
       >
         <Art run={run} />
       </div>
+      </div>
+      </TiltCard>
     </motion.div>
   );
 }

@@ -4,6 +4,7 @@ import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
+import TiltCard from "@/components/TiltCard";
 
 export const metadata: Metadata = {
   title: "Pricing — Start free, scale when it works | Safetyline",
@@ -112,8 +113,8 @@ export default function PricingPage() {
       <section className="mx-auto max-w-7xl px-5 pb-8">
         <div className="grid gap-5 md:grid-cols-2 md:items-stretch xl:grid-cols-4">
           {TIERS.map((t) => (
+            <TiltCard key={t.name} maxTilt={6} className="h-full">
             <article
-              key={t.name}
               className={
                 t.featured
                   ? "bg-azure-dawn glass-ring relative flex flex-col overflow-hidden rounded-[32px] p-7 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)]"
@@ -166,6 +167,7 @@ export default function PricingPage() {
                 </a>
               </div>
             </article>
+            </TiltCard>
           ))}
         </div>
         <p className="mt-5 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">
