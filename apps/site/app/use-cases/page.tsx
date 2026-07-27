@@ -5,6 +5,7 @@ import UseCaseThreads from "@/components/UseCaseThreads";
 import SpotlightRows from "@/components/SpotlightRows";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Use cases — See the house at work | Safetyline",
@@ -20,7 +21,7 @@ export default function UseCasesPage() {
 
       {/* light hero on the waves */}
       <section className="px-5 pb-16 pt-36 text-center sm:pb-20 sm:pt-44">
-        <div className="mx-auto max-w-4xl">
+        <Reveal className="mx-auto max-w-4xl">
           <p className="mb-6 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Use cases
           </p>
@@ -47,16 +48,20 @@ export default function UseCasesPage() {
               Explore the product
             </a>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* the tabbed starter demo */}
-      <UseCaseThreads />
+      <Reveal>
+        <UseCaseThreads />
+      </Reveal>
 
       {/* one order followed through the house */}
       <SpotlightRows />
 
-      <CTABand />
+      <Reveal>
+        <CTABand />
+      </Reveal>
       <Footer />
     </main>
   );

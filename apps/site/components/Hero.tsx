@@ -4,6 +4,7 @@
    Server component wrapping client islands. */
 
 import ShowcasePlayer from "./ShowcasePlayer";
+import Reveal from "./Reveal";
 
 const TRUST_CHIPS = [
   "WhatsApp-first — proven in production",
@@ -16,7 +17,7 @@ export default function Hero() {
     <>
       <section className="bg-azure-dawn-hero relative overflow-hidden rounded-b-[var(--radius-band)] px-4 pb-44 pt-32 sm:pb-48 sm:pt-40">
         <div className="aurora-beams" aria-hidden />
-        <div className="relative mx-auto max-w-5xl text-center">
+        <Reveal className="relative mx-auto max-w-5xl text-center">
           <h1 className="text-display-1 mx-auto text-white">
             A whole business running
             <br className="hidden sm:block" />{" "}
@@ -56,7 +57,7 @@ export default function Hero() {
               </li>
             ))}
           </ul>
-        </div>
+        </Reveal>
       </section>
 
       {/* showcase rides out of the band — its header sits on the boundary */}

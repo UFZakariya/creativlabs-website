@@ -20,7 +20,9 @@ export default function Home() {
       <Hero />
 
       {/* viktor-structure rotating positioning statement on the wave background */}
-      <RotatingStatement />
+      <Reveal>
+        <RotatingStatement />
+      </Reveal>
 
       {/* why it feels like staff */}
       <ProofCards />

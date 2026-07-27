@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
 import TiltCard from "@/components/TiltCard";
 import TierName, { type TierKey } from "@/components/TierName";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Pricing — Start free, scale when it works | Safetyline",
@@ -128,8 +129,9 @@ export default function PricingPage() {
       {/* the four-tier ladder */}
       <section className="mx-auto max-w-7xl px-5 pb-8">
         <div className="grid gap-5 md:grid-cols-2 md:items-stretch xl:grid-cols-4">
-          {TIERS.map((t) => (
-            <TiltCard key={t.name} maxTilt={6} className="h-full">
+          {TIERS.map((t, ti) => (
+            <Reveal key={t.name} delay={ti * 0.08} className="h-full">
+            <TiltCard maxTilt={6} className="h-full">
             <article
               className={
                 t.featured
@@ -184,6 +186,7 @@ export default function PricingPage() {
               </div>
             </article>
             </TiltCard>
+            </Reveal>
           ))}
         </div>
         <p className="mt-5 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">
@@ -195,7 +198,8 @@ export default function PricingPage() {
 
       {/* who it's for */}
       <section className="mx-auto max-w-5xl px-5 py-16 sm:py-20">
-        <div className="glass-ring rounded-[32px] bg-white px-6 py-10 text-center shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:px-12">
+        <Reveal className="liquid-glass glass-ring relative rounded-[32px] px-6 py-10 text-center shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:px-12">
+          <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
           <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Who it&apos;s for
           </p>
@@ -209,10 +213,12 @@ export default function PricingPage() {
             that? Start on Sardauna Lite — it&apos;s free — and climb the
             ladder when the enquiries justify it.
           </p>
-        </div>
+        </Reveal>
       </section>
 
-      <CTABand />
+      <Reveal>
+        <CTABand />
+      </Reveal>
       <Footer />
     </main>
   );

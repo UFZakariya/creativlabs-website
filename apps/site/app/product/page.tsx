@@ -8,6 +8,7 @@ import ControlSafety from "@/components/ControlSafety";
 import SuiteDashboard from "@/components/SuiteDashboard";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Product — Sardauna, the AI Business Assistant | Safetyline",
@@ -23,7 +24,7 @@ export default function ProductPage() {
 
       {/* light hero on the waves */}
       <section className="px-5 pb-16 pt-36 text-center sm:pb-20 sm:pt-44">
-        <div className="mx-auto max-w-4xl">
+        <Reveal className="mx-auto max-w-4xl">
           <div className="mb-8 flex items-center justify-center gap-3">
             <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#25d366] shadow-[0_14px_34px_rgba(37,211,102,0.35)]">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
@@ -65,18 +66,22 @@ export default function ProductPage() {
               See it in action
             </a>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* the org chart — our unique section */}
-      <OrgChart />
+      <Reveal>
+        <OrgChart />
+      </Reveal>
 
       {/* what the house runs */}
-      <CapabilitiesGrid />
+      <Reveal>
+        <CapabilitiesGrid />
+      </Reveal>
 
       {/* the dashboard — Business Suite showcase */}
       <section className="mx-auto max-w-5xl px-5 pb-20 sm:pb-28">
-        <div className="mb-10 text-center">
+        <Reveal className="mb-10 text-center">
           <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Mission control
           </p>
@@ -88,14 +93,22 @@ export default function ProductPage() {
             and watch Operations, Finance, Marketing, Projects and Messages
             work — on your laptop or your phone.
           </p>
-        </div>
-        <SuiteDashboard />
+        </Reveal>
+        <Reveal delay={0.1}>
+          <SuiteDashboard />
+        </Reveal>
       </section>
 
       {/* onboarding + control + close */}
-      <StepsSection />
-      <ControlSafety />
-      <CTABand />
+      <Reveal>
+        <StepsSection />
+      </Reveal>
+      <Reveal>
+        <ControlSafety />
+      </Reveal>
+      <Reveal>
+        <CTABand />
+      </Reveal>
       <Footer />
     </main>
   );

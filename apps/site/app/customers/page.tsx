@@ -62,7 +62,7 @@ export default function CustomersPage() {
 
       {/* light hero on the waves */}
       <section className="px-5 pb-14 pt-36 text-center sm:pt-44">
-        <div className="mx-auto max-w-4xl">
+        <Reveal className="mx-auto max-w-4xl">
           <p className="mb-6 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Customers
           </p>
@@ -75,7 +75,7 @@ export default function CustomersPage() {
             national member register, and our own front desk. These are the
             deployments we stand on.
           </p>
-        </div>
+        </Reveal>
       </section>
 
       {/* live demos — the old site's device showcase, brought over whole */}
@@ -101,7 +101,7 @@ export default function CustomersPage() {
 
       {/* billboards */}
       <section className="mx-auto flex max-w-5xl flex-col gap-6 px-5 pb-20 sm:pb-24">
-        {BILLBOARDS.map((b) => {
+        {BILLBOARDS.map((b, bi) => {
           const inner = (
             <div className="grid items-stretch md:grid-cols-[1fr_260px]">
               <div className="p-7 sm:p-9">
@@ -146,22 +146,26 @@ export default function CustomersPage() {
           );
 
           return b.href ? (
-            <TiltCard key={b.name} maxTilt={4}>
-              <a
-                href={b.href}
-                className="liquid-glass glass-ring relative block rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-transform hover:-translate-y-0.5"
-              >
-                <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-                {inner}
-              </a>
-            </TiltCard>
+            <Reveal key={b.name} delay={(bi % 2) * 0.08}>
+              <TiltCard maxTilt={4}>
+                <a
+                  href={b.href}
+                  className="liquid-glass glass-ring relative block rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-transform hover:-translate-y-0.5"
+                >
+                  <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+                  {inner}
+                </a>
+              </TiltCard>
+            </Reveal>
           ) : (
-            <TiltCard key={b.name} maxTilt={4}>
-              <div className="liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)]">
-                <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-                {inner}
-              </div>
-            </TiltCard>
+            <Reveal key={b.name} delay={(bi % 2) * 0.08}>
+              <TiltCard maxTilt={4}>
+                <div className="liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)]">
+                  <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+                  {inner}
+                </div>
+              </TiltCard>
+            </Reveal>
           );
         })}
         <p className="mt-2 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">

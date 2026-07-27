@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import type { CaseSection } from "@/lib/case-studies";
+import Reveal from "./Reveal";
 
 export default function CaseStudyLayout({
   sections,
@@ -61,7 +62,8 @@ export default function CaseStudyLayout({
       {/* content rail */}
       <article className="min-w-0">
         {sections.map((s) => (
-          <section key={s.id} id={s.id} className="mb-12 scroll-mt-28 last:mb-0">
+          <Reveal key={s.id} className="mb-12 last:mb-0">
+          <section id={s.id} className="scroll-mt-28">
             <h2 className="text-display-3">{s.title}</h2>
             {s.paras.map((p) => (
               <p key={p.slice(0, 32)} className="mt-4 text-[15.5px] leading-relaxed text-[var(--color-ink-soft)]">
@@ -90,6 +92,7 @@ export default function CaseStudyLayout({
               </ul>
             )}
           </section>
+          </Reveal>
         ))}
       </article>
 
