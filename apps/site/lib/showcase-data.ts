@@ -13,6 +13,8 @@ export interface ShowMessage {
   text?: string;
   /** small structured artifact card rendered inside the thread */
   card?: { title: string; lines: string[]; cta?: string };
+  /** WhatsApp template quick-reply buttons — full-width divider rows */
+  buttons?: string[];
   /** subtle status line, e.g. "logged to CRM · receipt sent" */
   status?: string;
   /** render a product-photo message (IG demo) */
@@ -167,6 +169,45 @@ export const WHATSAPP_THREADS: ShowThread[] = [
     ],
   },
 ];
+
+/* Use-cases page Instagram DM scene — a boutique sale that starts as a story
+   reply. Product vision with generic specifics per the brief's demo-honesty
+   line; distinct from the homepage IG scene. */
+export const USECASE_INSTAGRAM_THREAD: ShowThread = {
+  key: "uc-ig",
+  label: "Instagram DMs",
+  agent: "Sardauna",
+  emoji: "🛍️",
+  preview: "Story reply → paid order, in one thread",
+  rowTime: "17:24",
+  messages: [
+    { id: "u1", from: "system", time: "", text: "Replied to your story" },
+    {
+      id: "u2", from: "customer", time: "17:18",
+      image: { label: "Two-piece set — tonight's story", gradient: "linear-gradient(135deg,#3b1d6e,#d62976 58%,#fa7e1e)" },
+    },
+    { id: "u3", from: "customer", time: "17:18", text: "Hi! Do you still have this in a size 12? 😍" },
+    {
+      id: "u4", from: "agent", name: "Sardauna", time: "17:19",
+      text: "We do — the last two in size 12. It's ₦32,000, and I can hold one for you till 6pm. Want the payment link?",
+      reaction: "❤️",
+    },
+    { id: "u5", from: "customer", time: "17:21", text: "Yes please!" },
+    {
+      id: "u6", from: "agent", name: "Sardauna", time: "17:21",
+      card: {
+        title: "Your order — ₦32,000",
+        lines: ["1 × two-piece set (size 12)", "Held for you till 18:00", "Delivery or pickup — your choice"],
+        cta: "Pay securely",
+      },
+    },
+    {
+      id: "u7", from: "agent", name: "Sardauna", time: "17:24",
+      text: "Payment received — thank you! 🎉 Your order is packed; delivery updates will land right here.",
+      status: "stock updated · receipt sent · logged to CRM",
+    },
+  ],
+};
 
 /* Instagram DM skin — product vision, generic specifics */
 export const INSTAGRAM_THREAD: ShowThread = {

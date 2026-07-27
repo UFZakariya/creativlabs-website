@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Use cases — See the house at work | Safetyline",
   description:
-    "Five department threads from a running house of agents: support answered, leads qualified, stock reordered under your approval, books kept current, and a daily brief that tells you the whole story.",
+    "Five department threads from a running house of agents — plus the same house answering Instagram DMs: support answered, leads qualified, stock reordered under your approval, books kept current, and a daily brief that tells you the whole story.",
 };
 
 export default function UseCasesPage() {
@@ -30,7 +30,8 @@ export default function UseCasesPage() {
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-ink-soft)]">
             Five departments, one chief of staff, real conversations. Pick a
             thread below and watch how orders, money, stock and growth move
-            through Sardauna — with you approving what matters.
+            through Sardauna — on WhatsApp or in your Instagram DMs, with you
+            approving what matters.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <a
