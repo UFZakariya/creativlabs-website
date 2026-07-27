@@ -135,9 +135,9 @@ body {
      brand palette, dark-band variant) */
 /* true liquid glass: near-transparent gradient fill, deep blur + saturation */
 .liquid-glass {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03));
-  -webkit-backdrop-filter: blur(28px) saturate(1.6);
-  backdrop-filter: blur(28px) saturate(1.6);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+  -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  backdrop-filter: blur(14px) saturate(1.5);
 }
 
 /* light-background shimmer: animated sweep across the brand ink gradient */

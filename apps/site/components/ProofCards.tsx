@@ -270,7 +270,7 @@ function ProofCard({ title, body, Art }: (typeof CARDS)[number]) {
       onHoverStart={() => setRun((r) => r + 1)}
       className="group liquid-glass glass-ring overflow-hidden rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-[0_32px_80px_rgba(8,60,255,0.18)]"
     >
-      <div className="relative m-3 grid min-h-[264px] place-items-center overflow-hidden rounded-3xl border border-white/50 bg-white/45 p-5 backdrop-blur-sm">
+      <div className="relative m-3 grid min-h-[264px] place-items-center overflow-hidden rounded-3xl border border-white/40 bg-white/20 p-5 backdrop-blur-sm">
         <Art run={run} />
       </div>
       <div className="px-6 pb-6 pt-3">
