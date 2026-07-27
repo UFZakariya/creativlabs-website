@@ -27,7 +27,7 @@ function ChatArt({ run }: { run: number }) {
     <motion.div key={run} initial="hide" animate="show" className="flex w-full max-w-[300px] flex-col gap-2">
       <motion.div
         variants={msg(0.15)}
-        className="self-end rounded-2xl rounded-br-md bg-[var(--color-blue)] px-3.5 py-2 text-[13px] font-medium leading-snug text-white shadow-[0_8px_20px_rgba(8,60,255,0.25)]"
+        className="self-end rounded-2xl rounded-br-md bg-[var(--color-ink)] px-3.5 py-2 text-[13px] font-medium leading-snug text-white shadow-[0_10px_24px_rgba(2,6,31,0.35)]"
       >
         Compile this week&apos;s brief, please.
       </motion.div>
@@ -75,8 +75,8 @@ function OrbitArt({ run }: { run: number }) {
   return (
     <motion.div key={run} initial="hide" animate="show" className="relative grid h-[190px] w-[190px] place-items-center">
       {/* rings */}
-      <span aria-hidden className="absolute inset-0 rounded-full border border-[var(--color-blue)]/12" />
-      <span aria-hidden className="absolute inset-[30px] rounded-full border border-[var(--color-blue)]/18" />
+      <span aria-hidden className="absolute inset-0 rounded-full border border-white/25" />
+      <span aria-hidden className="absolute inset-[30px] rounded-full border border-white/35" />
       {/* orbiting departments — slow spin, tiles counter-rotated upright */}
       <div aria-hidden className="absolute inset-0 [animation:orbit_22s_linear_infinite] group-hover:[animation-duration:7s]">
         {DEPT.map(({ label, angle, r }, i) => (
@@ -204,7 +204,7 @@ function MemoryArt({ run }: { run: number }) {
             custom={i}
             variants={lineV}
             d={`M130 70 L ${s.x} ${s.y}`}
-            stroke="rgba(8,60,255,0.3)"
+            stroke="rgba(255,255,255,0.5)"
             strokeWidth="1.5"
             strokeDasharray="2 5"
             strokeLinecap="round"
@@ -270,7 +270,7 @@ function ProofCard({ title, body, Art }: (typeof CARDS)[number]) {
       onHoverStart={() => setRun((r) => r + 1)}
       className="group liquid-glass glass-ring overflow-hidden rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-[0_32px_80px_rgba(8,60,255,0.18)]"
     >
-      <div className="relative m-3 grid min-h-[264px] place-items-center overflow-hidden rounded-3xl border border-white/40 bg-white/20 p-5 backdrop-blur-sm">
+      <div className="bg-azure-dawn-hero relative m-3 grid min-h-[264px] place-items-center overflow-hidden rounded-3xl border border-white/10 p-5">
         <Art run={run} />
       </div>
       <div className="px-6 pb-6 pt-3">
