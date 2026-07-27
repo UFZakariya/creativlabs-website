@@ -108,8 +108,13 @@ function useScriptPlayback(
       timers.push(window.setTimeout(() => { if (!cancelled) fn(); }, ms));
     };
     let at = 400;
+    // perspective: customer threads are viewed as the business (agent = sent);
+    // owner threads are viewed as the owner (agent = received, left side)
+    const hasCustomer = thread.messages.some((m) => m.from === "customer");
     thread.messages.forEach((m, i) => {
-      const fromHouse = m.from === "agent" || m.from === "owner";
+      const fromHouse = hasCustomer
+        ? m.from === "agent" || m.from === "owner"
+        : m.from === "owner";
       const think = i === 0 ? 0 : m.from === "system" ? 300 : typingTime(m);
       if (think > 350) later(() => setTyping(fromHouse ? "out" : "in"), at);
       at += think;
@@ -161,8 +166,8 @@ function TypingBubble({ side, skin }: { side: "in" | "out"; skin: Skin }) {
 }
 
 /* ── WhatsApp bubble ── */
-function WaBubble({ m, first, read }: { m: ShowMessage; first: boolean; read: boolean }) {
-  const outgoing = m.from === "agent" || m.from === "owner";
+function WaBubble({ m, first, read, mine }: { m: ShowMessage; first: boolean; read: boolean; mine: boolean }) {
+  const outgoing = mine;
   return (
     <div className={`flex ${outgoing ? "justify-end" : "justify-start"} px-[6%]`}>
       <div
@@ -317,6 +322,11 @@ function WaThread({
               m={m}
               first={i === 0 || thread.messages[i - 1]?.from !== m.from}
               read={i < shown.length - 1 || done}
+              mine={
+                thread.messages.some((x) => x.from === "customer")
+                  ? m.from === "agent" || m.from === "owner"
+                  : m.from === "owner"
+              }
             />
           </motion.div>
         ))}
