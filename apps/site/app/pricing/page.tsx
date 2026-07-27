@@ -153,7 +153,7 @@ export default function PricingPage() {
               <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="text-[32px] font-bold leading-none tracking-tight">{t.price}</span>
               </div>
-              <p className={`mt-1.5 text-[13px] font-medium ${t.featured ? "text-white/60" : "text-[var(--color-ink-soft)]"}`}>
+              <p className={`mt-1.5 text-[13px] font-medium ${t.featured ? "text-white/70" : "text-[var(--color-ink-soft)]"}`}>
                 {t.priceSub}
               </p>
               <p className={`mt-4 text-[14.5px] leading-relaxed ${t.featured ? "text-white/85" : "text-[var(--color-ink-soft)]"}`}>

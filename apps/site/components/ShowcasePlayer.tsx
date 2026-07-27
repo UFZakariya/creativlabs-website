@@ -709,7 +709,9 @@ export default function ShowcasePlayer() {
         </div>
       </div>
 
-      <p className="mt-3 text-center text-xs text-white/55">
+      {/* the showcase overlaps out of the hero band onto the light canvas —
+          this caption sits below the boundary, so it must be ink, not white */}
+      <p className="mt-3 text-center text-xs text-[var(--color-ink-soft)]">
         {skin === "whatsapp"
           ? "Real flows from live deployments — orders, support, finance, growth, and the owner's daily brief."
           : "Instagram, Facebook, X, Teams and Slack ride the same House of Agents."}

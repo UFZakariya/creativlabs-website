@@ -892,7 +892,7 @@ export default function UseCaseThreads() {
           </div>
         </div>
 
-        <p className="mt-6 text-center text-[12.5px] text-white/50">
+        <p className="mt-6 text-center text-[12.5px] text-white/70">
           {skin === "whatsapp"
             ? "Transcripts are illustrative — the WhatsApp flow mirrors how Sardauna runs in production today."
             : "Instagram DMs ride the same House of Agents — demo scene with generic specifics."}

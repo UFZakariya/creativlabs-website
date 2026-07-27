@@ -63,7 +63,7 @@ function FileCard({ title, sub }: { title: string; sub: string }) {
   return (
     <div className="rounded-xl border border-white/25 bg-white/12 px-4 py-2.5 text-left backdrop-blur-sm">
       <div className="text-[13px] font-semibold text-white">{title}</div>
-      <div className="text-[11px] text-white/60">{sub}</div>
+      <div className="text-[11px] text-white/70">{sub}</div>
     </div>
   );
 }
@@ -144,7 +144,7 @@ function OpsArt({ run }: { run: number }) {
             <motion.span variants={outV} className="col-start-1 row-start-1">12</motion.span>
             <motion.span variants={inV} className="col-start-1 row-start-1 text-[#7ef2ff]">11</motion.span>
           </span>{" "}
-          <span className="text-white/50">units</span>
+          <span className="text-white/70">units</span>
         </motion.div>
         <motion.div
           variants={slideV(1.45)}
@@ -171,7 +171,7 @@ function FinanceArt({ run }: { run: number }) {
           </svg>
         </span>
         <span className="text-[13.5px] font-bold text-white">
-          ₦18,500 received <span className="font-medium text-white/60">· matched</span>
+          ₦18,500 received <span className="font-medium text-white/70">· matched</span>
         </span>
       </motion.div>
       <motion.span variants={fadeV(0.75)} className="h-4 w-px bg-white/40" />

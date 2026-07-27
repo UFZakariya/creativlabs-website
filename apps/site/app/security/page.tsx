@@ -27,7 +27,7 @@ function ApprovalArt() {
           <span className="flex-1 border-l border-black/8 py-1.5 text-center text-[12px] font-medium text-[#008ecc]">Hold</span>
         </div>
       </div>
-      <p className="mt-2 text-center text-[10.5px] font-medium uppercase tracking-wide text-white/50">
+      <p className="mt-2 text-center text-[10.5px] font-medium uppercase tracking-wide text-white/70">
         waiting on you — nothing sent
       </p>
     </div>
@@ -64,7 +64,7 @@ function LedgerArt() {
           <span className="min-w-0 flex-1 truncate text-[11.5px] text-white/85">
             <span className="font-semibold text-white">{r.who}</span> · {r.what}
           </span>
-          <span className="shrink-0 font-mono text-[10px] text-white/45">{r.when}</span>
+          <span className="shrink-0 font-mono text-[10px] text-white/70">{r.when}</span>
         </div>
       ))}
     </div>
@@ -89,7 +89,7 @@ function StagesArt() {
           </div>
         ))}
       </div>
-      <div className="mt-2 flex justify-between text-[9px] font-medium uppercase tracking-wide text-white/55">
+      <div className="mt-2 flex justify-between text-[9px] font-medium uppercase tracking-wide text-white/70">
         <span>Draft</span>
         <span className="text-white/90">Live</span>
       </div>
@@ -238,7 +238,7 @@ export default function SecurityPage() {
           </div>
 
           <Reveal delay={0.1}>
-            <p className="mt-8 text-center text-[13px] text-white/50">
+            <p className="mt-8 text-center text-[13px] text-white/70">
               Every agent is versioned — and a promotion can always be reversed.
             </p>
           </Reveal>

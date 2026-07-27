@@ -187,7 +187,7 @@ export default function ComparisonTabs() {
                 />
                 <div className="-mr-1 mt-2 rounded-lg border border-white/25 bg-white/12 px-3 py-1.5 text-right backdrop-blur-sm">
                   <div className="text-[11.5px] font-semibold">{tab.right.artifact.title}</div>
-                  <div className="text-[10px] text-white/60">{tab.right.artifact.sub}</div>
+                  <div className="text-[10px] text-white/70">{tab.right.artifact.sub}</div>
                 </div>
               </div>
             </div>

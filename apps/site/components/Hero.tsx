@@ -49,7 +49,7 @@ export default function Hero() {
             </a>
           </div>
 
-          <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] text-white/60">
+          <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] text-white/70">
             {TRUST_CHIPS.map((c) => (
               <li key={c} className="flex items-center gap-1.5">
                 <span aria-hidden className="text-[var(--color-cyan)]">✓</span>

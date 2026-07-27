@@ -254,7 +254,7 @@ function Chart({ run }: { run: number }) {
           />
         </span>
         <span className="mt-3 text-[17px] font-bold tracking-tight text-white">Sardauna</span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
           Chief of Staff
         </span>
       </motion.div>
@@ -380,7 +380,7 @@ export default function OrgChart() {
           viewport={{ once: true, margin: "-60px" }}
         >
           <Chart run={run} />
-          <p className="mt-9 text-[12.5px] font-medium uppercase tracking-[0.18em] text-white/45">
+          <p className="mt-9 text-[12.5px] font-medium uppercase tracking-[0.18em] text-white/70">
             Hire more agents any time — the house grows with you
           </p>
         </motion.div>

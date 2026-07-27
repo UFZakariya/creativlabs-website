@@ -28,7 +28,7 @@ export default function CTABand() {
             See pricing
           </a>
         </div>
-        <p className="mt-6 text-[12.5px] text-white/55">
+        <p className="mt-6 text-[12.5px] text-white/70">
           Free audit · No card · You approve anything that leaves the house
         </p>
       </div>

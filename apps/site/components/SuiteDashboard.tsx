@@ -861,7 +861,7 @@ export default function SuiteDashboard() {
         <DesktopFrame run={run} pane={pane} onSelect={setPane} />
         <PhoneFrame run={run} tab={tab} onSelect={setTab} />
 
-        <p className="mt-4 text-center text-[10.5px] font-medium uppercase tracking-[0.14em] text-white/50">
+        <p className="mt-4 text-center text-[10.5px] font-medium uppercase tracking-[0.14em] text-white/70">
           Figures illustrative — the interface is the real Business Suite
         </p>
       </div>

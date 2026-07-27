@@ -23,7 +23,9 @@ const COLS: { head: string; links: { label: string; href: string }[] }[] = [
     head: "Trust",
     links: [
       { label: "Security", href: "/security" },
-      { label: "Talk to Bari & Biba", href: "https://safetyline.com.ng/#contact" },
+      /* relative on purpose: this must survive the cutover to safetyline.com.ng
+         (the old site's #contact anchor won't exist on the new one) */
+      { label: "Talk to Bari & Biba", href: "/contact" },
     ],
   },
 ];

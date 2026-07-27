@@ -162,7 +162,7 @@ export default function ChannelsPage() {
               questions, follow-ups, your own approvals — one chat, with no
               app to download and no portal to teach anyone.
             </p>
-            <p className="mt-4 max-w-md text-[13.5px] leading-relaxed text-white/55">
+            <p className="mt-4 max-w-md text-[13.5px] leading-relaxed text-white/70">
               Proven, not promised: Safetyline&apos;s own front desk and
               working farm-management agents run on WhatsApp in production
               right now.
