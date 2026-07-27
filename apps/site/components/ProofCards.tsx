@@ -109,40 +109,58 @@ function OrbitArt({ run }: { run: number }) {
   );
 }
 
-/* 3 — the schedule: the week's line draws itself */
-function ChartArt({ run }: { run: number }) {
-  const path = "M6 78 C 40 70, 58 54, 86 58 C 114 62, 128 34, 158 30 C 180 27, 196 20, 214 14";
+/* 3 — the schedule: recurring work checking itself off, clock sweeping */
+function ScheduleArt({ run }: { run: number }) {
+  const rows = [
+    { when: "07:00", what: "Daily brief", d: 0.45 },
+    { when: "Mon", what: "Sales reconciliation", d: 0.95 },
+    { when: "1st", what: "Month-end pack", d: 1.45 },
+  ];
+  const pop = (d: number) => ({
+    hide: { opacity: 0, scale: 0.4 },
+    show: { opacity: 1, scale: 1, transition: { delay: d, duration: 0.3, ease: EASE } },
+  });
+  const rowV = (d: number) => ({
+    hide: { opacity: 0, x: -12 },
+    show: { opacity: 1, x: 0, transition: { delay: d - 0.25, duration: 0.35, ease: EASE } },
+  });
   return (
-    <motion.div key={run} initial="hide" animate="show" className="w-full max-w-[260px]">
-      <div className="relative rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
-        <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-black/40">This week</span>
+    <motion.div key={run} initial="hide" animate="show" className="w-full max-w-[250px]">
+      <div className="rounded-2xl border border-black/6 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            <span className="relative grid h-8 w-8 place-items-center rounded-lg bg-[var(--color-blue)]/10">
+              <span aria-hidden className="absolute h-5 w-5 rounded-full border-[1.8px] border-[#083cff]" />
+              <span aria-hidden className="absolute bottom-1/2 left-1/2 h-[7px] w-[2px] origin-bottom rounded bg-[#083cff] [animation:orbit_5s_linear_infinite]" />
+            </span>
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-black/40">On schedule</span>
+          </span>
           <motion.span
-            variants={{ hide: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0, transition: { delay: 1.15, duration: 0.3, ease: EASE } } }}
-            className="rounded-md bg-[var(--color-ink)] px-2 py-0.5 text-[11px] font-bold text-white"
+            variants={pop(1.9)}
+            className="rounded-full bg-[var(--color-blue)]/8 px-2.5 py-1 text-[10.5px] font-bold text-[var(--color-blue)]"
           >
-            ₦412k <span className="text-[#7ef2a0]">▲12%</span>
+            next · 07:00
           </motion.span>
         </div>
-        <svg viewBox="0 0 220 88" className="h-[88px] w-full" fill="none" aria-hidden>
-          <motion.path
-            d={path}
-            stroke="#083cff"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            variants={{ hide: { pathLength: 0 }, show: { pathLength: 1, transition: { duration: 1.1, ease: "easeInOut" } } }}
-          />
-          <motion.circle
-            cx="214"
-            cy="14"
-            r="4"
-            fill="#083cff"
-            variants={{ hide: { opacity: 0, scale: 0 }, show: { opacity: 1, scale: 1, transition: { delay: 1.05, duration: 0.25 } } }}
-          />
-        </svg>
-        <div className="mt-1 flex justify-between text-[9.5px] font-medium uppercase text-black/35">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-            <span key={d}>{d}</span>
+        <div className="flex flex-col gap-2">
+          {rows.map((r) => (
+            <motion.div
+              key={r.what}
+              variants={rowV(r.d)}
+              className="flex items-center gap-2.5 rounded-xl border border-black/5 bg-[#f8faff] px-3 py-2"
+            >
+              <span className="w-9 shrink-0 font-mono text-[10px] font-bold text-[var(--color-blue)]">{r.when}</span>
+              <span className="min-w-0 flex-1 truncate text-[12px] font-medium text-[var(--color-ink)]">{r.what}</span>
+              <motion.span
+                variants={pop(r.d)}
+                className="grid shrink-0 place-items-center rounded-full bg-[#22c55e]"
+                style={{ width: 16, height: 16 }}
+              >
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" aria-hidden>
+                  <path d="m5 13 4.5 4.5L19 8" />
+                </svg>
+              </motion.span>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -234,7 +252,7 @@ const CARDS = [
   {
     title: "Runs on a schedule",
     body: "Daily briefs, weekly reconciliations, month-end packs — recurring work happens without you asking twice.",
-    Art: ChartArt,
+    Art: ScheduleArt,
   },
   {
     title: "It knows your business",

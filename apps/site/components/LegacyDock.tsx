@@ -41,6 +41,20 @@ export default function LegacyDock() {
     if (!el) return;
     el.innerHTML = SHELL;
 
+    // icon sprite + refraction filter the dock's <use href="#i-…"> refs need
+    if (!document.getElementById("i-clock")) {
+      fetch("/legacy/sprite.html")
+        .then((r) => r.text())
+        .then((html) => {
+          const holder = document.createElement("div");
+          holder.style.cssText = "position:absolute;width:0;height:0;overflow:hidden";
+          holder.setAttribute("aria-hidden", "true");
+          holder.innerHTML = html;
+          document.body.appendChild(holder);
+        })
+        .catch(() => {});
+    }
+
     const load = (src: string) =>
       new Promise<void>((res, rej) => {
         const s = document.createElement("script");
@@ -51,6 +65,7 @@ export default function LegacyDock() {
       });
 
     load("/legacy/hermes-config.js")
+      .then(() => load("/legacy/sl-bar.js")) // quiz data the Readiness tool needs
       .then(() => load("/legacy/hermes-dock.js"))
       .catch(() => {});
   }, []);

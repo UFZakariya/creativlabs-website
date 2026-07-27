@@ -8,7 +8,7 @@
    play in with stagger + auto-scroll; threads crossfade; skins toggle. */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   INSTAGRAM_THREAD,
   WHATSAPP_THREADS,
@@ -18,7 +18,10 @@ import {
 
 type Skin = "whatsapp" | "instagram";
 
-const STEP_MS = 1150;
+/* conversational pacing: a beat to read, typing time scaled to the reply */
+const READ_PAUSE = 520;
+const typingTime = (m: ShowMessage) =>
+  Math.min(1400, 550 + (m.text?.length ?? 24) * 14);
 
 /* ── tiny hand-drawn icon set ── */
 const I = {
@@ -57,31 +60,82 @@ const I = {
   ),
 };
 
-function useScriptPlayback(thread: ShowThread, enabled: boolean) {
-  const reduced = useReducedMotion();
-  const [count, setCount] = useState(reduced ? thread.messages.length : 0);
+function useScriptPlayback(
+  thread: ShowThread,
+  enabled: boolean,
+  replay: number,
+  onDone?: () => void
+) {
+  // NOTE: no reduced-motion shortcut — the sequenced conversation IS the
+  // content of this demo (OS "show animations off" was dumping the whole
+  // scene at once). Bubble entry stays a gentle fade.
+  const [count, setCount] = useState(0);
+  const [typing, setTyping] = useState<null | "in" | "out">(null);
 
   useEffect(() => {
-    if (reduced) {
-      setCount(thread.messages.length);
-      return;
-    }
     setCount(0);
+    setTyping(null);
     if (!enabled) return;
-    let i = 0;
-    const t = setInterval(() => {
-      i += 1;
-      setCount(i);
-      if (i >= thread.messages.length) clearInterval(t);
-    }, STEP_MS);
-    return () => clearInterval(t);
-  }, [thread, enabled, reduced]);
+    let cancelled = false;
+    const timers: number[] = [];
+    const later = (fn: () => void, ms: number) => {
+      timers.push(window.setTimeout(() => { if (!cancelled) fn(); }, ms));
+    };
+    let at = 400;
+    thread.messages.forEach((m, i) => {
+      const fromHouse = m.from === "agent" || m.from === "owner";
+      const think = i === 0 ? 0 : m.from === "system" ? 300 : typingTime(m);
+      if (think > 350) later(() => setTyping(fromHouse ? "out" : "in"), at);
+      at += think;
+      const idx = i + 1;
+      later(() => {
+        setTyping(null);
+        setCount(idx);
+        if (idx >= thread.messages.length) onDone?.();
+      }, at);
+      at += READ_PAUSE;
+    });
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thread, enabled, replay]);
 
-  return thread.messages.slice(0, count);
+  return {
+    shown: thread.messages.slice(0, count),
+    typing,
+    done: count >= thread.messages.length,
+  };
+}
+
+/* typing-dots bubble, per skin and side */
+function TypingBubble({ side, skin }: { side: "in" | "out"; skin: Skin }) {
+  const dots = (
+    <span className="flex items-center gap-[3px] px-1 py-1">
+      {[0, 1, 2].map((d) => (
+        <span key={d} className="typing-dot h-[6px] w-[6px] rounded-full bg-[#667781]" />
+      ))}
+    </span>
+  );
+  if (skin === "instagram") {
+    return (
+      <div className={`flex ${side === "out" ? "justify-end" : "justify-start"} px-3`}>
+        <div className="rounded-[20px] bg-[#efefef] px-3 py-1.5">{dots}</div>
+      </div>
+    );
+  }
+  return (
+    <div className={`flex ${side === "out" ? "justify-end" : "justify-start"} px-[6%]`}>
+      <div className={`rounded-lg px-2 py-1 shadow-[0_1px_.5px_rgba(11,20,26,.13)] ${side === "out" ? "bg-[#d9fdd3]" : "bg-white"}`}>
+        {dots}
+      </div>
+    </div>
+  );
 }
 
 /* ── WhatsApp bubble ── */
-function WaBubble({ m, first }: { m: ShowMessage; first: boolean }) {
+function WaBubble({ m, first, read }: { m: ShowMessage; first: boolean; read: boolean }) {
   const outgoing = m.from === "agent" || m.from === "owner";
   return (
     <div className={`flex ${outgoing ? "justify-end" : "justify-start"} px-[6%]`}>
@@ -117,7 +171,9 @@ function WaBubble({ m, first }: { m: ShowMessage; first: boolean }) {
         )}
         <span className="float-right ml-2 mt-1 flex translate-y-[3px] items-center gap-0.5 text-[10.2px] text-[#667781]">
           {m.time}
-          {outgoing && <span className="text-[#53bdeb]">✓✓</span>}
+          {outgoing && (
+            <span className={read ? "text-[#53bdeb]" : "text-[#8696a0]"}>✓✓</span>
+          )}
         </span>
       </div>
     </div>
@@ -182,9 +238,28 @@ function IgBubble({ m }: { m: ShowMessage }) {
 }
 
 /* ── thread panes ── */
-function WaThread({ thread, enabled }: { thread: ShowThread; enabled: boolean }) {
-  const shown = useScriptPlayback(thread, enabled);
+function WaThread({
+  thread,
+  enabled,
+  replay,
+  onTyping,
+  onDone,
+}: {
+  thread: ShowThread;
+  enabled: boolean;
+  replay: number;
+  onTyping?: (t: null | "in" | "out") => void;
+  onDone?: () => void;
+}) {
+  const { shown, typing, done } = useScriptPlayback(thread, enabled, replay, onDone);
   const scroller = useRef<HTMLDivElement>(null);
+
+  // real WhatsApp signals the other side's typing in the HEADER, not a bubble
+  useEffect(() => {
+    onTyping?.(typing);
+    return () => onTyping?.(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typing]);
 
   useEffect(() => {
     const el = scroller.current;
@@ -212,7 +287,11 @@ function WaThread({ thread, enabled }: { thread: ShowThread; enabled: boolean })
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className={i > 0 && thread.messages[i - 1]?.from !== m.from ? "mt-2" : ""}
           >
-            <WaBubble m={m} first={i === 0 || thread.messages[i - 1]?.from !== m.from} />
+            <WaBubble
+              m={m}
+              first={i === 0 || thread.messages[i - 1]?.from !== m.from}
+              read={i < shown.length - 1 || done}
+            />
           </motion.div>
         ))}
       </div>
@@ -220,15 +299,24 @@ function WaThread({ thread, enabled }: { thread: ShowThread; enabled: boolean })
   );
 }
 
-function IgThread({ thread, enabled }: { thread: ShowThread; enabled: boolean }) {
-  const shown = useScriptPlayback(thread, enabled);
+function IgThread({
+  thread,
+  enabled,
+  replay,
+  onDone,
+}: {
+  thread: ShowThread;
+  enabled: boolean;
+  replay: number;
+  onDone?: () => void;
+}) {
+  const { shown, typing, done } = useScriptPlayback(thread, enabled, replay, onDone);
   const scroller = useRef<HTMLDivElement>(null);
-  const done = shown.length === thread.messages.length;
 
   useEffect(() => {
     const el = scroller.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [shown.length]);
+  }, [shown.length, typing]);
 
   return (
     <div ref={scroller} className="h-full overflow-y-auto bg-white py-3">
@@ -243,6 +331,8 @@ function IgThread({ thread, enabled }: { thread: ShowThread; enabled: boolean })
             <IgBubble m={m} />
           </motion.div>
         ))}
+        {/* Instagram authentically shows the other side's typing as a dots bubble */}
+        {typing === "in" && <TypingBubble side="in" skin="instagram" />}
         {done && (
           <div className="px-4 text-right text-[10.5px] font-medium text-black/40">Seen 12:09</div>
         )}
@@ -257,6 +347,9 @@ export default function ShowcasePlayer() {
   const [activeKey, setActiveKey] = useState(WHATSAPP_THREADS[0].key);
   // the simulation starts on hover; touch devices (no hover) start in-view
   const [engaged, setEngaged] = useState(false);
+  const [waTyping, setWaTyping] = useState<null | "in" | "out">(null);
+  const [replay, setReplay] = useState(0);
+  const doneRef = useRef(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -327,7 +420,14 @@ export default function ShowcasePlayer() {
       {/* device card — hovering it starts the simulation */}
       <div
         ref={cardRef}
-        onMouseEnter={() => setEngaged(true)}
+        onMouseEnter={() => {
+          if (!engaged) setEngaged(true);
+          else if (doneRef.current) {
+            // hovering a finished scene replays it
+            doneRef.current = false;
+            setReplay((r) => r + 1);
+          }
+        }}
         className="glass-ring relative overflow-hidden rounded-3xl bg-white text-left shadow-[0_40px_80px_rgba(2,6,31,0.45)] transition-shadow duration-500 hover:shadow-[0_50px_100px_rgba(2,6,31,0.55)]"
       >
         {skin === "whatsapp" ? (
@@ -340,7 +440,9 @@ export default function ShowcasePlayer() {
               <div className="truncate text-[14.5px] font-semibold">
                 {active.label} · Safetyline
               </div>
-              <div className="text-[11.5px] text-[#667781]">{active.agent} · online</div>
+              <div className="text-[11.5px] text-[#667781]">
+                {waTyping === "in" ? "typing…" : `${active.agent} · online`}
+              </div>
             </div>
             <div className="ml-auto flex items-center gap-4 text-[#54656f]">
               <span className="hidden sm:block">{I.video()}</span>
@@ -452,9 +554,20 @@ export default function ShowcasePlayer() {
                   transition={{ duration: 0.25 }}
                 >
                   {skin === "whatsapp" ? (
-                    <WaThread thread={active} enabled={engaged} />
+                    <WaThread
+                      thread={active}
+                      enabled={engaged}
+                      replay={replay}
+                      onTyping={setWaTyping}
+                      onDone={() => { doneRef.current = true; }}
+                    />
                   ) : (
-                    <IgThread thread={active} enabled={engaged} />
+                    <IgThread
+                      thread={active}
+                      enabled={engaged}
+                      replay={replay}
+                      onDone={() => { doneRef.current = true; }}
+                    />
                   )}
                 </motion.div>
               </AnimatePresence>
