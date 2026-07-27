@@ -178,15 +178,17 @@ function WaBubble({ m, first, read }: { m: ShowMessage; first: boolean; read: bo
         )}
         {m.text && <p className="[overflow-wrap:anywhere]">{m.text}</p>}
         {m.card && (
-          <div className="mt-1 w-56 max-w-full rounded-lg border border-black/8 bg-[#f7f8fa] p-2.5 text-[12.3px]">
-            <div className="mb-1 font-semibold">{m.card.title}</div>
-            <ul className="space-y-0.5 text-black/65">
+          /* WA Business template message: content lives in the bubble; the
+             action is a full-width divider row in WhatsApp action blue */
+          <div className="-mx-2 -my-[5px] w-60 max-w-full px-2 py-[5px] text-[12.6px]">
+            <div className="mb-0.5 font-semibold">{m.card.title}</div>
+            <ul className="space-y-0.5 text-black/70">
               {m.card.lines.map((l) => (
                 <li key={l}>{l}</li>
               ))}
             </ul>
             {m.card.cta && (
-              <div className="mt-2 rounded-md border border-[#008069]/35 py-1.5 text-center text-[12.5px] font-semibold text-[#008069]">
+              <div className="-mx-2 mt-2 border-t border-black/10 px-2 pb-0.5 pt-1.5 text-center text-[13px] font-medium text-[#00a5f4]">
                 {m.card.cta}
               </div>
             )}

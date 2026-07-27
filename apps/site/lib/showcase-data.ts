@@ -70,23 +70,23 @@ export const WHATSAPP_THREADS: ShowThread[] = [
     label: "Orders",
     agent: "Kola · Operations",
     emoji: "⚙️",
-    preview: "Order #1042 confirmed — ₦18,400 received",
-    rowTime: "10:18",
+    preview: "Transfer confirmed — booked for Thursday",
+    rowTime: "10:17",
     unread: 2,
     messages: [
-      { id: "o1", from: "customer", time: "10:12", text: "Do you deliver to Gwarinpa? I want 2 cartons." },
+      { id: "o1", from: "customer", time: "10:09", text: "Good afternoon. Do you deliver to Gwarinpa? How much for 2 cartons?" },
       {
-        id: "o2", from: "agent", name: "Kola", time: "10:12",
-        text: "We do — ₦18,400 including delivery, arriving Thursday. Pay securely here:",
+        id: "o2", from: "agent", name: "Kola", time: "10:10",
+        text: "Good afternoon! Yes we do. 2 cartons is ₦16,000 and delivery to Gwarinpa is ₦2,400 — ₦18,400 total, arriving Thursday. You can pay by transfer or card:",
       },
       {
-        id: "o3", from: "agent", name: "Kola", time: "10:12",
-        card: { title: "Order #1042", lines: ["2 × carton — ₦16,000", "Delivery (Gwarinpa) — ₦2,400", "Total — ₦18,400"], cta: "Pay now" },
+        id: "o3", from: "agent", name: "Kola", time: "10:10",
+        card: { title: "Order #1042", lines: ["2 × carton — ₦16,000", "Delivery (Gwarinpa) — ₦2,400", "Total — ₦18,400"], cta: "Pay securely" },
       },
-      { id: "o4", from: "customer", time: "10:18", text: "Paid ✅" },
+      { id: "o4", from: "customer", time: "10:16", text: "Done, I've sent the transfer ✅" },
       {
-        id: "o5", from: "agent", name: "Kola", time: "10:18",
-        text: "Received, thank you! Order confirmed — dispatch is scheduled and you'll get updates right here.",
+        id: "o5", from: "agent", name: "Kola", time: "10:17",
+        text: "Confirmed — ₦18,400 received, thank you! 🙏 You're booked for Thursday; the rider's number will come here that morning.",
         status: "receipt sent · logged to CRM · dispatch scheduled",
       },
     ],
@@ -99,7 +99,7 @@ export const WHATSAPP_THREADS: ShowThread[] = [
     preview: "Replacement booked — delivery credit added",
     rowTime: "14:06",
     messages: [
-      { id: "s1", from: "customer", time: "14:03", text: "My order arrived with one carton missing 😡" },
+      { id: "s1", from: "customer", time: "14:03", text: "Please o, my order just arrived but one carton is missing 😡 I ordered 3" },
       { id: "s2", from: "agent", name: "Zara", time: "14:03", text: "So sorry about that — checking order #1029 now." },
       {
         id: "s3", from: "agent", name: "Zara", time: "14:04",
@@ -158,7 +158,12 @@ export const WHATSAPP_THREADS: ShowThread[] = [
         id: "g3", from: "agent", name: "Tunde", time: "16:41",
         card: { title: "Pipeline · new deal", lines: ["Bukka & Grill (Yaba)", "Weekend catering — est. ₦150,000", "Stage — call booked (Thu 2pm)"] },
       },
-      { id: "g4", from: "owner", time: "16:55", text: "👍" },
+      { id: "g4", from: "owner", time: "16:55", text: "Nice one. Remind me before the call 👍" },
+      {
+        id: "g5", from: "agent", name: "Tunde", time: "16:55",
+        text: "Will do — reminder set for Thursday 1:30pm with the deal notes attached.",
+        status: "reminder scheduled · pipeline updated",
+      },
     ],
   },
 ];
