@@ -3,6 +3,7 @@
    agents proven before they're trusted. Original copy. */
 
 import GlowingEffect from "./GlowingEffect";
+import TiltCard from "./TiltCard";
 
 const CONTROLS = [
   {
@@ -36,19 +37,18 @@ export default function ControlSafety() {
 
       <div className="grid gap-5 md:grid-cols-3">
         {CONTROLS.map((c) => (
-          <div
-            key={c.title}
-            className="liquid-glass glass-ring relative rounded-3xl p-6 shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(8,60,255,0.16)]"
-          >
-            <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-            <span className="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-[var(--color-blue)]/8 text-xl">
-              {c.icon}
-            </span>
-            <h3 className="text-lg font-bold tracking-tight">{c.title}</h3>
-            <p className="mt-2 text-[14px] leading-relaxed text-[var(--color-ink-soft)]">
-              {c.body}
-            </p>
-          </div>
+          <TiltCard key={c.title} maxTilt={8}>
+            <div className="liquid-glass glass-ring relative h-full rounded-3xl p-6 shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(8,60,255,0.16)]">
+              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+              <span className="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-[var(--color-blue)]/8 text-xl">
+                {c.icon}
+              </span>
+              <h3 className="text-lg font-bold tracking-tight">{c.title}</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-[var(--color-ink-soft)]">
+                {c.body}
+              </p>
+            </div>
+          </TiltCard>
         ))}
       </div>
     </section>

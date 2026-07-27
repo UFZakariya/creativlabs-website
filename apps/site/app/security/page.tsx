@@ -4,6 +4,8 @@ import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
+import TiltCard from "@/components/TiltCard";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Security & control — Autonomy you can audit | Safetyline",
@@ -173,20 +175,21 @@ export default function SecurityPage() {
       {/* the three pillars */}
       <section className="mx-auto max-w-6xl px-5 pb-20 sm:pb-24">
         <div className="grid gap-5 md:grid-cols-3">
-          {PILLARS.map(({ title, body, Art }) => (
-            <article
-              key={title}
-              className="liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
-            >
-              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-              <div className="bg-azure-dawn m-3 grid min-h-[210px] place-items-center overflow-hidden rounded-3xl p-5">
-                <Art />
-              </div>
-              <div className="px-6 pb-6 pt-3">
-                <h2 className="text-lg font-bold tracking-tight">{title}</h2>
-                <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--color-ink-soft)]">{body}</p>
-              </div>
-            </article>
+          {PILLARS.map(({ title, body, Art }, i) => (
+            <Reveal key={title} delay={i * 0.08} className="h-full">
+              <TiltCard className="h-full">
+                <article className="liquid-glass glass-ring relative h-full rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)]">
+                  <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+                  <div className="bg-azure-dawn m-3 grid min-h-[210px] place-items-center overflow-hidden rounded-3xl p-5">
+                    <Art />
+                  </div>
+                  <div className="px-6 pb-6 pt-3">
+                    <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+                    <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--color-ink-soft)]">{body}</p>
+                  </div>
+                </article>
+              </TiltCard>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -194,7 +197,7 @@ export default function SecurityPage() {
       {/* the quality ladder */}
       <section className="bg-azure-dawn rounded-[var(--radius-band)] mx-3 px-5 py-20 sm:py-28">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-12 text-center">
+          <Reveal className="mb-12 text-center">
             <p className="mb-4 inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)]">
               The quality ladder
             </p>
@@ -205,42 +208,46 @@ export default function SecurityPage() {
               Five stages between an idea and your customers. Most software
               ships and hopes; the house promotes and proves.
             </p>
-          </div>
+          </Reveal>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {LIFECYCLE.map((s, i) => (
-              <div
-                key={s.step}
-                className={`rounded-[24px] border p-5 backdrop-blur-sm ${
-                  i === 4
-                    ? "border-[#7ef2a0]/40 bg-white/12"
-                    : "border-white/15 bg-white/8"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[12px] font-semibold text-[var(--color-cyan)]">{s.step}</span>
-                  {i === 4 && (
-                    <span className="grid place-items-center rounded-full bg-[#22c55e]" style={{ width: 18, height: 18 }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4">
-                        <path d="m5 13 4.5 4.5L19 8" />
-                      </svg>
-                    </span>
-                  )}
+              <Reveal key={s.step} delay={i * 0.06} className="h-full">
+                <div
+                  className={`h-full rounded-[24px] border p-5 backdrop-blur-sm ${
+                    i === 4
+                      ? "border-[#7ef2a0]/40 bg-white/12"
+                      : "border-white/15 bg-white/8"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[12px] font-semibold text-[var(--color-cyan)]">{s.step}</span>
+                    {i === 4 && (
+                      <span className="grid place-items-center rounded-full bg-[#22c55e]" style={{ width: 18, height: 18 }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4">
+                          <path d="m5 13 4.5 4.5L19 8" />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="mt-2 text-[17px] font-bold tracking-tight text-white">{s.name}</h3>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-white/70">{s.body}</p>
                 </div>
-                <h3 className="mt-2 text-[17px] font-bold tracking-tight text-white">{s.name}</h3>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-white/70">{s.body}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
 
-          <p className="mt-8 text-center text-[13px] text-white/50">
-            Every agent is versioned — and a promotion can always be reversed.
-          </p>
+          <Reveal delay={0.1}>
+            <p className="mt-8 text-center text-[13px] text-white/50">
+              Every agent is versioned — and a promotion can always be reversed.
+            </p>
+          </Reveal>
         </div>
       </section>
 
       {/* your data */}
       <section className="mx-auto max-w-5xl px-5 py-20 sm:py-24">
+        <Reveal>
         <div className="glass-ring rounded-[32px] bg-white px-6 py-12 text-center shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:px-12">
           <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Your data
@@ -270,6 +277,7 @@ export default function SecurityPage() {
             ))}
           </div>
         </div>
+        </Reveal>
       </section>
 
       <CTABand />

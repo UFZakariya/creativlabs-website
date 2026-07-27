@@ -4,6 +4,8 @@ import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
+import TiltCard from "@/components/TiltCard";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Channels — One house, every door | Safetyline",
@@ -142,7 +144,7 @@ export default function ChannelsPage() {
       {/* featured: WhatsApp — the front door, proven live */}
       <section className="bg-azure-dawn rounded-[var(--radius-band)] mx-3 px-5 py-20 sm:py-24">
         <div className="mx-auto grid max-w-5xl items-center gap-10 md:grid-cols-2">
-          <div>
+          <Reveal>
             <div className="mb-5 flex items-center gap-3">
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#25d366] shadow-[0_14px_34px_rgba(37,211,102,0.35)] text-white">
                 {glyphs.whatsapp}
@@ -164,10 +166,10 @@ export default function ChannelsPage() {
               working farm-management agents run on WhatsApp in production
               right now.
             </p>
-          </div>
+          </Reveal>
 
           {/* mini chat strip */}
-          <div className="wa-wallpaper glass-ring mx-auto w-full max-w-md rounded-[24px] p-4 shadow-[0_40px_90px_rgba(2,6,31,0.45)]">
+          <Reveal delay={0.12} className="wa-wallpaper glass-ring mx-auto w-full max-w-md rounded-[24px] p-4 shadow-[0_40px_90px_rgba(2,6,31,0.45)]">
             <div className="flex flex-col gap-1.5">
               <div className="self-center rounded-md bg-white/95 px-2.5 py-1 text-[10.5px] font-medium uppercase text-black/50 shadow-sm">
                 Today
@@ -200,13 +202,13 @@ export default function ChannelsPage() {
                 <span className="text-[12px] font-semibold text-[#111b21]">Order #1104 · 2 reserved</span>
               </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* the directory */}
       <section className="mx-auto max-w-6xl px-5 py-20 sm:py-24">
-        <div className="mb-12 text-center">
+        <Reveal className="mb-12 text-center">
           <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             The directory
           </p>
@@ -218,43 +220,49 @@ export default function ChannelsPage() {
             build — tell us where your customers are and we&apos;ll meet them
             there.
           </p>
-        </div>
+        </Reveal>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CHANNELS.map((c, i) => (
-            <article
+            <Reveal
               key={c.name}
-              className={`liquid-glass glass-ring relative flex flex-col gap-3 rounded-[24px] p-6 shadow-[0_16px_40px_rgba(16,20,42,0.06)] ${
+              delay={(i % 3) * 0.07}
+              className={`h-full ${
                 i === CHANNELS.length - 1 ? "sm:col-span-2 lg:col-span-3" : ""
               }`}
             >
-              <GlowingEffect spread={38} proximity={56} inactiveZone={0.55} borderWidth={2} />
-              <div className="flex items-center justify-between">
-                <span
-                  className="grid h-11 w-11 place-items-center rounded-xl"
-                  style={{ background: `${c.tint}14`, color: c.tint }}
-                >
-                  {c.glyph}
-                </span>
-                <span
-                  className={`rounded-full px-3 py-1 text-[11.5px] font-semibold ${
-                    c.status === "Offered"
-                      ? "border border-black/10 bg-black/4 text-[var(--color-ink-soft)]"
-                      : "border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 text-[var(--color-blue)]"
-                  }`}
-                >
-                  {c.status}
-                </span>
-              </div>
-              <h3 className="text-[17px] font-bold tracking-tight">{c.name}</h3>
-              <p className="text-[13.5px] leading-relaxed text-[var(--color-ink-soft)]">{c.line}</p>
-            </article>
+              <TiltCard maxTilt={8} className="h-full">
+                <article className="liquid-glass glass-ring relative flex h-full flex-col gap-3 rounded-[24px] p-6 shadow-[0_16px_40px_rgba(16,20,42,0.06)]">
+                  <GlowingEffect spread={38} proximity={56} inactiveZone={0.55} borderWidth={2} />
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="grid h-11 w-11 place-items-center rounded-xl"
+                      style={{ background: `${c.tint}14`, color: c.tint }}
+                    >
+                      {c.glyph}
+                    </span>
+                    <span
+                      className={`rounded-full px-3 py-1 text-[11.5px] font-semibold ${
+                        c.status === "Offered"
+                          ? "border border-black/10 bg-black/4 text-[var(--color-ink-soft)]"
+                          : "border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 text-[var(--color-blue)]"
+                      }`}
+                    >
+                      {c.status}
+                    </span>
+                  </div>
+                  <h3 className="text-[17px] font-bold tracking-tight">{c.name}</h3>
+                  <p className="text-[13.5px] leading-relaxed text-[var(--color-ink-soft)]">{c.line}</p>
+                </article>
+              </TiltCard>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* one house behind every door */}
       <section className="mx-auto max-w-5xl px-5 pb-20 sm:pb-24">
+        <Reveal>
         <div className="glass-ring rounded-[32px] bg-white px-6 py-12 shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:px-12">
           <div className="mb-10 text-center">
             <h2 className="text-display-3 mx-auto max-w-2xl">
@@ -283,6 +291,7 @@ export default function ChannelsPage() {
             ))}
           </div>
         </div>
+        </Reveal>
       </section>
 
       <CTABand />
