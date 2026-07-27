@@ -27,7 +27,7 @@ const ITEMS = [
   },
   {
     q: "What does it cost?",
-    a: "Sardauna is a ladder of four tiers. Presence is free — a website, a WhatsApp door and a readiness mini-audit. Answered adds the 24/7 AI employee so you stop losing enquiries; Run puts your whole back office on AI staff; Built-for-you is project work on top of any tier. Paid tiers are naira-billed monthly and priced with you on the intro call — real numbers before you commit to anything.",
+    a: "Sardauna is a ladder of four tiers. Sardauna Lite is free — a website, a WhatsApp door and a readiness mini-audit. Sardauna Plus+ adds the 24/7 AI employee so you stop losing enquiries; Sardauna Elite puts your whole back office on AI staff; Sardauna Premiere is project work layered on top of any tier. Paid tiers are naira-billed monthly and priced with you on the intro call — real numbers before you commit to anything.",
   },
 ];
 

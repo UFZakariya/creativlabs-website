@@ -32,22 +32,33 @@ pocket." — two "pocket" headlines on one page. Proposed CTA replacements
 retainer model and its ₦ ranges are gone; the page now shows the four-tier
 ladder — get seen → get answered → get run → get built for you:
 
-- **Tier 1 — Presence: Free** — website (1 template), AI-readiness /
+- **Tier 1 — Sardauna Lite: Free** — website (1 template), AI-readiness /
   WhatsApp-response mini-audit, consent-gated contact capture, click-to-chat
-- **Tier 2 — Answered: monthly, naira-billed** (entry paid; featured card) —
-  24/7 AI chat on site + WhatsApp, booking/calendar, review automation,
-  missed-call text-back, CRM + lead pipeline, basic content/social
-- **Tier 3 — Run: monthly, naira-billed** — full back-office AI staff
-  (nurture, unified inbox, funnels, NGN/WHT/VAT finance, proposals, tickets,
-  social, compliance calendar, SOPs, plans, daily brief; voice AI receptionist
-  as premium)
-- **Tier 4 — Built for you: per project**, layered on any subscription
+- **Tier 2 — Sardauna Plus+: monthly, naira-billed** (entry paid; featured
+  card) — 24/7 AI chat on site + WhatsApp, booking/calendar, review
+  automation, missed-call text-back, CRM + lead pipeline, basic content/social
+- **Tier 3 — Sardauna Elite: monthly, naira-billed** — full back-office AI
+  staff (nurture, unified inbox, funnels, NGN/WHT/VAT finance, proposals,
+  tickets, social, compliance calendar, SOPs, plans, daily brief; voice AI
+  receptionist as premium)
+- **Tier 4 — Sardauna Premiere: per project**, layered on any subscription
+
+**Tier naming — ✅ DECIDED (2026-07-27):** the tiers sell under the product
+name: **Sardauna Lite** (free), **Sardauna Plus+** (featured; the trailing
+"+" is its own animated badge on the card), **Sardauna Elite** and
+**Sardauna Premiere**. The former working names (Presence / Answered / Run /
+Built-for-you) are retired from the site; the ladder verbs — get seen → get
+answered → get run → get built for you — stay as descriptors. Each card
+heading is now an animated nameplate (`TierName.tsx`): Lite shimmer-waves,
+the Plus+ badge spring-spins and sparks on hover, Elite charge-flickers,
+Premiere gets the champagne sheen + rising star.
 
 **Still open (one item):** the naira price bands per tier — tiers.md says
 "to draft on owner's nod". Until bands are published, the page and the FAQ say
 paid tiers are priced on the intro call. Send the bands and the cards get
 numbers. The ICP card ("10–100 staff, or ₦5M+ a month") is kept, but smaller
-businesses are now routed to free Presence instead of being disqualified.
+businesses are now routed to free Sardauna Lite instead of being
+disqualified.
 
 ## 4. Case-study numbers (/customers, /customers/ufms, /customers/truckville)
 

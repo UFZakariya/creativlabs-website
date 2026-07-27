@@ -5,11 +5,12 @@ import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
 import TiltCard from "@/components/TiltCard";
+import TierName, { type TierKey } from "@/components/TierName";
 
 export const metadata: Metadata = {
   title: "Pricing — Start free, scale when it works | Safetyline",
   description:
-    "Sardauna's four-tier ladder: get seen free with Presence, get answered 24/7, get your whole back office run, or get custom systems built for you. Naira-billed, WhatsApp-first, priced with you before you commit.",
+    "Sardauna's four-tier ladder: get seen free on Sardauna Lite, get answered 24/7 on Sardauna Plus+, get your whole back office run on Sardauna Elite, or get custom systems built for you with Sardauna Premiere. Naira-billed, WhatsApp-first, priced with you before you commit.",
 };
 
 const check = (
@@ -18,9 +19,21 @@ const check = (
   </svg>
 );
 
-const TIERS = [
+type Tier = {
+  name: string;
+  tier: TierKey;
+  price: string;
+  priceSub: string;
+  blurb: string;
+  features: string[];
+  cta: { label: string; href: string };
+  featured: boolean;
+};
+
+const TIERS: Tier[] = [
   {
-    name: "Presence",
+    name: "Sardauna Lite",
+    tier: "lite",
     price: "Free",
     priceSub: "tier 1 · get seen",
     blurb:
@@ -35,7 +48,8 @@ const TIERS = [
     featured: false,
   },
   {
-    name: "Answered",
+    name: "Sardauna Plus+",
+    tier: "plus",
     price: "Monthly",
     priceSub: "tier 2 · get answered · naira-billed",
     blurb:
@@ -52,7 +66,8 @@ const TIERS = [
     featured: true,
   },
   {
-    name: "Run",
+    name: "Sardauna Elite",
+    tier: "elite",
     price: "Monthly",
     priceSub: "tier 3 · get run · naira-billed",
     blurb:
@@ -65,11 +80,12 @@ const TIERS = [
       "Compliance calendar (Nigeria), SOPs, operating plans and the daily brief",
       "The full AI-staff org — voice AI receptionist as a premium add-on",
     ],
-    cta: { label: "Talk about Run", href: "/contact" },
+    cta: { label: "Talk about Elite", href: "/contact" },
     featured: false,
   },
   {
-    name: "Built for you",
+    name: "Sardauna Premiere",
+    tier: "premiere",
     price: "Per project",
     priceSub: "tier 4 · on top of any tier",
     blurb:
@@ -101,10 +117,10 @@ export default function PricingPage() {
             Start free. <span className="text-dawn-gradient">Scale when it works.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-ink-soft)]">
-            No subscriptions. No charges. That&apos;s how you start — Presence
-            is free. From there the ladder is a clean climb: get answered, get
-            run, get built for you — each step naira-billed, and only when you
-            choose it.
+            No subscriptions. No charges. That&apos;s how you start — Sardauna
+            Lite is free. From there the ladder is a clean climb: get answered
+            on Plus+, get run on Elite, get built for you on Premiere — each
+            step naira-billed, and only when you choose it.
           </p>
         </div>
       </section>
@@ -130,7 +146,7 @@ export default function PricingPage() {
                 </span>
               )}
               <h2 className={`text-[15px] font-bold ${t.featured ? "text-[var(--color-cyan)]" : "text-[var(--color-blue)]"}`}>
-                {t.name}
+                <TierName tier={t.tier} />
               </h2>
               <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="text-[32px] font-bold leading-none tracking-tight">{t.price}</span>
@@ -189,9 +205,9 @@ export default function PricingPage() {
           <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-soft)]">
             Sardauna&apos;s full staff pays for itself fastest in teams of
             roughly 10–100 people, or businesses doing ₦5M+ a month — enough
-            moving parts for Run to earn its keep. Smaller than that? Start on
-            Presence — it&apos;s free — and climb the ladder when the
-            enquiries justify it.
+            moving parts for Sardauna Elite to earn its keep. Smaller than
+            that? Start on Sardauna Lite — it&apos;s free — and climb the
+            ladder when the enquiries justify it.
           </p>
         </div>
       </section>
