@@ -164,4 +164,91 @@
     const qaUfms = new URLSearchParams(location.search).get("ufms");
     if (qaUfms) { const t = navs.find((n) => n.dataset.ufmsGoto === qaUfms); if (t) t.click(); }
   })();
+  /* ============================================================
+     6e. Parallel in-app navigation for the other previews — the
+         same data-*-goto contract module 6d gives UFMS, one wiring
+         per namespace:
+           data-tvos-goto → [data-tvos-page]  TruckVille OS pages (?tvos=)
+           data-tvcl-goto → [data-tvcl-page]  TVOS closeout steps  (?tvcl=)
+           data-lp-goto   → [data-lp-page]    Labour portal pages  (?lp=)
+           data-lpp-goto  → [data-lpp-panel|page] member panels    (?lpp=)
+         Only elements marked data-goto-nav carry active state
+         (is-active/is-on) — plain action buttons ("Open closeout",
+         "Next: confirm money") just navigate. Optional
+         data-goto-title on a nav swaps the app masthead title.
+     ============================================================ */
+  (() => {
+    const qs = new URLSearchParams(location.search);
+    const wire = (key, opts) => {
+      const navs = Array.from(document.querySelectorAll("[data-" + key + "-goto]"));
+      if (!navs.length) return;
+      const pageAttr = "data-" + key + "-page";
+      const go = (target) => {
+        const pages = Array.from(document.querySelectorAll("[" + pageAttr + "]"));
+        if (!pages.some((p) => p.getAttribute(pageAttr) === target)) return;
+        pages.forEach((p) => p.classList.toggle("is-active", p.getAttribute(pageAttr) === target));
+        navs.forEach((n) => {
+          if (!n.hasAttribute("data-goto-nav")) return;
+          const on = n.getAttribute("data-" + key + "-goto") === target;
+          // sidebar items style with is-active, top-nav links with is-on —
+          // toggling both keeps one handler for every skin
+          n.classList.toggle("is-active", on);
+          n.classList.toggle("is-on", on);
+        });
+        if (opts && opts.title) {
+          const t = document.querySelector(opts.title);
+          const src = navs.find((n) => n.getAttribute("data-" + key + "-goto") === target && n.dataset.gotoTitle);
+          if (t && src) t.textContent = src.dataset.gotoTitle;
+        }
+        // page heights differ — restart at the top and refresh the
+        // "more below" hint, exactly like 6d does for UFMS
+        const vp = pages[0] && pages[0].closest(".uc-viewport");
+        if (!vp) return;
+        vp.scrollTop = 0;
+        const hint = vp.parentElement && vp.parentElement.querySelector(".uc-scroll-hint");
+        if (hint) {
+          requestAnimationFrame(() => {
+            hint.classList.toggle("is-visible", vp.scrollHeight - vp.clientHeight > 4);
+          });
+        }
+      };
+      navs.forEach((n) => n.addEventListener("click", () => go(n.getAttribute("data-" + key + "-goto"))));
+      const qa = qs.get(key); // ?<key>=<page> — QA/screenshot hook
+      if (qa) go(qa);
+    };
+    wire("tvos", { title: ".tvos-top .mock-h1" }); // Dashboard ↔ Closeout
+    wire("tvcl");                                  // closeout stepper: review/money/close
+    wire("lp");                                    // portal: member ↔ register
+    wire("lpp");                                   // member panels: dashboard/profile/card/update
+  })();
+  /* ============================================================
+     6f. Live tickers — subtle proof-of-life: values marked
+         data-tick-key creep upward on an interval (eggs collected,
+         orders recorded). Elements sharing a key stay in sync (the
+         dashboard KPI and the closeout figure show the same count).
+         Step/interval read from the first element of each group.
+     ============================================================ */
+  (() => {
+    const els = Array.from(document.querySelectorAll("[data-tick-key]"));
+    if (!els.length) return;
+    const groups = new Map();
+    els.forEach((el) => {
+      const k = el.dataset.tickKey;
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(el);
+    });
+    groups.forEach((list) => {
+      const lead = list[0];
+      const step = Math.max(1, parseInt(lead.dataset.tickStep || "1", 10));
+      const every = Math.max(1500, parseInt(lead.dataset.tickEvery || "6000", 10));
+      let val = parseInt((lead.textContent || "").replace(/[^0-9]/g, ""), 10);
+      if (!isFinite(val)) return;
+      setInterval(() => {
+        if (document.hidden) return; // no pointless churn in background tabs
+        val += Math.max(1, Math.round(step * (0.5 + Math.random())));
+        const txt = val.toLocaleString("en-US");
+        list.forEach((el) => { el.textContent = txt; });
+      }, every);
+    });
+  })();
 })();
