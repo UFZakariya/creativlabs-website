@@ -61,49 +61,89 @@ function ChatArt({ run }: { run: number }) {
   );
 }
 
-/* 2 — the orbit: departments circling one request */
+/* 2 — the orbit: department satellites and sparks circling one request */
 function OrbitArt({ run }: { run: number }) {
   const DEPT = [
-    { label: "Ops", angle: 0, r: 62 },
-    { label: "Fin", angle: 130, r: 62 },
-    { label: "Gro", angle: 245, r: 62 },
+    {
+      key: "ops",
+      angle: 0,
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" aria-hidden>
+          <path d="M12 2.8 20 7v10l-8 4.2L4 17V7l8-4.2Z" />
+          <path d="M4 7l8 4.2L20 7M12 11.2v10" />
+        </svg>
+      ),
+    },
+    {
+      key: "fin",
+      angle: 130,
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" aria-hidden>
+          <path d="M6 4v16M18 4v16M4 9h16M4 15h16" />
+        </svg>
+      ),
+    },
+    {
+      key: "gro",
+      angle: 245,
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" aria-hidden>
+          <path d="m4 17 5.5-5.5 3.5 3L19 8.5" />
+          <path d="M14.5 8.5H19V13" />
+        </svg>
+      ),
+    },
   ];
+  const SPARKS_OUT = [70, 300];
+  const SPARKS_IN = [30, 150, 270];
   const pop = (i: number) => ({
-    hide: { opacity: 0, scale: 0.6 },
+    hide: { opacity: 0, scale: 0.5 },
     show: { opacity: 1, scale: 1, transition: { delay: 0.2 + i * 0.14, duration: 0.4, ease: EASE } },
   });
   return (
     <motion.div key={run} initial="hide" animate="show" className="relative grid h-[190px] w-[190px] place-items-center">
       {/* rings */}
       <span aria-hidden className="absolute inset-0 rounded-full border border-white/25" />
-      <span aria-hidden className="absolute inset-[30px] rounded-full border border-white/35" />
-      {/* orbiting departments — slow spin, tiles counter-rotated upright */}
-      <div aria-hidden className="absolute inset-0 [animation:orbit_22s_linear_infinite] group-hover:[animation-duration:7s]">
-        {DEPT.map(({ label, angle, r }, i) => (
-          <span
-            key={label}
-            className="absolute left-1/2 top-1/2"
-            style={{ transform: `rotate(${angle}deg) translateY(-${r}px)` }}
-          >
-            <span className="block [animation:orbit_22s_linear_infinite_reverse] group-hover:[animation-duration:7s]">
+      <span aria-hidden className="absolute inset-[34px] rounded-full border border-white/20" />
+
+      {/* outer ring — glass department satellites + a couple of sparks */}
+      <div aria-hidden className="absolute inset-0 [animation:orbit_22s_linear_infinite] group-hover:[animation-duration:8s]">
+        {DEPT.map(({ key, angle, icon }, i) => (
+          <span key={key} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${angle}deg) translateY(-95px)` }}>
+            <span className="block [animation:orbit_22s_linear_infinite_reverse] group-hover:[animation-duration:8s]">
               <motion.span
                 variants={pop(i)}
-                className="grid h-9 w-9 place-items-center rounded-xl border border-black/6 bg-white text-[10px] font-bold text-[var(--color-blue)] shadow-sm"
-                style={{ margin: -18, rotate: `${-angle}deg` }}
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/40 bg-white/15 shadow-[0_6px_16px_rgba(2,6,31,0.3)] backdrop-blur-sm"
+                style={{ margin: -18 }}
               >
-                {label}
+                {icon}
               </motion.span>
             </span>
           </span>
         ))}
+        {SPARKS_OUT.map((a) => (
+          <span key={a} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${a}deg) translateY(-95px)` }}>
+            <span className="block h-[5px] w-[5px] rounded-full bg-[var(--color-cyan)] shadow-[0_0_8px_rgba(126,242,255,0.9)]" style={{ margin: -2.5 }} />
+          </span>
+        ))}
       </div>
-      {/* centre */}
-      <motion.span
-        variants={pop(0)}
-        className="relative grid h-14 w-14 place-items-center rounded-2xl bg-white shadow-[0_14px_30px_rgba(8,60,255,0.22)]"
-      >
-        <span aria-hidden className="absolute -inset-2 -z-10 rounded-full bg-[var(--color-azure)]/20 blur-lg" />
-        <img src="/logo-128.png" alt="" className="h-8 w-8" />
+
+      {/* inner ring — counter-rotating sparks */}
+      <div aria-hidden className="absolute inset-0 [animation:orbit_13s_linear_infinite_reverse] group-hover:[animation-duration:5s]">
+        {SPARKS_IN.map((a, i) => (
+          <span key={a} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${a}deg) translateY(-61px)` }}>
+            <span
+              className={`block rounded-full ${i === 1 ? "h-[6px] w-[6px] bg-white" : "h-1 w-1 bg-white/70"}`}
+              style={{ margin: i === 1 ? -3 : -2 }}
+            />
+          </span>
+        ))}
+      </div>
+
+      {/* centre — bare mark with a halo, no white tile */}
+      <motion.span variants={pop(0)} className="relative grid place-items-center">
+        <span aria-hidden className="absolute -inset-5 rounded-full bg-[var(--color-cyan)]/30 blur-xl" />
+        <img src="/logo-128.png" alt="" className="relative h-11 w-11 drop-shadow-[0_8px_18px_rgba(2,6,31,0.5)]" />
       </motion.span>
     </motion.div>
   );
