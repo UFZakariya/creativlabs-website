@@ -1,4 +1,7 @@
-/* Closing CTA band: dark azure-dawn rounded panel, one big ask. */
+/* Closing CTA band: dark azure-dawn rounded panel, one big ask. Stays a
+   server component — the dock-opening behavior lives in DockOpenButton. */
+
+import DockOpenButton from "@/components/DockOpenButton";
 
 export default function CTABand() {
   return (
@@ -14,12 +17,10 @@ export default function CTABand() {
           plate.
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <a
-            href="/contact"
-            className="rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
-          >
-            Start free on WhatsApp
-          </a>
+          <DockOpenButton
+            label="Start free with Biba or Bari"
+            className="cursor-pointer rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
+          />
           <a
             href="/pricing"
             className="glass-surface glass-ring rounded-full px-8 py-4 text-[15px] font-semibold text-white transition-opacity hover:opacity-90"

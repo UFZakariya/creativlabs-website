@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
 import TiltCard from "@/components/TiltCard";
 import Reveal from "@/components/Reveal";
+import WaMiniDemo from "@/components/WaMiniDemo";
 
 export const metadata: Metadata = {
   title: "Channels — One house, every door | Safetyline",
@@ -168,40 +169,9 @@ export default function ChannelsPage() {
             </p>
           </Reveal>
 
-          {/* mini chat strip */}
-          <Reveal delay={0.12} className="wa-wallpaper glass-ring mx-auto w-full max-w-md rounded-[24px] p-4 shadow-[0_40px_90px_rgba(2,6,31,0.45)]">
-            <div className="flex flex-col gap-1.5">
-              <div className="self-center rounded-md bg-white/95 px-2.5 py-1 text-[10.5px] font-medium uppercase text-black/50 shadow-sm">
-                Today
-              </div>
-              <div className="wa-tail-in relative max-w-[85%] self-start rounded-lg bg-white px-3 py-1.5 shadow-sm">
-                <p className="text-[13.5px] leading-snug text-[#111b21]">
-                  Good morning — is the shea butter 500g in stock?
-                  <span className="float-right ml-2 mt-[7px] text-[10px] leading-none text-black/40">08:12</span>
-                </p>
-              </div>
-              <div className="wa-tail-out relative max-w-[85%] self-end rounded-lg bg-[#d9fdd3] px-3 py-1.5 shadow-sm">
-                <p className="text-[13.5px] leading-snug text-[#111b21]">
-                  It is — ₦7,200 each. How many should I reserve for delivery
-                  today?
-                  <span className="float-right ml-2 mt-[7px] text-[10px] leading-none text-black/40">08:12</span>
-                </p>
-              </div>
-              <div className="wa-tail-in relative max-w-[85%] self-start rounded-lg bg-white px-3 py-1.5 shadow-sm">
-                <p className="text-[13.5px] leading-snug text-[#111b21]">
-                  Two, please!
-                  <span className="float-right ml-2 mt-[7px] text-[10px] leading-none text-black/40">08:14</span>
-                </p>
-              </div>
-              <div className="mt-1 flex items-center gap-2 self-center rounded-full bg-white/95 px-4 py-1.5 shadow-sm">
-                <span className="grid place-items-center rounded-full bg-[#22c55e]" style={{ width: 16, height: 16 }}>
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4">
-                    <path d="m5 13 4.5 4.5L19 8" />
-                  </svg>
-                </span>
-                <span className="text-[12px] font-semibold text-[#111b21]">Order #1104 · 2 reserved</span>
-              </div>
-            </div>
+          {/* mini chat strip — sequenced simulation, homepage-player style */}
+          <Reveal delay={0.12} className="mx-auto w-full max-w-md">
+            <WaMiniDemo />
           </Reveal>
         </div>
       </section>
