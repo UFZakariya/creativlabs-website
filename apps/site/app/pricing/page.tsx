@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
+import GlowingEffect from "@/components/GlowingEffect";
 
 export const metadata: Metadata = {
   title: "Pricing — Start free, scale when it works | Safetyline",
@@ -98,9 +99,12 @@ export default function PricingPage() {
               className={
                 t.featured
                   ? "bg-azure-dawn glass-ring relative flex flex-col overflow-hidden rounded-[32px] p-7 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)] sm:p-8"
-                  : "glass-ring flex flex-col rounded-[32px] bg-white p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:p-8"
+                  : "liquid-glass glass-ring relative flex flex-col rounded-[32px] p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)] sm:p-8"
               }
             >
+              {!t.featured && (
+                <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+              )}
               {t.featured && (
                 <span className="absolute right-6 top-6 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[11.5px] font-semibold text-[var(--color-cyan)]">
                   Most businesses

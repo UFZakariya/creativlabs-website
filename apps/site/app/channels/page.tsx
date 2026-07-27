@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
+import GlowingEffect from "@/components/GlowingEffect";
 
 export const metadata: Metadata = {
   title: "Channels — One house, every door | Safetyline",
@@ -223,10 +224,11 @@ export default function ChannelsPage() {
           {CHANNELS.map((c, i) => (
             <article
               key={c.name}
-              className={`glass-ring flex flex-col gap-3 rounded-[24px] bg-white p-6 shadow-[0_16px_40px_rgba(16,20,42,0.06)] ${
+              className={`liquid-glass glass-ring relative flex flex-col gap-3 rounded-[24px] p-6 shadow-[0_16px_40px_rgba(16,20,42,0.06)] ${
                 i === CHANNELS.length - 1 ? "sm:col-span-2 lg:col-span-3" : ""
               }`}
             >
+              <GlowingEffect spread={38} proximity={56} inactiveZone={0.55} borderWidth={2} />
               <div className="flex items-center justify-between">
                 <span
                   className="grid h-11 w-11 place-items-center rounded-xl"

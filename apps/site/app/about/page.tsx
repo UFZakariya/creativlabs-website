@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
+import GlowingEffect from "@/components/GlowingEffect";
 
 export const metadata: Metadata = {
   title: "About — Safetyline | The house behind Sardauna",
@@ -101,8 +102,9 @@ export default function AboutPage() {
           {VALUES.map((v) => (
             <div
               key={v.title}
-              className="glass-ring rounded-3xl bg-white p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
+              className="liquid-glass glass-ring relative rounded-3xl p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
             >
+              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
               <h3 className="text-lg font-bold tracking-tight text-[var(--color-blue)]">{v.title}</h3>
               <p className="mt-2 text-[14px] leading-relaxed text-[var(--color-ink-soft)]">{v.body}</p>
             </div>

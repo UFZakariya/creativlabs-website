@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
+import GlowingEffect from "@/components/GlowingEffect";
 
 export const metadata: Metadata = {
   title: "Customers — Built on real operations, not demos | Safetyline",
@@ -123,15 +124,17 @@ export default function CustomersPage() {
             <a
               key={b.name}
               href={b.href}
-              className="glass-ring block overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-transform hover:-translate-y-0.5"
+              className="liquid-glass glass-ring relative block rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-transform hover:-translate-y-0.5"
             >
+              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
               {inner}
             </a>
           ) : (
             <div
               key={b.name}
-              className="glass-ring overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
+              className="liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
             >
+              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
               {inner}
             </div>
           );
