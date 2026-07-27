@@ -4,6 +4,8 @@ import WaveBackground from "@/components/WaveBackground";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
+import TiltCard from "@/components/TiltCard";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "About — Safetyline | The house behind Sardauna",
@@ -29,7 +31,7 @@ const VALUES = [
 /* placeholder card — owner supplies photo + bio before launch */
 function TeamPlaceholder({ role }: { role: string }) {
   return (
-    <div className="glass-ring flex flex-col items-center gap-3 rounded-[24px] bg-white p-8 text-center shadow-[0_16px_40px_rgba(16,20,42,0.06)]">
+    <div className="glass-ring flex h-full flex-col items-center gap-3 rounded-[24px] bg-white p-8 text-center shadow-[0_16px_40px_rgba(16,20,42,0.06)]">
       <span className="grid h-24 w-24 place-items-center rounded-full border-2 border-dashed border-[var(--color-blue)]/30 bg-[var(--color-blue)]/5">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#083cff" strokeWidth="1.6" opacity="0.5" aria-hidden>
           <circle cx="12" cy="8" r="3.6" />
@@ -71,7 +73,7 @@ export default function AboutPage() {
 
       {/* mission band */}
       <section className="bg-azure-dawn rounded-[var(--radius-band)] mx-3 px-5 py-20 text-center sm:py-24">
-        <div className="mx-auto max-w-3xl">
+        <Reveal className="mx-auto max-w-3xl">
           <p className="mb-4 inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)]">
             The mission
           </p>
@@ -85,49 +87,56 @@ export default function AboutPage() {
             Our mission is to put a house of agents behind every one of them:
             think, ideate, plan — while the agents do the dirty work.
           </p>
-        </div>
+        </Reveal>
       </section>
 
       {/* values */}
       <section className="mx-auto max-w-5xl px-5 py-20 sm:py-24">
-        <div className="mb-12 text-center">
+        <Reveal className="mb-12 text-center">
           <p className="mb-4 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             How we work
           </p>
           <h2 className="text-display-2 mx-auto max-w-2xl">
             Three rules <span className="text-dawn-gradient">we don&apos;t bend</span>
           </h2>
-        </div>
+        </Reveal>
         <div className="grid gap-5 md:grid-cols-3">
-          {VALUES.map((v) => (
-            <div
-              key={v.title}
-              className="liquid-glass glass-ring relative rounded-3xl p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
-            >
-              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-              <h3 className="text-lg font-bold tracking-tight text-[var(--color-blue)]">{v.title}</h3>
-              <p className="mt-2 text-[14px] leading-relaxed text-[var(--color-ink-soft)]">{v.body}</p>
-            </div>
+          {VALUES.map((v, i) => (
+            <Reveal key={v.title} delay={i * 0.08} className="h-full">
+              <TiltCard maxTilt={8} className="h-full">
+                <div className="liquid-glass glass-ring relative h-full rounded-3xl p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)]">
+                  <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+                  <h3 className="text-lg font-bold tracking-tight text-[var(--color-blue)]">{v.title}</h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-[var(--color-ink-soft)]">{v.body}</p>
+                </div>
+              </TiltCard>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* team — placeholders until the owner supplies photos & bios */}
       <section className="mx-auto max-w-5xl px-5 pb-20 sm:pb-24">
-        <div className="mb-10 text-center">
+        <Reveal className="mb-10 text-center">
           <h2 className="text-display-3 mx-auto max-w-2xl">The people behind the house</h2>
           <p className="mx-auto mt-3 max-w-xl text-[14.5px] leading-relaxed text-[var(--color-ink-soft)]">
             Faces and stories are on their way — for now, you can meet us the
             way our customers do: start a conversation.
           </p>
-        </div>
+        </Reveal>
         <div className="mx-auto grid max-w-2xl gap-5 sm:grid-cols-2">
-          <TeamPlaceholder role="Founder" />
-          <TeamPlaceholder role="The team" />
+          <Reveal delay={0.05} className="h-full">
+            <TeamPlaceholder role="Founder" />
+          </Reveal>
+          <Reveal delay={0.13} className="h-full">
+            <TeamPlaceholder role="The team" />
+          </Reveal>
         </div>
-        <p className="mt-8 text-center text-[13px] text-[var(--color-ink-soft)]/80">
-          Safetyline Communications Ltd · RC 432180 · Lagos &amp; Abuja, Nigeria
-        </p>
+        <Reveal delay={0.1}>
+          <p className="mt-8 text-center text-[13px] text-[var(--color-ink-soft)]/80">
+            Safetyline Communications Ltd · RC 432180 · Lagos &amp; Abuja, Nigeria
+          </p>
+        </Reveal>
       </section>
 
       <CTABand />

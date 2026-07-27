@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import GlowingEffect from "./GlowingEffect";
+import TiltCard from "./TiltCard";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -362,16 +363,20 @@ function ProofCard({ title, body, Art }: (typeof CARDS)[number]) {
       variants={cardV}
       onViewportEnter={() => setRun((r) => (r === 0 ? 1 : r))}
       onHoverStart={() => setRun((r) => r + 1)}
-      className="group liquid-glass glass-ring relative rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-[0_32px_80px_rgba(8,60,255,0.18)]"
+      className="group h-full"
     >
-      <GlowingEffect spread={40} proximity={72} inactiveZone={0.55} borderWidth={3} />
-      <div className="bg-azure-dawn-hero relative m-3 grid min-h-[264px] place-items-center overflow-hidden rounded-3xl border border-white/10 p-5">
-        <Art run={run} />
-      </div>
-      <div className="px-6 pb-6 pt-3">
-        <h3 className="text-lg font-bold tracking-tight">{title}</h3>
-        <p className="mt-1.5 text-[14.5px] leading-relaxed text-[var(--color-ink-soft)]">{body}</p>
-      </div>
+      <TiltCard maxTilt={6} className="h-full">
+        <div className="liquid-glass glass-ring relative h-full rounded-[32px] shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-[0_32px_80px_rgba(8,60,255,0.18)]">
+          <GlowingEffect spread={40} proximity={72} inactiveZone={0.55} borderWidth={3} />
+          <div className="bg-azure-dawn-hero relative m-3 grid min-h-[264px] place-items-center overflow-hidden rounded-3xl border border-white/10 p-5">
+            <Art run={run} />
+          </div>
+          <div className="px-6 pb-6 pt-3">
+            <h3 className="text-lg font-bold tracking-tight">{title}</h3>
+            <p className="mt-1.5 text-[14.5px] leading-relaxed text-[var(--color-ink-soft)]">{body}</p>
+          </div>
+        </div>
+      </TiltCard>
     </motion.article>
   );
 }
