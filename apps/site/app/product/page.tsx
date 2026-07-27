@@ -85,7 +85,8 @@ export default function ProductPage() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--color-ink-soft)]">
             The Safetyline Business Suite: chat with Sardauna, clear approvals
-            and watch every department work — seven modules, one place.
+            and watch Operations, Finance, Marketing, Projects and Messages
+            work — on your laptop or your phone.
           </p>
         </div>
         <SuiteDashboard />
