@@ -71,6 +71,10 @@ const GlowingEffect = memo(function GlowingEffect({
 
   useEffect(() => {
     if (disabled) return;
+    // touch devices have no hover pointer — the chase never shows, so skip the
+    // body-wide listener and its rAF work entirely (real win on low-end phones,
+    // where several of these run per page)
+    if (typeof window !== "undefined" && !window.matchMedia("(hover: hover)").matches) return;
     const onScroll = () => handleMove();
     const onPointer = (e: PointerEvent) => handleMove({ x: e.clientX, y: e.clientY });
     window.addEventListener("scroll", onScroll, { passive: true });

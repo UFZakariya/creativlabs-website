@@ -11,7 +11,7 @@
    stylesheet's <=700px phone-frame overrides are scoped to it.
    Only change from the archived markup: href="#contact" -> "/contact". */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SHELL = `
 <div id="products">
@@ -714,8 +714,30 @@ const SHELL = `
 </div>
 `;
 
+/* Phones hide each app's own nav rail (the skins reflow to one column), which
+   would strand the in-app pages. This strip mirrors whichever rail belongs to
+   the visible app and drives the real legacy controls. */
+const PHONE_PAGES: Record<string, { sel: string; label: string }[]> = {
+  ufms: [
+    { sel: "[data-ufms-goto='dashboard']", label: "Dashboard" },
+    { sel: "[data-ufms-goto='records']", label: "Records" },
+  ],
+  os: [
+    { sel: "[data-tvos-goto='dashboard']", label: "Dashboard" },
+    { sel: "[data-tvos-goto='closeout']", label: "Closeout" },
+  ],
+  labour: [
+    { sel: "[data-lp-goto='member']", label: "Member area" },
+    { sel: "[data-lp-goto='register']", label: "Register" },
+    { sel: "[data-lpp-goto='profile']", label: "Profile" },
+    { sel: "[data-lpp-goto='card']", label: "Card" },
+  ],
+};
+
 export default function UcShowcase() {
   const host = useRef<HTMLDivElement>(null);
+  const [app, setApp] = useState("ufms");
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     if (document.getElementById("products")) return; // once per page load
@@ -728,7 +750,51 @@ export default function UcShowcase() {
     const s = document.createElement("script");
     s.src = "/legacy/uc-demo.js";
     document.body.appendChild(s);
+
+    // mirror the legacy app tabs so the phone strip follows the visible app
+    const stage = el.querySelector("[data-uc-stage]");
+    const tabs = el.querySelectorAll<HTMLElement>(".uc-tab[data-app]");
+    const sync = (e: Event) => {
+      const a = (e.currentTarget as HTMLElement).dataset.app;
+      if (a) { setApp(a); setPage(0); }
+    };
+    tabs.forEach((t) => t.addEventListener("click", sync));
+    // ?uc= deep link sets the app before we mount
+    const q = new URLSearchParams(window.location.search).get("uc");
+    if (q && PHONE_PAGES[q]) setApp(q);
+    return () => {
+      tabs.forEach((t) => t.removeEventListener("click", sync));
+      void stage;
+    };
   }, []);
 
-  return <div ref={host} />;
+  const pages = PHONE_PAGES[app] ?? [];
+
+  return (
+    <div>
+      <div ref={host} />
+      {pages.length > 0 && (
+        <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
+          {pages.map((p, i) => (
+            <button
+              key={p.sel}
+              type="button"
+              onClick={() => {
+                const target = document.querySelector<HTMLElement>(`#products ${p.sel}`);
+                target?.click();
+                setPage(i);
+              }}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
+                page === i
+                  ? "bg-[var(--color-blue)] text-white"
+                  : "border border-black/10 bg-white/70 text-[var(--color-ink-soft)]"
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
