@@ -31,16 +31,29 @@ function ChatArt({ run }: { run: number }) {
       >
         Compile this week&apos;s brief, please.
       </motion.div>
+      {/* typing dots bridge the request and the reply */}
       <motion.div
-        variants={msg(0.75)}
-        className="flex items-start gap-2 self-start"
+        variants={{
+          hide: { opacity: 0 },
+          show: { opacity: [0, 1, 1, 0], transition: { delay: 0.5, duration: 0.75, times: [0, 0.15, 0.8, 1] } },
+        }}
+        className="flex items-center gap-[3px] self-start rounded-2xl rounded-bl-md border border-black/6 bg-white px-3 py-2.5 shadow-sm ml-8"
+        aria-hidden
+      >
+        {[0, 1, 2].map((d) => (
+          <span key={d} className="typing-dot h-[5px] w-[5px] rounded-full bg-black/40" />
+        ))}
+      </motion.div>
+      <motion.div
+        variants={msg(1.3)}
+        className="-mt-9 flex items-start gap-2 self-start"
       >
         <img src="/logo-128.png" alt="" className="mt-0.5 h-6 w-6 shrink-0" />
         <div className="rounded-2xl rounded-bl-md border border-black/6 bg-white px-3.5 py-2 text-[13px] leading-snug text-[var(--color-ink)] shadow-sm">
           Done — sales, cash and stock, six pages. It&apos;s in your chat.
         </div>
       </motion.div>
-      <motion.div variants={msg(1.35)} className="ml-8 flex items-center gap-2.5 self-start rounded-xl border border-black/6 bg-white px-3 py-2 shadow-sm">
+      <motion.div variants={msg(1.95)} className="ml-8 flex items-center gap-2.5 self-start rounded-xl border border-black/6 bg-white px-3 py-2 shadow-sm">
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--color-blue)]/10">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#083cff" strokeWidth="2" aria-hidden>
             <path d="M6 2.8h8L19.2 8v13.2H6z" />
@@ -85,7 +98,7 @@ function OrbitArt({ run }: { run: number }) {
     },
     {
       key: "gro",
-      angle: 245,
+      angle: 120,
       icon: (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" aria-hidden>
           <path d="m4 17 5.5-5.5 3.5 3L19 8.5" />
@@ -93,9 +106,27 @@ function OrbitArt({ run }: { run: number }) {
         </svg>
       ),
     },
+    {
+      key: "comms",
+      angle: 240,
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" aria-hidden>
+          <path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L4 20l1-4.6A8.5 8.5 0 1 1 21 11.5Z" />
+        </svg>
+      ),
+    },
+    {
+      key: "analyst",
+      angle: 310,
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" aria-hidden>
+          <path d="M3 12h4l2-5 4 10 2-5h6" />
+        </svg>
+      ),
+    },
   ];
-  const SPARKS_OUT = [70, 300];
-  const SPARKS_IN = [30, 270]; // clear of the Finance satellite at 130°
+  const SPARKS_OUT = [60, 300];
+  const SPARKS_IN = [40, 220]; // clear of the inner satellites at 130° / 310°
   const pop = (i: number) => ({
     hide: { opacity: 0, scale: 0.5 },
     show: { opacity: 1, scale: 1, transition: { delay: 0.2 + i * 0.14, duration: 0.4, ease: EASE } },
@@ -108,7 +139,7 @@ function OrbitArt({ run }: { run: number }) {
 
       {/* outer ring (26s) — Ops + Growth satellites and cyan sparks */}
       <div aria-hidden className="absolute inset-0 [animation:orbit_26s_linear_infinite] group-hover:[animation-duration:9s]">
-        {[DEPT[0], DEPT[2]].map(({ key, angle, icon }, i) => (
+        {[DEPT[0], DEPT[2], DEPT[3]].map(({ key, angle, icon }, i) => (
           <span key={key} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${angle}deg) translateY(-95px)` }}>
             <span className="block [animation:orbit_26s_linear_infinite_reverse] group-hover:[animation-duration:9s]">
               <motion.span
@@ -128,19 +159,21 @@ function OrbitArt({ run }: { run: number }) {
         ))}
       </div>
 
-      {/* inner ring (14s, counter-rotating) — Finance satellite + sparks */}
+      {/* inner ring (14s, counter-rotating) — Finance + Analyst satellites */}
       <div aria-hidden className="absolute inset-0 [animation:orbit_14s_linear_infinite_reverse] group-hover:[animation-duration:6s]">
-        <span className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${DEPT[1].angle}deg) translateY(-61px)` }}>
-          <span className="block [animation:orbit_14s_linear_infinite] group-hover:[animation-duration:6s]">
-            <motion.span
-              variants={pop(2)}
-              className="grid h-8 w-8 place-items-center rounded-full border border-white/40 bg-white/15 shadow-[0_6px_16px_rgba(2,6,31,0.3)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-110"
-              style={{ margin: -16 }}
-            >
-              {DEPT[1].icon}
-            </motion.span>
+        {[DEPT[1], DEPT[4]].map(({ key, angle, icon }, i) => (
+          <span key={key} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${angle}deg) translateY(-61px)` }}>
+            <span className="block [animation:orbit_14s_linear_infinite] group-hover:[animation-duration:6s]">
+              <motion.span
+                variants={pop(3 + i)}
+                className="grid h-8 w-8 place-items-center rounded-full border border-white/40 bg-white/15 shadow-[0_6px_16px_rgba(2,6,31,0.3)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-110"
+                style={{ margin: -16 }}
+              >
+                {icon}
+              </motion.span>
+            </span>
           </span>
-        </span>
+        ))}
         {SPARKS_IN.map((a, i) => (
           <span key={a} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${a}deg) translateY(-61px)` }}>
             <span
@@ -168,8 +201,12 @@ function ScheduleArt({ run }: { run: number }) {
     { when: "1st", what: "Month-end pack", d: 1.45 },
   ];
   const pop = (d: number) => ({
-    hide: { opacity: 0, scale: 0.4 },
-    show: { opacity: 1, scale: 1, transition: { delay: d, duration: 0.3, ease: EASE } },
+    hide: { opacity: 0, scale: 0.3 },
+    show: {
+      opacity: 1,
+      scale: [0.3, 1.25, 1],
+      transition: { delay: d, duration: 0.45, times: [0, 0.6, 1], ease: EASE },
+    },
   });
   const rowV = (d: number) => ({
     hide: { opacity: 0, x: -12 },
@@ -241,10 +278,14 @@ function MemoryArt({ run }: { run: number }) {
       </>
     ),
   };
-  const lineV = { hide: { pathLength: 0, opacity: 0 }, show: (i: number) => ({ pathLength: 1, opacity: 1, transition: { delay: 0.25 + i * 0.22, duration: 0.5, ease: "easeOut" as const } }) };
+  const lineV = { hide: { opacity: 0 }, show: (i: number) => ({ opacity: 1, transition: { delay: 0.25 + i * 0.22, duration: 0.45, ease: "easeOut" as const } }) };
   const satV = (i: number) => ({
     hide: { opacity: 0, scale: 0.5 },
-    show: { opacity: 1, scale: 1, transition: { delay: 0.55 + i * 0.22, duration: 0.35, ease: EASE } },
+    show: {
+      opacity: 1,
+      scale: [0.5, 1.15, 1],
+      transition: { delay: 0.55 + i * 0.22, duration: 0.4, times: [0, 0.65, 1], ease: EASE },
+    },
   });
   return (
     <motion.div key={run} initial="hide" animate="show" className="relative h-[140px] w-full max-w-[260px]">
@@ -259,6 +300,7 @@ function MemoryArt({ run }: { run: number }) {
             strokeWidth="1.5"
             strokeDasharray="2 5"
             strokeLinecap="round"
+            className="[animation:dash-flow_2.2s_linear_infinite]"
           />
         ))}
       </svg>
@@ -279,7 +321,7 @@ function MemoryArt({ run }: { run: number }) {
         className="absolute left-1/2 top-1/2 grid h-13 w-13 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl bg-white shadow-[0_14px_30px_rgba(8,60,255,0.22)]"
         style={{ width: 52, height: 52 }}
       >
-        <span aria-hidden className="absolute -inset-2 -z-10 rounded-full bg-[var(--color-cyan)]/25 blur-lg" />
+        <span aria-hidden className="absolute -inset-2 -z-10 rounded-full bg-[var(--color-cyan)]/25 blur-lg [animation:halo-pulse_3.5s_ease-in-out_infinite]" />
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#083cff" strokeWidth="1.9" aria-hidden>
           <path d="M12 3.5c1 2.6 2.9 4.5 5.5 5.5-2.6 1-4.5 2.9-5.5 5.5-1-2.6-2.9-4.5-5.5-5.5 2.6-1 4.5-2.9 5.5-5.5Z" />
           <path d="M18.5 14.5c.5 1.4 1.6 2.5 3 3-1.4.5-2.5 1.6-3 3-.5-1.4-1.6-2.5-3-3 1.4-.5 2.5-1.6 3-3Z" />
