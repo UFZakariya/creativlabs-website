@@ -1012,3 +1012,43 @@
   display: none;
 }
 
+
+/* ---------- launcher motion: roll-out / roll-home + attention bounce ----------
+   Motion borrowed from the chat-dock animation handoff (descending three-bounce
+   attention cue; logo rolls out while a compact card reveals, then rolls home
+   while the card grows into the dock). Everything else — glass, palette,
+   geometry — stays ours; none of the reference's teal/mint is used.
+   The sequence itself is driven from hermes-dock.js via the Web Animations API
+   so it can be cancelled cleanly; these rules only cover what CSS must own. */
+
+/* the panel morphs from a compact card, so it must not fade/scale in as well */
+.dock-panel.is-morph {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+  transition: none;
+  transform-origin: 100% 100%;
+}
+
+/* nothing inside may show until the dock has reached full height — no text
+   revealed by width compression or clipping */
+.dock-panel.is-morph > * {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+
+.dock-panel.is-morph.is-content > * {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* the launcher keeps its own transform during the roll, so suppress the
+   hover lift that would otherwise fight the animation mid-flight */
+.dock.is-animating .dock-btn:hover { transform: none; }
+.dock.is-animating .dock-btn { cursor: default; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* immediate open/close, non-bouncing unread indicator */
+  .dock-panel.is-morph > * { transition: none; }
+}

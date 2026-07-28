@@ -10,6 +10,61 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const status = document.getElementById("dock-status");
     if (!dock || !btn || !panel || !msgs || !form) return;
 
+    /* ---------- launcher motion (roll-out / roll-home + attention bounce) ----
+       Motion ported from the chat-dock animation handoff, on our own glass and
+       palette. Our dock is a separate launcher + panel rather than the
+       reference's single morphing object, so the roll runs the launcher across
+       the panel's foot while the panel reveals as a compact card and then grows
+       up into the full dock. Close is the exact reverse.
+
+       A monotonically increasing token guards every await, so a stale sequence
+       can never keep running after a reset and leave the panel half-grown. */
+    const ROLL = 620;      /* logo roll-out + compact-card reveal            */
+    const GROW = 420;      /* card grows up into the dock                    */
+    const HOME = 380;      /* logo rolls back to its corner                  */
+    const FOLD = 340;      /* dock folds back down to the compact card       */
+    let seq = 0;
+    let anims = [];
+    const alive = (run) => run === seq;
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const stopAnims = () => { anims.forEach((a) => { try { a.cancel(); } catch {} }); anims = []; };
+    const play = (el, frames, ms, ease) => {
+      const a = el.animate(frames, { duration: ms, easing: ease || "linear", fill: "forwards" });
+      anims.push(a);
+      return a.finished.catch(() => {});
+    };
+    /* how far the launcher travels: the panel's width less the launcher, so it
+       stops at the far edge of the card and rolls home along the same line */
+    const travel = () => {
+      const p = panel.getBoundingClientRect().width || 320;
+      const b = btn.getBoundingClientRect().width || 58;
+      return Math.max(0, Math.round(p - b - 8));
+    };
+    const resetLauncher = () => {
+      stopAnims();
+      btn.style.transform = "";
+      panel.style.width = "";
+      panel.style.height = "";
+      panel.classList.remove("is-morph", "is-content");
+      dock.classList.remove("is-animating");
+    };
+    /* one descending three-bounce on the whole launcher — glass, logo and the
+       unread dot travel together (the dot is a child, so it rides along) */
+    const attention = () => {
+      if (reducedMotion || open || dock.classList.contains("is-animating")) return;
+      btn.animate(
+        [
+          { transform: "translateY(0) scale(1, 1)" },
+          { transform: "translateY(-26px) scale(0.94, 1.07)", offset: 0.22 },
+          { transform: "translateY(0) scale(1.06, 0.94)", offset: 0.44 },
+          { transform: "translateY(-12px) scale(0.97, 1.03)", offset: 0.66 },
+          { transform: "translateY(0) scale(1.03, 0.97)", offset: 0.85 },
+          { transform: "translateY(0) scale(1, 1)" },
+        ],
+        { duration: 1200, easing: "ease-out" }
+      );
+    };
+
     const cfg = window.HERMES || {};
     const live = Boolean(cfg.endpoint);
     // Two selectable personas (Bari / Biba). The visitor picks one when the dock
@@ -821,6 +876,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         panel.hidden = false;
         void panel.offsetWidth; // flush styles so the open transition runs
         panel.classList.add("open");
+        rollOpen();
         if (!greeted) {
           greeted = true;
           renderConsent();
@@ -840,13 +896,79 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         track("dock_opened", {});
         if (finePointer) setTimeout(() => input?.focus(), 250);
       } else {
-        panel.classList.remove("open");
         quizActive = false;   // don't leave the Readiness tool latched off
         clearNudge();
         clearFirstNudge();
-        setTimeout(() => { panel.hidden = true; }, 220);
+        rollClose();
       }
     };
+
+    /* opening: launcher rolls out along the panel foot while the panel reveals
+       as a compact card; only once it lands does the card grow up into the full
+       dock, and only then does any content appear. */
+    async function rollOpen() {
+      resetLauncher();
+      if (reducedMotion) return;                    // immediate open
+      const run = ++seq;
+      const full = panel.getBoundingClientRect();
+      const w = full.width, h = full.height, x = travel();
+      dock.classList.add("is-animating");
+      panel.classList.add("is-morph");
+      panel.style.width = "58px";
+      panel.style.height = "58px";
+      await Promise.all([
+        play(panel, [{ width: "58px" }, { width: w + "px" }], ROLL),
+        play(btn, [{ transform: "translate(0,0) rotate(0deg)" },
+                   { transform: `translate(${-x}px,0) rotate(-450deg)` }], ROLL),
+      ]);
+      if (!alive(run)) return;
+      await Promise.all([
+        play(panel, [{ height: "58px" }, { height: h + "px" }], GROW, "cubic-bezier(.16,.82,.22,1)"),
+        play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
+                   { transform: "translate(0,0) rotate(0deg)" }], HOME),
+      ]);
+      if (!alive(run)) return;
+      panel.style.width = "";
+      panel.style.height = "";
+      panel.classList.add("is-content");            // content only at full size
+      dock.classList.remove("is-animating");
+    }
+
+    /* closing is the exact reverse: content out, fold down while the launcher
+       rolls out, then the card retracts as the launcher rolls home. */
+    async function rollClose() {
+      if (reducedMotion) {
+        panel.classList.remove("open");
+        resetLauncher();
+        setTimeout(() => { panel.hidden = true; }, 200);
+        return;
+      }
+      const run = ++seq;
+      const full = panel.getBoundingClientRect();
+      const w = full.width, h = full.height, x = travel();
+      stopAnims();
+      dock.classList.add("is-animating");
+      panel.classList.add("is-morph");
+      panel.classList.remove("is-content");         // 1. content out first
+      await wait(200);
+      if (!alive(run)) return;
+      panel.style.width = w + "px";
+      await Promise.all([                           // 2. fold down + roll out
+        play(panel, [{ height: h + "px" }, { height: "58px" }], FOLD, "cubic-bezier(.16,.82,.22,1)"),
+        play(btn, [{ transform: "translate(0,0) rotate(0deg)" },
+                   { transform: `translate(${-x}px,0) rotate(-450deg)` }], HOME),
+      ]);
+      if (!alive(run)) return;
+      await Promise.all([                           // 3. retract + roll home
+        play(panel, [{ width: w + "px" }, { width: "58px" }], ROLL),
+        play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
+                   { transform: "translate(0,0) rotate(0deg)" }], ROLL),
+      ]);
+      if (!alive(run)) return;
+      panel.classList.remove("open");
+      resetLauncher();
+      panel.hidden = true;
+    }
 
     btn.addEventListener("click", () => setOpen(!open));
     document.getElementById("dock-close")?.addEventListener("click", () => setOpen(false));
@@ -887,6 +1009,9 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       label.addEventListener("click", () => setOpen(true)); // setOpen also dismisses
       x.addEventListener("click", (e) => { e.stopPropagation(); dismissTeaser(); });
       requestAnimationFrame(() => teaserEl && teaserEl.classList.add("show"));
+      /* a message arriving while the dock is shut is the unread moment — one
+         descending bounce on the launcher, never a continuous loop */
+      attention();
     };
 
     // Proactive dwell trigger (M4): don't nag on cold load. Wait until the
