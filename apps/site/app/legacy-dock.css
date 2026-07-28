@@ -1094,8 +1094,8 @@
   box-shadow: none;
 }
 
-.dock.is-animating .dock-btn,
-.dock.is-shell-open .dock-btn { transform: none; }
+/* the logo holds its translate to the header slot while open — never reset it */
+.dock.is-animating .dock-btn { will-change: transform; }
 
 /* the panel fills the shell rather than floating above the launcher */
 .dock .dock-panel {
@@ -1299,3 +1299,63 @@
 
 /* smoother hand-off: the body's own transition never fights the WAAPI legs */
 .dock .dock-panel { transition: none; }
+
+/* ---------- the composer reclaims the corner when open -------------------
+   The pocket exists only because the logo parks at the lower right. Once open
+   the logo has climbed to the header, so the input stretches back across the
+   full width instead of leaving a gap where it used to sit. */
+.dock.is-shell-open .dock-form { padding-right: 0; }
+
+/* ...and the launcher keeps its pocket only while it is actually down there */
+.dock:not(.is-shell-open) .dock-form { padding-right: 66px; }
+
+/* ================= dock: resting logo, composer, reveal ==================== */
+
+/* THE RESTING LOGO IS LAID OUT, NOT TRANSLATED.
+   Holding it in place with a transform meant the offset was computed once at
+   open time — so squeezing the window afterwards left the logo behind, hanging
+   outside the panel. Once the sequence is over the wrapper takes the body's
+   size and the logo is positioned in it like any other element, so it tracks
+   every resize for free. --logo-top is set from the header's real slot, which
+   moves when the title wraps. */
+.dock.is-shell-open {
+  width: min(360px, calc(100vw - 32px));
+  height: min(480px, calc(100dvh - 120px));
+}
+
+.dock.is-shell-open:not(.is-animating) .dock-btn {
+  left: var(--logo-left, 2px);
+  top: var(--logo-top, 18px);
+  right: auto;
+  bottom: auto;
+  transform: rotate(-720deg);   /* upright, two full turns */
+}
+
+/* the composer is symmetric again — the send button had 12px on the left and
+   nothing on the right, so it sat on the edge */
+.dock.is-shell-open .dock-form { padding-right: 12px; }
+
+/* ---------- the panel assembles from the bottom up ------------------------
+   The contents build upward — composer first, then the tools, the thread, and
+   the header last — each rising into place. Transform and opacity only, so it
+   is compositor work; nothing here can trigger layout. */
+.dock .dock-panel.is-content > * {
+  animation: dock-assemble 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.dock .dock-panel.is-content > .dock-form  { animation-delay: 0ms; }
+.dock .dock-panel.is-content > .dock-tools { animation-delay: 70ms; }
+.dock .dock-panel.is-content > .dock-msgs  { animation-delay: 140ms; }
+.dock .dock-panel.is-content > .dock-head  { animation-delay: 210ms; }
+
+@keyframes dock-assemble {
+  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.985); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* the thread's own bubbles should not each animate on top of the assembly —
+   one movement, not two competing ones */
+.dock .dock-panel.is-content .dock-msgs > * { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dock .dock-panel.is-content > * { animation: none; }
+}

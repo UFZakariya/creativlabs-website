@@ -61,24 +61,36 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       dock.classList.remove("is-animating", "is-shell-open");
     };
     /* the shell's open size, measured from CSS rather than hard-coded */
+    /* Where the logo comes to rest: the header's own logo box.
+       X is stable (padding 16 + half of a 30px logo, less half the 58px
+       button) so it can be a constant. Y is NOT — the header grows when its
+       title wraps, so the slot sits at y=18 on a 360px panel but y=27 on a
+       300px one. It is therefore read from the header itself, with the open
+       state applied for the measurement, and falls back to the constant only
+       if the header is missing. */
+    const SLOT_X = 60;
+    const SLOT_Y = 63;
     const shellSize = () => {
-      /* children are display:none while morphing, so the header slot can only
-         be measured by briefly applying the settled open state */
       dock.classList.add("is-shell-open");
-      panel.classList.add("is-content");
+      panel.classList.add("is-content");           // header must be laid out to read it
       const r = panel.getBoundingClientRect();
-      const b = btn.getBoundingClientRect();       // btn has no transform here
+      const w = Math.round(r.width), h = Math.round(r.height);
       const img = panel.querySelector(".dock-head img");
-      let dx = -(Math.round(r.width) - 58), dy = -(Math.round(r.height) - 58);
+      let dy = SLOT_Y - h;
       if (img) {
         const t = img.getBoundingClientRect();
-        dx = Math.round((t.left + t.width / 2) - (b.left + b.width / 2));
-        dy = Math.round((t.top + t.height / 2) - (b.top + b.height / 2));
+        /* the button's top so its centred logo lands exactly on the header's
+           slot; published as --logo-top so CSS can hold the resting position
+           (and keep holding it through any resize) */
+        const top = Math.round((t.top - r.top) - (58 - t.height) / 2);
+        const left = Math.round((t.left - r.left) - (58 - t.width) / 2);
+        dock.style.setProperty("--logo-top", top + "px");
+        dock.style.setProperty("--logo-left", left + "px");
+        dy = top - (h - 58);                       // same point, as an offset
       }
-      const size = { w: Math.round(r.width), h: Math.round(r.height), dx, dy };
       panel.classList.remove("is-content");
       dock.classList.remove("is-shell-open");
-      return size;
+      return { w, h, dx: SLOT_X - w, dy };
     };
     /* one descending three-bounce on the whole launcher — glass, logo and the
        unread dot travel together (the dot is a child, so it rides along) */
@@ -982,25 +994,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       panel.style.width = "";
       panel.style.height = "";
       dock.classList.add("is-shell-open");
-      btn.style.transform = `translate(${dx}px,${dy}px) rotate(-720deg)`;
+      /* hand the resting position to CSS (left/top + --logo-top). Holding it
+         with a transform pinned it to the size measured at open time, so a
+         later resize left the logo stranded outside the panel. */
+      btn.style.transform = "";
+      dock.classList.remove("is-animating");        // lets the CSS rest rule apply
       panel.classList.add("is-content");            // content only at full size
-      dock.classList.remove("is-animating");
-      requestAnimationFrame(() => {
-        if (!alive(run)) return;
-        const img = panel.querySelector(".dock-head img");
-        if (!img) return;
-        const t = img.getBoundingClientRect();
-        const prev = btn.style.transform;
-        btn.style.transform = "";                  // read the untransformed anchor
-        const a = btn.getBoundingClientRect();
-        btn.style.transform = prev;
-        const nx = Math.round((t.left + t.width / 2) - (a.left + a.width / 2));
-        const ny = Math.round((t.top + t.height / 2) - (a.top + a.height / 2));
-        slot = { dx: nx, dy: ny };                 // close retraces from here
-        btn.style.transition = "transform 220ms cubic-bezier(.22,1,.36,1)";
-        btn.style.transform = `translate(${nx}px,${ny}px) rotate(-720deg)`;
-        setTimeout(() => { btn.style.transition = ""; }, 260);
-      });
     }
 
     /* closing is the exact reverse: content out, fold down while the launcher
