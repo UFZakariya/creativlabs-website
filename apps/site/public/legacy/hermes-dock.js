@@ -10,6 +10,11 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const status = document.getElementById("dock-status");
     if (!dock || !btn || !panel || !msgs || !form) return;
 
+    /* outer-scope dep from the original app.js that was never shimmed —
+       every open threw "finePointer is not defined" before this. Local to
+       the IIFE so it cannot clash with a global of the same name. */
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+
     /* ---------- launcher motion (roll-out / roll-home + attention bounce) ----
        Motion ported from the chat-dock animation handoff, on our own glass and
        palette. Our dock is a separate launcher + panel rather than the
@@ -20,9 +25,9 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
        A monotonically increasing token guards every await, so a stale sequence
        can never keep running after a reset and leave the panel half-grown. */
     /* timings straight from the handoff's motion table, not compressed */
-    const ROLL = 1500;     /* horizontal roll / compact-card reveal          */
-    const CTRL = 600;      /* pause after arrival, before the card grows     */
-    const GROW = 1900;     /* card growth into the full dock                 */
+    const ROLL = 1100;     /* horizontal roll / compact-card reveal          */
+    const CTRL = 420;      /* pause after arrival, before the card grows     */
+    const GROW = 1500;     /* card growth into the full dock                 */
     const HOME = 850;      /* logo returns to its corner                     */
     const FOLD = 1050;     /* close fold                                     */
     let seq = 0;
@@ -59,9 +64,13 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     };
     /* one descending three-bounce on the whole launcher — glass, logo and the
        unread dot travel together (the dot is a child, so it rides along) */
+    /* unread state — the badge shows only while a message is unseen, and is
+       cleared the moment the visitor opens the dock (CSS animates both ways) */
+    const setUnread = (on) => { dock.classList.toggle("has-unread", Boolean(on)); };
+
     const attention = () => {
       if (reducedMotion || open || dock.classList.contains("is-animating")) return;
-      btn.animate(
+      dock.animate(
         [
           { transform: "translateY(0) scale(1, 1)" },
           { transform: "translateY(-26px) scale(0.94, 1.07)", offset: 0.22 },
@@ -885,6 +894,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       open = next;
       btn.setAttribute("aria-expanded", String(next));
       if (next) {
+        setUnread(false);
         dismissTeaser();
         panel.hidden = false;
         void panel.offsetWidth; // flush styles so the open transition runs
@@ -1037,6 +1047,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       requestAnimationFrame(() => teaserEl && teaserEl.classList.add("show"));
       /* a message arriving while the dock is shut is the unread moment — one
          descending bounce on the launcher, never a continuous loop */
+      setUnread(true);
       attention();
     };
 

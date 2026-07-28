@@ -1170,3 +1170,57 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* ---------- unread badge: animated in and out --------------------------- */
+/* The dot is the unread indicator. It pops in when a message arrives unseen
+   and shrinks away when the logo is clicked — both animated, per the handoff's
+   "hide the badge completely when unread count is zero". It rides the closed
+   body, so the attention bounce carries it along. */
+.dock-pulse {
+  transform: scale(0);
+  opacity: 0;
+  transform-origin: center;
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.5, 1), opacity 200ms ease;
+}
+
+.dock.has-unread .dock-pulse {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* the badge belongs to the CLOSED body only */
+.dock.is-shell-open .dock-pulse,
+.dock.is-animating .dock-pulse {
+  transform: scale(0);
+  opacity: 0;
+}
+
+/* ---------- panel contents reveal once the body is open ----------------- */
+/* they rise in a short stagger instead of appearing all at once */
+.dock .dock-panel.is-content > * {
+  animation: dock-item-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.dock .dock-panel.is-content > *:nth-child(1) { animation-delay: 40ms; }
+.dock .dock-panel.is-content > *:nth-child(2) { animation-delay: 100ms; }
+.dock .dock-panel.is-content > *:nth-child(3) { animation-delay: 160ms; }
+.dock .dock-panel.is-content > *:nth-child(4) { animation-delay: 215ms; }
+.dock .dock-panel.is-content > *:nth-child(5) { animation-delay: 265ms; }
+
+@keyframes dock-item-in {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- the logo must never sit on the send button ------------------ */
+/* the composer keeps a pocket wide enough to clear the 58px logo plus gap;
+   on narrow screens the send button is closer to the edge, so widen it */
+.dock .dock-form { padding-right: 66px; }
+
+@media (max-width: 640px) {
+  .dock .dock-form { padding-right: 70px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-pulse { transition: none; }
+  .dock .dock-panel.is-content > * { animation: none; }
+}
