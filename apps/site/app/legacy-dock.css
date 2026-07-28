@@ -1109,3 +1109,53 @@
 
 /* leave a pocket at the foot so the logo never covers the composer */
 .dock .dock-form { padding-right: 62px; }
+
+/* ---------- corrections: one card, never an oval -------------------------- */
+
+/* A 50% radius on a 247x58 shell renders an ELLIPSE. Per the handoff the
+   compact card keeps corners equal to the logo container's radius, so the
+   moment the shell starts stretching it switches to a fixed 29px (= half the
+   58px launcher) and holds that through the open state. */
+.dock.is-animating .dock-panel,
+.dock.is-shell-open .dock-panel { border-radius: 29px; }
+
+/* ---------- the PANEL is the single glass body ----------------------------
+   The glass that sits around the logo when closed is the panel's own glass —
+   the same body that stretches as the logo rolls and then rises into the full
+   dock. So `.dock` reverts to a bare positioning wrapper with no surface of
+   its own, and `.dock-panel` (which already carries .glass-panel) is the
+   object that morphs: a 58px circle behind the logo when closed, grown to the
+   dock when open. One body, never a card inside a card. */
+
+.dock {
+  width: auto;
+  height: auto;
+  overflow: visible;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.dock .dock-panel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  left: auto;
+  width: 58px;
+  height: 58px;
+  border-radius: 29px;
+  overflow: hidden;
+  opacity: 1;
+  translate: none;
+  scale: none;
+  transition: none;
+}
+
+.dock.is-shell-open .dock-panel {
+  width: min(360px, calc(100vw - 32px));
+  height: min(480px, calc(100dvh - 120px));
+}
+
+/* the logo rides on top of that one body, at its lower-right corner */
+.dock .dock-btn { z-index: 6; }

@@ -19,10 +19,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 
        A monotonically increasing token guards every await, so a stale sequence
        can never keep running after a reset and leave the panel half-grown. */
-    const ROLL = 620;      /* logo roll-out + compact-card reveal            */
-    const GROW = 420;      /* card grows up into the dock                    */
-    const HOME = 380;      /* logo rolls back to its corner                  */
-    const FOLD = 340;      /* dock folds back down to the compact card       */
+    /* timings straight from the handoff's motion table, not compressed */
+    const ROLL = 1500;     /* horizontal roll / compact-card reveal          */
+    const CTRL = 600;      /* pause after arrival, before the card grows     */
+    const GROW = 1900;     /* card growth into the full dock                 */
+    const HOME = 850;      /* logo returns to its corner                     */
+    const FOLD = 1050;     /* close fold                                     */
     let seq = 0;
     let anims = [];
     const alive = (run) => run === seq;
@@ -42,15 +44,15 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const resetLauncher = () => {
       stopAnims();
       btn.style.transform = "";
-      dock.style.width = "";
-      dock.style.height = "";
+      panel.style.width = "";
+      panel.style.height = "";
       panel.classList.remove("is-morph", "is-content");
       dock.classList.remove("is-animating", "is-shell-open");
     };
     /* the shell's open size, measured from CSS rather than hard-coded */
     const shellSize = () => {
       dock.classList.add("is-shell-open");
-      const r = dock.getBoundingClientRect();
+      const r = panel.getBoundingClientRect();
       const size = { w: Math.round(r.width), h: Math.round(r.height) };
       dock.classList.remove("is-shell-open");
       return size;
@@ -71,6 +73,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         { duration: 1200, easing: "ease-out" }
       );
     };
+
+    /* the panel's glass IS the launcher surface when closed, so it is never
+       hidden — it just sits collapsed to a 58px circle behind the logo */
+    panel.hidden = false;
 
     const cfg = window.HERMES || {};
     const live = Boolean(cfg.endpoint);
@@ -925,25 +931,27 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const x = travel(w);
       dock.classList.add("is-animating");
       panel.classList.add("is-morph");              // content stays hidden
-      dock.style.width = "58px";
-      dock.style.height = "58px";
+      panel.style.width = "58px";
+      panel.style.height = "58px";
       /* the shell widens into a compact card while the logo rolls out across it */
       await Promise.all([
-        play(dock, [{ width: "58px" }, { width: w + "px" }], ROLL),
+        play(panel, [{ width: "58px" }, { width: w + "px" }], ROLL),
         play(btn, [{ transform: "translate(0,0) rotate(0deg)" },
                    { transform: `translate(${-x}px,0) rotate(-450deg)` }], ROLL),
       ]);
       if (!alive(run)) return;
+      await wait(CTRL);                             /* settle at the compact card */
+      if (!alive(run)) return;
       /* then it grows up into the dock while the logo rolls home to the corner */
       await Promise.all([
-        play(dock, [{ height: "58px" }, { height: h + "px" }], GROW, "cubic-bezier(.16,.82,.22,1)"),
+        play(panel, [{ height: "58px" }, { height: h + "px" }], GROW, "cubic-bezier(.16,.82,.22,1)"),
         play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
                    { transform: "translate(0,0) rotate(0deg)" }], HOME),
       ]);
       if (!alive(run)) return;
       stopAnims();
-      dock.style.width = "";
-      dock.style.height = "";
+      panel.style.width = "";
+      panel.style.height = "";
       dock.classList.add("is-shell-open");
       btn.style.transform = "";
       panel.classList.add("is-content");            // content only at full size
@@ -953,12 +961,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     /* closing is the exact reverse: content out, fold down while the launcher
        rolls out, then the card retracts as the launcher rolls home. */
     async function rollClose() {
-      const r = dock.getBoundingClientRect();
+      const r = panel.getBoundingClientRect();
       const w = Math.round(r.width), h = Math.round(r.height);
       if (reducedMotion) {
         panel.classList.remove("open");
         resetLauncher();
-        setTimeout(() => { panel.hidden = true; }, 200);
+        
         return;
       }
       const run = ++seq;
@@ -966,26 +974,25 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       stopAnims();
       dock.classList.add("is-animating");
       dock.classList.remove("is-shell-open");       // drive the size ourselves
-      dock.style.width = w + "px";
-      dock.style.height = h + "px";
+      panel.style.width = w + "px";
+      panel.style.height = h + "px";
       panel.classList.add("is-morph");
       panel.classList.remove("is-content");         // 1. content out first
       await wait(200);
       if (!alive(run)) return;
       await Promise.all([                           // 2. fold down + roll out
-        play(dock, [{ height: h + "px" }, { height: "58px" }], FOLD, "cubic-bezier(.16,.82,.22,1)"),
+        play(panel, [{ height: h + "px" }, { height: "58px" }], FOLD, "cubic-bezier(.16,.82,.22,1)"),
         play(btn, [{ transform: "translate(0,0) rotate(0deg)" },
                    { transform: `translate(${-x}px,0) rotate(-450deg)` }], HOME),
       ]);
       if (!alive(run)) return;
       await Promise.all([                           // 3. retract + roll home
-        play(dock, [{ width: w + "px" }, { width: "58px" }], ROLL),
+        play(panel, [{ width: w + "px" }, { width: "58px" }], ROLL),
         play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
                    { transform: "translate(0,0) rotate(0deg)" }], ROLL),
       ]);
       if (!alive(run)) return;
       panel.classList.remove("open");
-      panel.hidden = true;
       resetLauncher();
     }
 
