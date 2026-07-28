@@ -2,11 +2,19 @@
 
 /* The House of Agents org chart — a clean org TREE. The bare glowing mark
    sits top-centre; ONE trunk draws down to a horizontal rail that sweeps out
-   from the centre; six rounded-elbow connectors drop into six frosted
-   department nodes. After the draw, glowing pulses travel from Sardauna along
-   a random connector every ~2.5s. Variants-based, whileInView-triggered,
-   replays on hover via keyed remount. Connectors render at lg+ only, where
-   the grid is a fixed 896px; below lg a stem + per-card top-ticks stand in. */
+   from the centre; six rounded-elbow connectors drop into six BARE department
+   nodes (icon medallion + name + role — no card around them, so the drawn
+   tree is the structure rather than a row of tiles).
+
+   The reveal is one continuous stroke travelling top -> bottom: trunk, then
+   rail, then elbows, then the nodes fading up under the line as it lands on
+   them. Each stage starts as the one above finishes, so it reads as a single
+   line being drawn rather than four separate animations. After the draw,
+   glowing pulses travel from Sardauna along a random connector every ~2.5s.
+
+   Variants-based, whileInView-triggered, replays on hover via keyed remount.
+   Connectors render at lg+ only, where the grid is a fixed 896px and DROPS
+   are its column centres; below lg a drawn stem stands in. */
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -149,12 +157,15 @@ const chiefV = {
   },
 };
 
+/* one continuous stroke: each stage starts as the previous one lands, and
+   every segment draws in its own direction of travel (down, then out from
+   the centre, then down again) so the eye follows a single moving tip */
 const trunkV = {
   hide: { pathLength: 0, opacity: 0 },
   show: {
     pathLength: 1,
     opacity: 1,
-    transition: { delay: 0.3, duration: 0.4, ease: EASE },
+    transition: { delay: 0.34, duration: 0.42, ease: "easeInOut" as const },
   },
 };
 
@@ -163,7 +174,7 @@ const railV = {
   show: {
     pathLength: 1,
     opacity: 1,
-    transition: { delay: 0.62, duration: 0.4, ease: EASE },
+    transition: { delay: 0.74, duration: 0.44, ease: "easeInOut" as const },
   },
 };
 
@@ -172,16 +183,22 @@ const jointV = {
   show: {
     opacity: 1,
     r: [0, 4, 2.6],
-    transition: { delay: 0.62, duration: 0.35, times: [0, 0.6, 1], ease: EASE },
+    transition: { delay: 0.72, duration: 0.34, times: [0, 0.6, 1], ease: EASE },
   },
 };
 
+/* elbows drop outward-in step, the outermost pair last, so the drawing tip
+   appears to run along the rail and turn down at each branch in turn */
 const elbowV = {
   hide: { pathLength: 0, opacity: 0 },
   show: (i: number) => ({
     pathLength: 1,
     opacity: 1,
-    transition: { delay: 0.9 + i * 0.07, duration: 0.38, ease: EASE },
+    transition: {
+      delay: 1.1 + Math.abs(i - 2.5) * 0.09,
+      duration: 0.36,
+      ease: "easeInOut" as const,
+    },
   }),
 };
 
@@ -197,16 +214,21 @@ const pulseV = {
 
 const stemV = {
   hide: { scaleY: 0, opacity: 0 },
-  show: { scaleY: 1, opacity: 1, transition: { delay: 0.3, duration: 0.4, ease: EASE } },
+  show: {
+    scaleY: 1,
+    opacity: 1,
+    transition: { delay: 0.34, duration: 0.5, ease: "easeInOut" as const },
+  },
 };
 
+/* nodes rise into place just as their connector lands on them — no overshoot,
+   so nothing competes with the line for attention */
 const nodeV = (i: number) => ({
-  hide: { opacity: 0, y: 14, scale: 0.5 },
+  hide: { opacity: 0, y: 10 },
   show: {
     opacity: 1,
     y: 0,
-    scale: [0.5, 1.15, 1],
-    transition: { delay: 1.05 + i * 0.09, duration: 0.5, times: [0, 0.6, 1], ease: EASE },
+    transition: { delay: 1.34 + Math.abs(i - 2.5) * 0.09, duration: 0.42, ease: EASE },
   },
 });
 
@@ -319,37 +341,45 @@ function Chart({ run }: { run: number }) {
         </svg>
       </div>
 
-      {/* below lg: subtle stem; each card carries its own top-tick */}
-      <div className="mt-3 flex w-full flex-col items-center lg:hidden" aria-hidden>
-        <motion.span variants={stemV} className="block h-7 w-px origin-top rounded-full bg-white/40" />
+      {/* below lg: one drawn stem standing in for the tree */}
+      <div className="mb-7 mt-3 flex w-full flex-col items-center lg:hidden" aria-hidden>
+        <motion.span
+          variants={stemV}
+          className="block h-10 w-px origin-top rounded-full bg-gradient-to-b from-white/55 to-white/20"
+        />
       </div>
 
-      {/* six frosted department nodes */}
-      <div className="grid w-full max-w-4xl grid-cols-2 gap-3 sm:grid-cols-3 lg:mt-0 lg:grid-cols-6">
+      {/* six bare department nodes — no card; the drawn tree is the structure.
+          Three-up on a phone (two tidy rows) rather than a cramped two-up.
+          gap-x stays 3 at lg because DROPS are derived from that column pitch */}
+      <div className="grid w-full max-w-4xl grid-cols-3 gap-x-4 gap-y-9 lg:mt-0 lg:grid-cols-6 lg:gap-x-3 lg:gap-y-0">
         {DEPARTMENTS.map((d, i) => (
           <motion.div
             key={d.name}
             variants={nodeV(i)}
-            className="group flex flex-col items-center"
+            className="group flex w-full flex-col items-center text-center"
           >
-            <span aria-hidden className="mb-1.5 block h-3 w-px rounded-full bg-white/35 lg:hidden" />
-            <div className="flex w-full flex-1 flex-col items-center gap-2.5 rounded-2xl border border-white/40 bg-white/15 px-3 py-4 shadow-[0_10px_28px_rgba(2,6,31,0.25)] backdrop-blur-sm transition-colors duration-200 group-hover:bg-white/20">
-              <span className="grid h-10 w-10 place-items-center rounded-full border border-white/40 bg-white/15">
-                {d.icon}
-              </span>
-              <span className="text-center leading-tight">
-                <span className="block text-[14px] font-bold tracking-tight text-white">{d.name}</span>
-                <span className="block text-[11px] font-medium text-white/65">{d.role}</span>
-              </span>
-              <span className="mt-0.5 flex items-center gap-1.5" aria-hidden>
-                {DOT_DELAYS.map((delay) => (
-                  <span
-                    key={delay}
-                    className={`h-1.5 w-1.5 rounded-full bg-white/40 transition-[background-color,box-shadow] duration-200 group-hover:bg-[var(--color-cyan)] group-hover:shadow-[0_0_8px_rgba(126,242,255,0.85)] ${delay}`}
-                  />
-                ))}
-              </span>
-            </div>
+            <span className="relative grid h-12 w-12 place-items-center rounded-2xl border border-white/30 bg-white/10 backdrop-blur-sm transition-all duration-200 group-hover:border-[var(--color-cyan)]/60 group-hover:bg-white/[0.18] group-hover:shadow-[0_0_22px_rgba(126,242,255,0.35)]">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -inset-2 rounded-[20px] bg-[var(--color-cyan)]/0 blur-md transition-colors duration-200 group-hover:bg-[var(--color-cyan)]/20"
+              />
+              <span className="relative">{d.icon}</span>
+            </span>
+            <span className="mt-2.5 block text-[14px] font-bold leading-tight tracking-tight text-white">
+              {d.name}
+            </span>
+            <span className="block text-[11px] font-medium leading-tight text-white/60">
+              {d.role}
+            </span>
+            <span className="mt-2 flex items-center gap-1.5" aria-hidden>
+              {DOT_DELAYS.map((delay) => (
+                <span
+                  key={delay}
+                  className={`h-1 w-1 rounded-full bg-white/30 transition-[background-color,box-shadow] duration-200 group-hover:bg-[var(--color-cyan)] group-hover:shadow-[0_0_8px_rgba(126,242,255,0.85)] ${delay}`}
+                />
+              ))}
+            </span>
           </motion.div>
         ))}
       </div>

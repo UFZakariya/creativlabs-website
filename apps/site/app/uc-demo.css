@@ -329,6 +329,12 @@
 .uc-caption { margin: 0; font-size: 0.92rem; color: var(--text-soft); }
 .uc-caption strong { color: var(--ink); font-weight: 600; }
 
+/* mobile-only chrome (hamburgers, the TruckVille dock) — declared BEFORE the
+   phone media query so the query's display rules win inside it */
+.ufms-burger,
+.lp-burger,
+.tvos-dock { display: none; }
+
 @media (max-width: 700px) {
   /* 4 tabs don't fit one row at this width; wrapping stranded the 4th tab
      alone on its own centered row (looked broken). A horizontal swipeable
@@ -379,7 +385,13 @@
   #products .uc-laptop-base { display: none; }
   #products .uc-cam { top: 8px; width: 40px; height: 5px; border-radius: 999px; }
   #products .uc-viewport { flex: 1; border-radius: 30px; overflow-x: hidden; }
-  #products .uc-laptop .uc-app-inner { width: 100%; min-width: 0; zoom: 1; }
+  /* Lay the desktop apps out at a REAL phone logical width rather than a
+     desktop layout squeezed into ~270px. width stays 100% (percentages already
+     resolve inside the zoomed coordinate space), so the zoom factor alone sets
+     the logical width: 0.72 gives ~378 CSS px of layout — phone-sized type and
+     spacing — rendered down to fit the frame. (The ordering app works the same
+     way: 390px native, zoomed to fit.) */
+  #products .uc-laptop .uc-app-inner { width: 100%; min-width: 0; zoom: 0.72; }
 
   /* --- reflow each dashboard to one readable phone column --- */
   /* UFMS */
@@ -438,6 +450,81 @@
   #products .lp-pgrid { grid-template-columns: 1fr; }
   /* backstop: nothing in the phone frame may pan sideways */
   #products .uc-viewport { overflow-x: hidden; }
+
+  /* ------------------------------------------------------------------
+     Real mobile chrome, matched to each product's own phone build rather
+     than a stacked desktop. Sources:
+       UFMS  (C:\Dev\creativ\ufms-dashboard src/components/app-shell.tsx)
+             — sticky green command bar with a hamburger, the cockpit
+               filters on their own scrolling row under it, no bottom dock.
+       TVOS  (C:\Dev\creativ\truckville/dashboard components/WorkstationNav)
+             — fixed white bottom dock, ACTIVE ITEM IS A BLACK TILE, tiny
+               bold labels, a "More" item, content padded to clear it.
+       LP    (C:\Dev\clients\labour-party portal-v1-reference style.css)
+             — brand header keeps a menu toggle; the nav collapses away.
+     ------------------------------------------------------------------ */
+
+  /* UFMS — command bar + hamburger */
+  #products .ufms-burger {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; margin-right: 2px; flex: none;
+    /* this rebuild's UFMS bar is white (the shipped app's is green), so the
+       toggle takes the app's ink/surface tokens rather than white-on-white */
+    border-radius: 8px; color: #12211a;
+    background: #f4f7f5; border: 1px solid #e3ebe6;
+  }
+  #products .ufms-burger svg {
+    width: 17px; height: 17px; fill: none;
+    stroke: currentColor; stroke-width: 2; stroke-linecap: round;
+  }
+  #products .ufms-top { gap: 9px; align-items: center; }
+  #products .ufms-brandtxt small { font-size: 8.5px; }
+  /* the cockpit filters ride their own scrolling row, as on the real app */
+  #products .ufms-filters {
+    display: flex; gap: 6px; width: 100%;
+    overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
+  }
+  #products .ufms-filters::-webkit-scrollbar { display: none; }
+  #products .ufms-filters .ufms-chip { flex: none; }
+
+  /* TruckVille OS — black-tile bottom dock */
+  /* sticky, not absolute: the dock lives at the end of the scrolling app, so
+     absolute positioning parked it below the fold instead of pinning it */
+  /* .tvos is a flex ROW (rail + main) on desktop; the rail is hidden here, so
+     it must become a block or the dock joins the row as a vertical strip */
+  #products .tvos { display: block; position: relative; }
+  #products .tvos-dock {
+    position: sticky; bottom: 0; z-index: 5; margin-top: 10px;
+    display: flex; align-items: stretch; gap: 4px;
+    padding: 6px 7px calc(6px + env(safe-area-inset-bottom));
+    border-top: 1px solid #e2e8f0; background: #fff;
+  }
+  #products .tvos-dock a {
+    flex: 1 1 0; min-width: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 6px 2px; border-radius: 11px;
+    font-size: 8.5px; font-weight: 700; letter-spacing: 0.01em;
+    color: #64748b; text-align: center;
+  }
+  #products .tvos-dock a.is-on { background: #020617; color: #fff; }
+  #products .tvos-dock svg {
+    width: 15px; height: 15px; fill: none;
+    stroke: currentColor; stroke-width: 1.9;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* Labour Party — the nav collapses to a toggle beside the brand */
+  #products .lp-burger {
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: auto; width: 32px; height: 32px; flex: none;
+    border: 1px solid #d7dfeb; border-radius: 9px;
+    background: #fff; color: #0b2239;
+  }
+  #products .lp-burger svg {
+    width: 17px; height: 17px; fill: none;
+    stroke: currentColor; stroke-width: 2; stroke-linecap: round;
+  }
+  #products .lp-header { display: flex; align-items: center; gap: 10px; }
 }
 
 /* short/landscape viewports: shrink the whole stage so devices never

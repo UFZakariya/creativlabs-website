@@ -857,11 +857,13 @@ export default function SuiteDashboard() {
       className="liquid-glass glass-ring relative mx-auto w-full max-w-[400px] rounded-[32px] text-left shadow-[0_20px_60px_rgba(16,20,42,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_32px_80px_rgba(8,60,255,0.18)] md:max-w-none"
     >
       <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-      <div className="bg-azure-dawn-hero relative m-3 rounded-3xl border border-white/10 p-4 sm:p-8">
+      {/* no tinted panel behind the frames — the device shells carry their own
+          colour, and a blue wash under them fought the interface it was framing */}
+      <div className="relative m-3 rounded-3xl border border-[var(--color-ink)]/[0.07] p-4 sm:p-8">
         <DesktopFrame run={run} pane={pane} onSelect={setPane} />
         <PhoneFrame run={run} tab={tab} onSelect={setTab} />
 
-        <p className="mt-4 text-center text-[10.5px] font-medium uppercase tracking-[0.14em] text-white/70">
+        <p className="mt-4 text-center text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--color-ink-soft)]/75">
           Figures illustrative — the interface is the real Business Suite
         </p>
       </div>

@@ -131,9 +131,10 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* the ladder: three subscription tiers, then Premier — which isn't a
-          monthly rung but a project engagement layered on whichever tier
-          you're on, so it sits below them, full width */}
+      {/* the ladder. One grid holds all four: on a phone they stack, on a
+          tablet they land 2x2 (Premier beside Elite), and on desktop the three
+          monthly rungs are columns with Premier spanning beneath them —
+          it isn't a monthly rung but a project engagement layered on any tier */}
       <section className="mx-auto max-w-7xl px-5 pb-8">
         {/* the row is pulled in from the full width and centred; 85% is about
             as narrow as it goes while the display-size nameplates still sit on
@@ -203,52 +204,53 @@ export default function PricingPage() {
             </TiltCard>
             </Reveal>
           ))}
-        </div>
 
-        {/* Premier — the blue azure-dawn card, narrower than the row and
-            centred: pitch and CTA on the left, what you get on the right */}
-        <Reveal delay={0.24} className="mt-5 block">
-          <div className="mx-auto w-full lg:w-[70%]">
-            <TiltCard maxTilt={3}>
-              {/* two columns on desktop (pitch above its CTA, features
-                  alongside); on a phone it flows pitch -> features -> CTA, so
-                  nobody meets the button before they've read what they get */}
-              <article className="bg-azure-dawn glass-ring relative flex flex-col gap-8 overflow-hidden rounded-[32px] p-8 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)] lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-12 lg:gap-y-8 lg:p-11">
-                <div className="lg:col-start-1 lg:row-start-1">
-                  <h2 className="text-[32px] font-bold tracking-tight text-[var(--color-cyan)]">
-                    <TierName tier={PREMIER.tier} />
-                  </h2>
-                  <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-[15px] font-bold leading-none tracking-tight">{PREMIER.price}</span>
+          {/* Premier — the blue azure-dawn card. A plain cell up to tablet (so
+              it lands beside Elite in the 2x2); on desktop it spans the three
+              columns at 82.35% of this 85% row, which is 70% of the section */}
+          <Reveal delay={0.24} className="block h-full xl:col-span-3">
+            <div className="mx-auto h-full w-full xl:w-[82.35%]">
+              <TiltCard maxTilt={3} className="h-full">
+                {/* two columns on desktop (pitch above its CTA, features
+                    alongside); narrower than that it flows pitch -> features ->
+                    CTA, so nobody meets the button before they know what it buys */}
+                <article className="bg-azure-dawn glass-ring relative flex h-full flex-col gap-8 overflow-hidden rounded-[32px] p-8 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)] xl:grid xl:grid-cols-2 xl:items-start xl:gap-x-12 xl:gap-y-8 xl:p-11">
+                  <div className="xl:col-start-1 xl:row-start-1">
+                    <h2 className="text-[32px] font-bold tracking-tight text-[var(--color-cyan)]">
+                      <TierName tier={PREMIER.tier} />
+                    </h2>
+                    <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <span className="text-[15px] font-bold leading-none tracking-tight">{PREMIER.price}</span>
+                    </div>
+                    <p className="mt-1.5 text-[13px] font-medium text-white/70">
+                      {PREMIER.priceSub}
+                    </p>
+                    <p className="mt-4 text-[14.5px] leading-relaxed text-white/85">
+                      {PREMIER.blurb}
+                    </p>
                   </div>
-                  <p className="mt-1.5 text-[13px] font-medium text-white/70">
-                    {PREMIER.priceSub}
-                  </p>
-                  <p className="mt-4 text-[14.5px] leading-relaxed text-white/85">
-                    {PREMIER.blurb}
-                  </p>
-                </div>
-                <ul className="flex flex-col gap-3.5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
-                  {PREMIER.features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex gap-2.5 text-[13.5px] leading-snug text-white/90 [&_svg]:text-[#7ef2a0]"
-                    >
-                      {check}
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={PREMIER.cta.href}
-                  className="block rounded-full bg-white px-6 py-3.5 text-center text-sm font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 lg:col-start-1 lg:row-start-2 lg:self-start"
-                >
-                  {PREMIER.cta.label}
-                </a>
-              </article>
-            </TiltCard>
-          </div>
-        </Reveal>
+                  <ul className="flex flex-col gap-3.5 xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:self-center">
+                    {PREMIER.features.map((f) => (
+                      <li
+                        key={f}
+                        className="flex gap-2.5 text-[13.5px] leading-snug text-white/90 [&_svg]:text-[#7ef2a0]"
+                      >
+                        {check}
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href={PREMIER.cta.href}
+                    className="mt-auto block rounded-full bg-white px-6 py-3.5 text-center text-sm font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 xl:mt-0 xl:col-start-1 xl:row-start-2 xl:self-start"
+                  >
+                    {PREMIER.cta.label}
+                  </a>
+                </article>
+              </TiltCard>
+            </div>
+          </Reveal>
+        </div>
 
         <p className="mt-5 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">
           Price bands are being finalised. Until they&apos;re published, every

@@ -33,6 +33,7 @@ const SHELL = `
                   <div class="uc-app is-active" data-app-view="ufms"><div class="uc-app-inner">
                     <div class="ufms">
                       <header class="ufms-top">
+                        <span class="ufms-burger" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
                         <div class="ufms-brand">
                           <span class="ufms-logo">UF</span>
                           <span class="ufms-brandtxt"><small>UNIVERSAL FARMS</small><strong>UFMS</strong></span>
@@ -424,6 +425,13 @@ const SHELL = `
                           </div>
                         </div>
                       </div>
+                      <nav class="tvos-dock" aria-hidden="true">
+                        <a class="is-on"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+                        <a><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.4 12.3 2.4 2.4 4.8-5.2"/></svg>Closeout</a>
+                        <a><svg viewBox="0 0 24 24"><path d="M6 2.5h9L20 8v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1Z"/><path d="M9 12h7M9 16h5"/></svg>Orders</a>
+                        <a><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19"/></svg>Money</a>
+                        <a><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More</a>
+                      </nav>
                     </div>
                   </div><div class="uc-boot"><span class="uc-boot-dot"></span>TruckVille OS</div></div>
 
@@ -431,6 +439,7 @@ const SHELL = `
                     <div class="lp">
                       <header class="lp-header">
                         <div class="lp-brand"><span class="lp-logo">LP</span><span class="lp-brandtxt"><strong>Labour Party</strong><small>Membership Portal</small></span></div>
+                        <span class="lp-burger" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
                         <nav class="lp-nav">
                           <a>Home</a><a>How to Register</a><a>FAQ</a><a>Verify Member</a>
                           <a class="is-on" data-lp-goto="member" data-goto-nav>Member Login</a>

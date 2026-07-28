@@ -102,9 +102,18 @@ export default function CustomersPage() {
       {/* billboards */}
       <section className="mx-auto flex max-w-5xl flex-col gap-6 px-5 pb-20 sm:pb-24">
         {BILLBOARDS.map((b, bi) => {
+          /* the logo tile alternates sides down the column — first card left,
+             next right, and so on — so the eye zig-zags instead of running
+             down one rail. Order is swapped rather than the DOM, so the
+             heading still comes first for screen readers and on mobile. */
+          const tileLeft = bi % 2 === 0;
           const inner = (
-            <div className="grid items-stretch md:grid-cols-[1fr_260px]">
-              <div className="p-7 sm:p-9">
+            <div
+              className={`grid items-stretch ${
+                tileLeft ? "md:grid-cols-[260px_1fr]" : "md:grid-cols-[1fr_260px]"
+              }`}
+            >
+              <div className={`p-7 sm:p-9 ${tileLeft ? "md:order-2" : ""}`}>
                 <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-[var(--color-ink-soft)]/70">
                   {b.tag}
                 </p>
@@ -130,7 +139,11 @@ export default function CustomersPage() {
                   )}
                 </div>
               </div>
-              <div className="bg-azure-dawn relative m-3 hidden place-items-center overflow-hidden rounded-3xl md:grid">
+              <div
+                className={`bg-azure-dawn relative m-3 hidden place-items-center overflow-hidden rounded-3xl md:grid ${
+                  tileLeft ? "md:order-1" : ""
+                }`}
+              >
                 <span
                   aria-hidden
                   className="pointer-events-none absolute -top-10 left-1/4 h-32 w-44 rounded-full bg-[var(--color-cyan)]/25 blur-3xl"
