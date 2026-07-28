@@ -1,9 +1,36 @@
 # Cutover runbook — safetyline.com.ng → the Sardauna site
 
-> Status: **prepared, NOT executed.** Every step below is reversible and the
-> rollback is a single Caddy edit. Nothing here runs without the owner's word.
+> Status: ✅ **EXECUTED 2026-07-28 on the owner's go-ahead.** The Sardauna
+> site is live on https://safetyline.com.ng. The steps below are kept as the
+> reference for what was done and for the rollback path, which remains valid
+> until the old container is retired (~2026-08-04).
 >
-> Verified against the live box on 2026-07-27.
+> Originally verified against the live box on 2026-07-27.
+
+## Post-launch state (as executed)
+
+- Production container: `sardauna-site` at `/opt/sardauna-site` (compose copy:
+  `infra/prod-docker-compose.yml`). Staging `sardauna-preview` untouched.
+- Caddy `safetyline.com.ng` block → `reverse_proxy sardauna-site:3000`,
+  immutable cache on `/_next/static/*`. Backup: `Caddyfile.bak-cutover`.
+- Verified live: 15 routes 200; old trailing-slash URLs 308 to clean paths;
+  share-card, dock/demo assets, sitemap (15 URLs) all 200; POST /t accepts;
+  neighbours (chat gateway, dashboard auth, UFMS, staging) unharmed.
+- Analytics ON in the production bundle (compiled kill-switch check confirmed
+  falsy). Staging keeps `NEXT_PUBLIC_DISABLE_TRACK=1`.
+- **Uptime watchdog**: `/opt/sardauna-site/healthcheck.sh` (cron `*/5`, copy in
+  `infra/healthcheck.sh`) — self-heals via container restart, then alerts the
+  owner's WhatsApp through the same Cloud Graph API mechanism as the desk
+  watchdog (reads `/opt/safetyline-desk/data/.env`; hourly cooldown; recovery
+  and self-healed notices; log `/opt/sardauna-site/uptime.log`).
+- **CORS caveat**: the chat backend allowlists `https://safetyline.com.ng`
+  only — the contact form and dock intentionally do NOT work from the staging
+  origin (403 preflight). Not a bug.
+- **Cloudflare** fronts the domain and injects a managed robots block (search
+  allowed, AI crawlers disallowed — CF dashboard toggle); the app's
+  `Sitemap:` line survives at the bottom, so discovery is intact.
+- Two labeled "Cutover Test" leads were submitted to the live pipeline on
+  2026-07-28; owner confirms them in the 06:00 digest, then deletes.
 
 ## What's true right now
 
