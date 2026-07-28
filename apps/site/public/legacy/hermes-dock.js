@@ -25,18 +25,20 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
        A monotonically increasing token guards every await, so a stale sequence
        can never keep running after a reset and leave the panel half-grown. */
     /* timings straight from the handoff's motion table, not compressed */
-    const ROLL = 1100;     /* horizontal roll / compact-card reveal          */
-    const CTRL = 420;      /* pause after arrival, before the card grows     */
-    const GROW = 1500;     /* card growth into the full dock                 */
-    const HOME = 850;      /* logo returns to its corner                     */
-    const FOLD = 1050;     /* close fold                                     */
+    const ROLL = 720;     /* horizontal roll / compact-card reveal          */
+    const CTRL = 200;      /* pause after arrival, before the card grows     */
+    const GROW = 820;     /* card growth into the full dock                 */
+    const HOME = 560;      /* logo returns to its corner                     */
+    const FOLD = 620;     /* close fold                                     */
     let seq = 0;
     let anims = [];
     const alive = (run) => run === seq;
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     const stopAnims = () => { anims.forEach((a) => { try { a.cancel(); } catch {} }); anims = []; };
+    const ROLL_EASE = "cubic-bezier(.32,.72,.28,1)";
+    const GROW_EASE = "cubic-bezier(.16,.84,.24,1)";
     const play = (el, frames, ms, ease) => {
-      const a = el.animate(frames, { duration: ms, easing: ease || "linear", fill: "forwards" });
+      const a = el.animate(frames, { duration: ms, easing: ease || ROLL_EASE, fill: "forwards" });
       anims.push(a);
       return a.finished.catch(() => {});
     };
@@ -954,7 +956,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (!alive(run)) return;
       /* then it grows up into the dock while the logo rolls home to the corner */
       await Promise.all([
-        play(panel, [{ height: "58px" }, { height: h + "px" }], GROW, "cubic-bezier(.16,.82,.22,1)"),
+        play(panel, [{ height: "58px" }, { height: h + "px" }], GROW, GROW_EASE),
         play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
                    { transform: "translate(0,0) rotate(0deg)" }], HOME),
       ]);
@@ -991,7 +993,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       await wait(200);
       if (!alive(run)) return;
       await Promise.all([                           // 2. fold down + roll out
-        play(panel, [{ height: h + "px" }, { height: "58px" }], FOLD, "cubic-bezier(.16,.82,.22,1)"),
+        play(panel, [{ height: h + "px" }, { height: "58px" }], FOLD, GROW_EASE),
         play(btn, [{ transform: "translate(0,0) rotate(0deg)" },
                    { transform: `translate(${-x}px,0) rotate(-450deg)` }], HOME),
       ]);

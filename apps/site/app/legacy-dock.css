@@ -1224,3 +1224,31 @@
   .dock-pulse { transition: none; }
   .dock .dock-panel.is-content > * { animation: none; }
 }
+
+/* ---------- make the morph cheap so it runs at frame rate ----------------
+   The body animates width/height, which is a layout property. With the panel's
+   contents merely at opacity 0 the browser still re-laid out the whole chat
+   panel — header, message list, composer, tools — on EVERY frame of the roll
+   and the growth. That is the jank.
+
+   display:none while morphing takes the children out of layout entirely, so
+   the animating box is empty and each frame costs almost nothing. They come
+   back (and stagger in) only at is-content, when the body is already at its
+   final size and nothing is animating. */
+.dock .dock-panel:not(.is-content) > * {
+  display: none;
+}
+
+/* isolate the body's layout/paint from the page while it moves, and warn the
+   compositor about the properties actually changing */
+.dock.is-animating .dock-panel {
+  contain: layout paint;
+  will-change: width, height;
+}
+
+/* the large ambient shadow is re-rasterised on every resized frame — drop it
+   for the duration; the rim keeps the body readable while it moves */
+.dock.is-animating .dock-panel { box-shadow: none; }
+
+/* the logo only ever translates/rotates, so keep it on its own layer */
+.dock.is-animating .dock-btn { will-change: transform; }
