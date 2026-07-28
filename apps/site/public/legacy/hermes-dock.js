@@ -35,18 +35,25 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     };
     /* how far the launcher travels: the panel's width less the launcher, so it
        stops at the far edge of the card and rolls home along the same line */
-    const travel = () => {
-      const p = panel.getBoundingClientRect().width || 320;
+    const travel = (shellW) => {
       const b = btn.getBoundingClientRect().width || 58;
-      return Math.max(0, Math.round(p - b - 8));
+      return Math.max(0, Math.round((shellW || 320) - b));
     };
     const resetLauncher = () => {
       stopAnims();
       btn.style.transform = "";
-      panel.style.width = "";
-      panel.style.height = "";
+      dock.style.width = "";
+      dock.style.height = "";
       panel.classList.remove("is-morph", "is-content");
-      dock.classList.remove("is-animating");
+      dock.classList.remove("is-animating", "is-shell-open");
+    };
+    /* the shell's open size, measured from CSS rather than hard-coded */
+    const shellSize = () => {
+      dock.classList.add("is-shell-open");
+      const r = dock.getBoundingClientRect();
+      const size = { w: Math.round(r.width), h: Math.round(r.height) };
+      dock.classList.remove("is-shell-open");
+      return size;
     };
     /* one descending three-bounce on the whole launcher — glass, logo and the
        unread dot travel together (the dot is a child, so it rides along) */
@@ -908,28 +915,37 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
        dock, and only then does any content appear. */
     async function rollOpen() {
       resetLauncher();
-      if (reducedMotion) return;                    // immediate open
+      const { w, h } = shellSize();
+      if (reducedMotion) {                          // immediate open
+        dock.classList.add("is-shell-open");
+        panel.classList.add("is-morph", "is-content");
+        return;
+      }
       const run = ++seq;
-      const full = panel.getBoundingClientRect();
-      const w = full.width, h = full.height, x = travel();
+      const x = travel(w);
       dock.classList.add("is-animating");
-      panel.classList.add("is-morph");
-      panel.style.width = "58px";
-      panel.style.height = "58px";
+      panel.classList.add("is-morph");              // content stays hidden
+      dock.style.width = "58px";
+      dock.style.height = "58px";
+      /* the shell widens into a compact card while the logo rolls out across it */
       await Promise.all([
-        play(panel, [{ width: "58px" }, { width: w + "px" }], ROLL),
+        play(dock, [{ width: "58px" }, { width: w + "px" }], ROLL),
         play(btn, [{ transform: "translate(0,0) rotate(0deg)" },
                    { transform: `translate(${-x}px,0) rotate(-450deg)` }], ROLL),
       ]);
       if (!alive(run)) return;
+      /* then it grows up into the dock while the logo rolls home to the corner */
       await Promise.all([
-        play(panel, [{ height: "58px" }, { height: h + "px" }], GROW, "cubic-bezier(.16,.82,.22,1)"),
+        play(dock, [{ height: "58px" }, { height: h + "px" }], GROW, "cubic-bezier(.16,.82,.22,1)"),
         play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
                    { transform: "translate(0,0) rotate(0deg)" }], HOME),
       ]);
       if (!alive(run)) return;
-      panel.style.width = "";
-      panel.style.height = "";
+      stopAnims();
+      dock.style.width = "";
+      dock.style.height = "";
+      dock.classList.add("is-shell-open");
+      btn.style.transform = "";
       panel.classList.add("is-content");            // content only at full size
       dock.classList.remove("is-animating");
     }
@@ -937,6 +953,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     /* closing is the exact reverse: content out, fold down while the launcher
        rolls out, then the card retracts as the launcher rolls home. */
     async function rollClose() {
+      const r = dock.getBoundingClientRect();
+      const w = Math.round(r.width), h = Math.round(r.height);
       if (reducedMotion) {
         panel.classList.remove("open");
         resetLauncher();
@@ -944,30 +962,31 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         return;
       }
       const run = ++seq;
-      const full = panel.getBoundingClientRect();
-      const w = full.width, h = full.height, x = travel();
+      const x = travel(w);
       stopAnims();
       dock.classList.add("is-animating");
+      dock.classList.remove("is-shell-open");       // drive the size ourselves
+      dock.style.width = w + "px";
+      dock.style.height = h + "px";
       panel.classList.add("is-morph");
       panel.classList.remove("is-content");         // 1. content out first
       await wait(200);
       if (!alive(run)) return;
-      panel.style.width = w + "px";
       await Promise.all([                           // 2. fold down + roll out
-        play(panel, [{ height: h + "px" }, { height: "58px" }], FOLD, "cubic-bezier(.16,.82,.22,1)"),
+        play(dock, [{ height: h + "px" }, { height: "58px" }], FOLD, "cubic-bezier(.16,.82,.22,1)"),
         play(btn, [{ transform: "translate(0,0) rotate(0deg)" },
                    { transform: `translate(${-x}px,0) rotate(-450deg)` }], HOME),
       ]);
       if (!alive(run)) return;
       await Promise.all([                           // 3. retract + roll home
-        play(panel, [{ width: w + "px" }, { width: "58px" }], ROLL),
+        play(dock, [{ width: w + "px" }, { width: "58px" }], ROLL),
         play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
                    { transform: "translate(0,0) rotate(0deg)" }], ROLL),
       ]);
       if (!alive(run)) return;
       panel.classList.remove("open");
-      resetLauncher();
       panel.hidden = true;
+      resetLauncher();
     }
 
     btn.addEventListener("click", () => setOpen(!open));

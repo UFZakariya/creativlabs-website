@@ -1052,3 +1052,60 @@
   /* immediate open/close, non-bouncing unread indicator */
   .dock-panel.is-morph > * { transition: none; }
 }
+
+/* ---------- one glass object: the launcher IS the container ----------------
+   The handoff is explicit that the logo lives INSIDE the glass shell and the
+   roll reveals that same shell. So `.dock` — which already wraps the launcher
+   and the panel — becomes the glass object: a 58px circle when closed, grown
+   to the full dock when open. `.dock-btn` loses its own glass and becomes just
+   the logo riding at the shell's lower-right corner; the panel fills the shell.
+   Declared last so it wins over the earlier launcher/panel rules. */
+
+.dock {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 100% at 30% 0%, rgba(255, 255, 255, 0.95), rgba(230, 248, 255, 0.75) 60%),
+    linear-gradient(160deg, rgba(51, 242, 255, 0.3), rgba(8, 60, 255, 0.15));
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    0 14px 34px rgba(8, 60, 255, 0.3),
+    0 4px 10px rgba(8, 60, 255, 0.18);
+  transition: border-radius 260ms ease;
+}
+
+/* open: the same shell, grown. Radius eases to the panel's corner so the
+   logo still sits cleanly against the edge. */
+.dock.is-shell-open {
+  width: min(360px, calc(100vw - 32px));
+  height: min(480px, calc(100dvh - 120px));
+  border-radius: 22px;
+}
+
+/* the launcher is now only the logo — the glass belongs to the shell */
+.dock .dock-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  background: none;
+  box-shadow: none;
+}
+
+.dock.is-animating .dock-btn,
+.dock.is-shell-open .dock-btn { transform: none; }
+
+/* the panel fills the shell rather than floating above the launcher */
+.dock .dock-panel {
+  position: absolute;
+  inset: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* leave a pocket at the foot so the logo never covers the composer */
+.dock .dock-form { padding-right: 62px; }
