@@ -1252,3 +1252,15 @@
 
 /* the logo only ever translates/rotates, so keep it on its own layer */
 .dock.is-animating .dock-btn { will-change: transform; }
+
+/* The liquid-glass rim is a masked gradient stroke (::before with mask-composite
+   and a padding-box mask). That is the single most expensive thing to re-raster
+   as the body resizes, because the mask has to be regenerated at every new size.
+   While morphing it is swapped for a flat 1px stroke — visually near-identical
+   at speed, effectively free — and the real rim returns the moment it settles.
+   box-sizing is border-box globally here, so the swap costs no layout. */
+.dock.is-animating .dock-panel::before { display: none; }
+
+.dock.is-animating .dock-panel {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+}
