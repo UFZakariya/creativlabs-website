@@ -1281,3 +1281,21 @@
   z-index: 8;
   box-shadow: none;
 }
+
+/* ---------- the header's own logo is gone, not just unpainted -------------
+   The rolled logo occupies that slot, so the header image is removed from
+   paint entirely whenever the dock is open or moving. visibility (not display)
+   keeps its box, so the title and status stay exactly where they were and the
+   rolled logo has a reserved home to land in — display:none would slide the
+   text left and the logo would end up sitting on top of it. */
+.dock.is-shell-open .dock-head img,
+.dock.is-animating .dock-head img,
+.dock .dock-panel.is-content .dock-head img {
+  visibility: hidden;
+}
+
+/* the resting logo carries an inline transform, which already beats the
+   hover lift, so no hover override is needed here */
+
+/* smoother hand-off: the body's own transition never fights the WAAPI legs */
+.dock .dock-panel { transition: none; }

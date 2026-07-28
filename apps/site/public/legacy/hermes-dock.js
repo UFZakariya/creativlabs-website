@@ -27,10 +27,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     /* timings straight from the handoff's motion table, not compressed */
     const ROLL = 720;     /* horizontal roll / compact-card reveal          */
     const CTRL = 200;      /* pause after arrival, before the card grows     */
-    const GROW = 820;     /* card growth into the full dock                 */
+    const GROW = 900;     /* card growth into the full dock                 */
+    const CLIMB = 1250;   /* logo rolls UP the left edge — deliberately slower */
     const HOME = 560;      /* logo returns to its corner                     */
     const FOLD = 620;     /* close fold                                     */
     let seq = 0;
+    let slot = { dx: 0, dy: 0 };
     let anims = [];
     const alive = (run) => run === seq;
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -65,11 +67,13 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const r = panel.getBoundingClientRect();
       const b = btn.getBoundingClientRect();       // btn has no transform here
       const img = panel.querySelector(".dock-head img");
+      const head = panel.querySelector(".dock-head");
       let dx = -(Math.round(r.width) - 58), dy = -(Math.round(r.height) - 58);
       if (img) {
         const t = img.getBoundingClientRect();
         dx = Math.round((t.left + t.width / 2) - (b.left + b.width / 2));
-        dy = Math.round((t.top + t.height / 2) - (b.top + b.height / 2));
+        const hr = head ? head.getBoundingClientRect() : t;
+        dy = Math.round((hr.top + hr.height / 2) - (b.top + b.height / 2));
       }
       const size = { w: Math.round(r.width), h: Math.round(r.height), dx, dy };
       panel.classList.remove("is-content");
@@ -946,6 +950,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     async function rollOpen() {
       resetLauncher();
       const { w, h, dx, dy } = shellSize();
+      slot = { dx, dy };
       if (reducedMotion) {                          // immediate open
         dock.classList.add("is-shell-open");
         panel.classList.add("is-morph", "is-content");
@@ -971,7 +976,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       await Promise.all([
         play(panel, [{ height: "58px" }, { height: h + "px" }], GROW, GROW_EASE),
         play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
-                   { transform: `translate(${dx}px,${dy}px) rotate(-720deg)` }], GROW, GROW_EASE),
+                   { transform: `translate(${dx}px,${dy}px) rotate(-720deg)` }], CLIMB, GROW_EASE),
       ]);
       if (!alive(run)) return;
       stopAnims();
@@ -996,7 +1001,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       }
       const run = ++seq;
       const x = travel(w);
-      const { dx, dy } = shellSize();
+      const { dx, dy } = slot;   // measured at open; never re-measure here
       stopAnims();
       dock.classList.add("is-animating");
       dock.classList.remove("is-shell-open");       // drive the size ourselves
@@ -1007,9 +1012,9 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       await wait(200);
       if (!alive(run)) return;
       await Promise.all([                           // 2. roll DOWN the left edge
-        play(panel, [{ height: h + "px" }, { height: "58px" }], FOLD, GROW_EASE),
+        play(panel, [{ height: h + "px" }, { height: "58px" }], CLIMB, GROW_EASE),
         play(btn, [{ transform: `translate(${dx}px,${dy}px) rotate(-720deg)` },
-                   { transform: `translate(${-x}px,0) rotate(-450deg)` }], FOLD, GROW_EASE),
+                   { transform: `translate(${-x}px,0) rotate(-450deg)` }], CLIMB, GROW_EASE),
       ]);
       if (!alive(run)) return;
       await Promise.all([                           // 3. retract + roll home
