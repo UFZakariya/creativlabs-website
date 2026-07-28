@@ -224,6 +224,21 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       el.innerHTML = "<i></i><i></i><i></i>";
       msgs.appendChild(el);
       msgs.scrollTop = msgs.scrollHeight;
+      // SITE PATCH (2026-07-28): slow first turns feel like a hang — after 8s
+      // of dots, reassure the visitor; cleared automatically when the reply
+      // lands (clearTyping removes the element, so the check is parentNode).
+      setTimeout(() => {
+        if (!el.parentNode) return;
+        const note = document.createElement("div");
+        note.className = "dock-msg dock-msg--bot";
+        note.style.opacity = "0.75";
+        note.textContent = "Still with you — one moment…";
+        el.parentNode.insertBefore(note, el);
+        msgs.scrollTop = msgs.scrollHeight;
+        const tidy = setInterval(() => {
+          if (!el.parentNode) { note.remove(); clearInterval(tidy); }
+        }, 500);
+      }, 8000);
       return el;
     };
 
