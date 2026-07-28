@@ -231,8 +231,9 @@ function EliteWord({ hov }: { hov: boolean }) {
 }
 
 /* --------------------------------------------------------------- Premier */
-/* Cinematic: violet→blue word crossed by a warm champagne sheen (the
-   Premier card is light glass, where the warm note is allowed), while a
+/* Cinematic: a pale ice→cyan word crossed by a warm champagne sheen (the
+   Premier card is the blue azure-dawn glass, so the word carries its own
+   light — a violet→blue ramp would sink into that background), while a
    small cyan-glow star rises and settles beside it, then twinkles. The
    star remounts (key=run) so it re-rises on hover. */
 
@@ -296,7 +297,7 @@ function PremierWord({ hov, run }: { hov: boolean; run: number }) {
         className="inline-block"
         style={{
           backgroundImage:
-            "linear-gradient(105deg, rgba(247,229,196,0) 42%, rgba(247,229,196,0.9) 50%, rgba(247,229,196,0) 58%), linear-gradient(100deg, var(--color-violet) 0%, #4b3dff 52%, var(--color-blue) 100%)",
+            "linear-gradient(105deg, rgba(255,240,214,0) 42%, rgba(255,240,214,0.95) 50%, rgba(255,240,214,0) 58%), linear-gradient(100deg, #eaf1ff 0%, #b9d5ff 46%, var(--color-cyan) 100%)",
           backgroundSize: "260% 100%, 100% 100%",
           WebkitBackgroundClip: "text",
           backgroundClip: "text",

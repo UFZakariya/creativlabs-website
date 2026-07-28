@@ -202,47 +202,49 @@ export default function PricingPage() {
           ))}
         </div>
 
-        {/* Premier — horizontal: nameplate and pitch on the left, what you
-            get in the middle, the CTA held at the end of the row */}
+        {/* Premier — the blue azure-dawn card, narrower than the row and
+            centred: pitch and CTA on the left, what you get on the right */}
         <Reveal delay={0.24} className="mt-5 block">
-          <TiltCard maxTilt={3}>
-            <article className="liquid-glass glass-ring relative flex flex-col gap-7 rounded-[32px] p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)] lg:flex-row lg:items-center lg:gap-10 lg:p-9">
-              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
-              <div className="lg:w-[32%] lg:shrink-0">
-                <h2 className="text-[32px] font-bold tracking-tight text-[var(--color-blue)]">
-                  <TierName tier={PREMIER.tier} />
-                </h2>
-                <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="text-[15px] font-bold leading-none tracking-tight">{PREMIER.price}</span>
+          <div className="mx-auto w-full lg:w-[70%]">
+            <TiltCard maxTilt={3}>
+              {/* two columns on desktop (pitch above its CTA, features
+                  alongside); on a phone it flows pitch -> features -> CTA, so
+                  nobody meets the button before they've read what they get */}
+              <article className="bg-azure-dawn glass-ring relative flex flex-col gap-8 overflow-hidden rounded-[32px] p-8 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)] lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-12 lg:gap-y-8 lg:p-11">
+                <div className="lg:col-start-1 lg:row-start-1">
+                  <h2 className="text-[32px] font-bold tracking-tight text-[var(--color-cyan)]">
+                    <TierName tier={PREMIER.tier} />
+                  </h2>
+                  <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="text-[15px] font-bold leading-none tracking-tight">{PREMIER.price}</span>
+                  </div>
+                  <p className="mt-1.5 text-[13px] font-medium text-white/70">
+                    {PREMIER.priceSub}
+                  </p>
+                  <p className="mt-4 text-[14.5px] leading-relaxed text-white/85">
+                    {PREMIER.blurb}
+                  </p>
                 </div>
-                <p className="mt-1.5 text-[13px] font-medium text-[var(--color-ink-soft)]">
-                  {PREMIER.priceSub}
-                </p>
-                <p className="mt-4 text-[14.5px] leading-relaxed text-[var(--color-ink-soft)]">
-                  {PREMIER.blurb}
-                </p>
-              </div>
-              <ul className="grid flex-1 gap-2.5 sm:grid-cols-2 lg:gap-x-8">
-                {PREMIER.features.map((f) => (
-                  <li
-                    key={f}
-                    className="flex gap-2.5 text-[13.5px] leading-snug text-[var(--color-ink)] [&_svg]:text-[#16a34a]"
-                  >
-                    {check}
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="lg:w-[200px] lg:shrink-0">
+                <ul className="flex flex-col gap-3.5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+                  {PREMIER.features.map((f) => (
+                    <li
+                      key={f}
+                      className="flex gap-2.5 text-[13.5px] leading-snug text-white/90 [&_svg]:text-[#7ef2a0]"
+                    >
+                      {check}
+                      {f}
+                    </li>
+                  ))}
+                </ul>
                 <a
                   href={PREMIER.cta.href}
-                  className="block rounded-full bg-[var(--color-ink)] px-6 py-3.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="block rounded-full bg-white px-6 py-3.5 text-center text-sm font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 lg:col-start-1 lg:row-start-2 lg:self-start"
                 >
                   {PREMIER.cta.label}
                 </a>
-              </div>
-            </article>
-          </TiltCard>
+              </article>
+            </TiltCard>
+          </div>
         </Reveal>
 
         <p className="mt-5 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">
