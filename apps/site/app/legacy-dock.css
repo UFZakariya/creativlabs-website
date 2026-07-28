@@ -1159,3 +1159,14 @@
 
 /* the logo rides on top of that one body, at its lower-right corner */
 .dock .dock-btn { z-index: 6; }
+
+/* The panel is now always present (it IS the launcher glass when closed), so
+   its own contents — header logo, name, messages — must stay hidden until the
+   body has grown to full size. Keyed on is-content rather than is-morph so it
+   covers the resting closed state as well as the whole open/close sequence;
+   otherwise the header logo shows through the 58px circle beside the launcher
+   logo, which reads as two logos. */
+.dock .dock-panel:not(.is-content) > * {
+  opacity: 0;
+  pointer-events: none;
+}
