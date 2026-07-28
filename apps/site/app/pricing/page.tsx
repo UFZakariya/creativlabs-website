@@ -135,7 +135,10 @@ export default function PricingPage() {
           monthly rung but a project engagement layered on whichever tier
           you're on, so it sits below them, full width */}
       <section className="mx-auto max-w-7xl px-5 pb-8">
-        <div className="grid gap-5 md:grid-cols-2 md:items-stretch xl:grid-cols-3">
+        {/* the row is pulled in from the full width and centred; 85% is about
+            as narrow as it goes while the display-size nameplates still sit on
+            one line (the longest, "Sardauna Plus+", needs ~271px of text) */}
+        <div className="mx-auto grid gap-5 md:grid-cols-2 md:items-stretch xl:w-[85%] xl:grid-cols-3">
           {SUBSCRIPTION_TIERS.map((t, ti) => (
             <Reveal key={t.name} delay={ti * 0.08} className="h-full">
             <TiltCard maxTilt={6} className="h-full">
