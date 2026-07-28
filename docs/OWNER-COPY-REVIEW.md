@@ -41,17 +41,20 @@ ladder — get seen → get answered → get run → get built for you:
   staff (nurture, unified inbox, funnels, NGN/WHT/VAT finance, proposals,
   tickets, social, compliance calendar, SOPs, plans, daily brief; voice AI
   receptionist as premium)
-- **Tier 4 — Sardauna Premiere: per project**, layered on any subscription
+- **Tier 4 — Sardauna Premier: per project**, layered on any subscription
 
 **Tier naming — ✅ DECIDED (2026-07-27):** the tiers sell under the product
 name: **Sardauna Lite** (free), **Sardauna Plus+** (featured; the trailing
 "+" is its own animated badge on the card), **Sardauna Elite** and
-**Sardauna Premiere**. The former working names (Presence / Answered / Run /
+**Sardauna Premier** (spelling corrected from "Premiere" on the owner's note,
+2026-07-28). The former working names (Presence / Answered / Run /
 Built-for-you) are retired from the site; the ladder verbs — get seen → get
 answered → get run → get built for you — stay as descriptors. Each card
 heading is now an animated nameplate (`TierName.tsx`): Lite shimmer-waves,
 the Plus+ badge spring-spins and sparks on hover, Elite charge-flickers,
-Premiere gets the champagne sheen + rising star.
+Premier gets the champagne sheen + rising star. The nameplate is the card's
+headline type (32px) and the billing word ("Free" / "Monthly" / "Per project")
+sits small beneath it — the brand reads first, the cadence second.
 
 **Still open (one item):** the naira price bands per tier — tiers.md says
 "to draft on owner's nod". Until bands are published, the page and the FAQ say

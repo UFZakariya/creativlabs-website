@@ -11,7 +11,7 @@ import Reveal from "@/components/Reveal";
 export const metadata: Metadata = {
   title: "Pricing — Start free, scale when it works | Safetyline",
   description:
-    "Sardauna's four-tier ladder: get seen free on Sardauna Lite, get answered 24/7 on Sardauna Plus+, get your whole back office run on Sardauna Elite, or get custom systems built for you with Sardauna Premiere. Naira-billed, WhatsApp-first, priced with you before you commit.",
+    "Sardauna's four-tier ladder: get seen free on Sardauna Lite, get answered 24/7 on Sardauna Plus+, get your whole back office run on Sardauna Elite, or get custom systems built for you with Sardauna Premier. Naira-billed, WhatsApp-first, priced with you before you commit.",
 };
 
 const check = (
@@ -85,8 +85,8 @@ const TIERS: Tier[] = [
     featured: false,
   },
   {
-    name: "Sardauna Premiere",
-    tier: "premiere",
+    name: "Sardauna Premier",
+    tier: "premier",
     price: "Per project",
     priceSub: "tier 4 · on top of any tier",
     blurb:
@@ -101,6 +101,11 @@ const TIERS: Tier[] = [
     featured: false,
   },
 ];
+
+/* the three monthly rungs render as columns; Premier is a project
+   engagement layered on any of them, so it gets its own wide row below */
+const SUBSCRIPTION_TIERS = TIERS.filter((t) => t.tier !== "premier");
+const PREMIER = TIERS.find((t) => t.tier === "premier")!;
 
 export default function PricingPage() {
   return (
@@ -120,38 +125,45 @@ export default function PricingPage() {
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-ink-soft)]">
             No subscriptions. No charges. That&apos;s how you start — Sardauna
             Lite is free. From there the ladder is a clean climb: get answered
-            on Plus+, get run on Elite, get built for you on Premiere — each
+            on Plus+, get run on Elite, get built for you on Premier — each
             step naira-billed, and only when you choose it.
           </p>
         </div>
       </section>
 
-      {/* the four-tier ladder */}
+      {/* the ladder: three subscription tiers, then Premier — which isn't a
+          monthly rung but a project engagement layered on whichever tier
+          you're on, so it sits below them, full width */}
       <section className="mx-auto max-w-7xl px-5 pb-8">
-        <div className="grid gap-5 md:grid-cols-2 md:items-stretch xl:grid-cols-4">
-          {TIERS.map((t, ti) => (
+        <div className="grid gap-5 md:grid-cols-2 md:items-stretch xl:grid-cols-3">
+          {SUBSCRIPTION_TIERS.map((t, ti) => (
             <Reveal key={t.name} delay={ti * 0.08} className="h-full">
             <TiltCard maxTilt={6} className="h-full">
             <article
               className={
                 t.featured
-                  ? "bg-azure-dawn glass-ring relative flex flex-col overflow-hidden rounded-[32px] p-7 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)]"
-                  : "liquid-glass glass-ring relative flex flex-col rounded-[32px] p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
+                  ? "bg-azure-dawn glass-ring relative flex h-full flex-col overflow-hidden rounded-[32px] p-7 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)]"
+                  : "liquid-glass glass-ring relative flex h-full flex-col rounded-[32px] p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
               }
             >
               {!t.featured && (
                 <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
               )}
-              {t.featured && (
-                <span className="absolute right-6 top-6 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[11.5px] font-semibold text-[var(--color-cyan)]">
-                  The core promise
-                </span>
-              )}
-              <h2 className={`text-[15px] font-bold ${t.featured ? "text-[var(--color-cyan)]" : "text-[var(--color-blue)]"}`}>
+              {/* the badge keeps its own row on every card (empty when not
+                  featured) so the nameplates below stay on one baseline —
+                  absolute positioning collided with the display-size name */}
+              <div className="mb-2.5 flex h-7 items-center justify-end">
+                {t.featured && (
+                  <span className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[11.5px] font-semibold text-[var(--color-cyan)]">
+                    The core promise
+                  </span>
+                )}
+              </div>
+              <h2 className={`text-[32px] font-bold tracking-tight ${t.featured ? "text-[var(--color-cyan)]" : "text-[var(--color-blue)]"}`}>
                 <TierName tier={t.tier} />
               </h2>
               <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="text-[32px] font-bold leading-none tracking-tight">{t.price}</span>
+                <span className="text-[15px] font-bold leading-none tracking-tight">{t.price}</span>
               </div>
               <p className={`mt-1.5 text-[13px] font-medium ${t.featured ? "text-white/70" : "text-[var(--color-ink-soft)]"}`}>
                 {t.priceSub}
@@ -189,6 +201,50 @@ export default function PricingPage() {
             </Reveal>
           ))}
         </div>
+
+        {/* Premier — horizontal: nameplate and pitch on the left, what you
+            get in the middle, the CTA held at the end of the row */}
+        <Reveal delay={0.24} className="mt-5 block">
+          <TiltCard maxTilt={3}>
+            <article className="liquid-glass glass-ring relative flex flex-col gap-7 rounded-[32px] p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)] lg:flex-row lg:items-center lg:gap-10 lg:p-9">
+              <GlowingEffect spread={40} proximity={64} inactiveZone={0.55} borderWidth={3} />
+              <div className="lg:w-[32%] lg:shrink-0">
+                <h2 className="text-[32px] font-bold tracking-tight text-[var(--color-blue)]">
+                  <TierName tier={PREMIER.tier} />
+                </h2>
+                <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span className="text-[15px] font-bold leading-none tracking-tight">{PREMIER.price}</span>
+                </div>
+                <p className="mt-1.5 text-[13px] font-medium text-[var(--color-ink-soft)]">
+                  {PREMIER.priceSub}
+                </p>
+                <p className="mt-4 text-[14.5px] leading-relaxed text-[var(--color-ink-soft)]">
+                  {PREMIER.blurb}
+                </p>
+              </div>
+              <ul className="grid flex-1 gap-2.5 sm:grid-cols-2 lg:gap-x-8">
+                {PREMIER.features.map((f) => (
+                  <li
+                    key={f}
+                    className="flex gap-2.5 text-[13.5px] leading-snug text-[var(--color-ink)] [&_svg]:text-[#16a34a]"
+                  >
+                    {check}
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="lg:w-[200px] lg:shrink-0">
+                <a
+                  href={PREMIER.cta.href}
+                  className="block rounded-full bg-[var(--color-ink)] px-6 py-3.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                >
+                  {PREMIER.cta.label}
+                </a>
+              </div>
+            </article>
+          </TiltCard>
+        </Reveal>
+
         <p className="mt-5 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">
           Price bands are being finalised. Until they&apos;re published, every
           paid tier is priced with you on the intro call — real numbers, in

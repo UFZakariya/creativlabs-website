@@ -5,7 +5,11 @@
    living animation: a restrained silver/cyan shimmer-wave for Lite, a
    spring-spinning glow badge (with hover sparks) for the "+" of Plus+, an
    electric charge-flicker for Elite, and a champagne sheen with a rising
-   star for Premiere. Everything idles subtly and amplifies on hover.
+   star for Premier. Everything idles subtly and amplifies on hover.
+
+   All ornament sizing and travel is em-relative, so a nameplate renders
+   correctly at any font-size the card gives it (the pricing cards render
+   these large — the qualifier is the headline, not the price).
 
    Repo rules respected: named variants only (hide/show/amp — never inline
    initial/animate objects); continuous motion lives in `show`/`amp` states
@@ -19,7 +23,7 @@ import { motion, type Variants } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-export type TierKey = "lite" | "plus" | "elite" | "premiere";
+export type TierKey = "lite" | "plus" | "elite" | "premier";
 
 /* ------------------------------------------------------------------ Lite */
 /* Airy shimmer: thin letters, each carrying its own silver/cyan sweep with
@@ -115,16 +119,18 @@ const plusBadgeV: Variants = {
   },
 };
 
+/* em-relative so the burst scales with the nameplate (these were px-tuned
+   to a 15px heading; as ems they hold that geometry at any size) */
 const SPARK_DIRS = [
-  { x: 15, y: -12 },
-  { x: -13, y: -14 },
-  { x: 15, y: 11 },
-  { x: -12, y: 13 },
+  { x: "1em", y: "-0.8em" },
+  { x: "-0.87em", y: "-0.93em" },
+  { x: "1em", y: "0.73em" },
+  { x: "-0.8em", y: "0.87em" },
 ];
 
 const sparkV: Variants = {
   hide: { opacity: 0, x: 0, y: 0, scale: 0.4 },
-  show: (d: { x: number; y: number }) => ({
+  show: (d: { x: string; y: string }) => ({
     opacity: [1, 1, 0],
     scale: [1, 1, 0.2],
     x: [0, d.x],
@@ -158,8 +164,8 @@ function PlusWord({ hov, run }: { hov: boolean; run: number }) {
                 variants={sparkV}
                 initial="hide"
                 animate="show"
-                className="absolute left-1/2 top-1/2 h-[3px] w-[3px] rounded-full bg-[var(--color-cyan)]"
-                style={{ marginLeft: -1.5, marginTop: -1.5 }}
+                className="absolute left-1/2 top-1/2 h-[0.2em] w-[0.2em] rounded-full bg-[var(--color-cyan)]"
+                style={{ marginLeft: "-0.1em", marginTop: "-0.1em" }}
               />
             ))}
           </span>
@@ -224,9 +230,9 @@ function EliteWord({ hov }: { hov: boolean }) {
   );
 }
 
-/* -------------------------------------------------------------- Premiere */
+/* --------------------------------------------------------------- Premier */
 /* Cinematic: violet→blue word crossed by a warm champagne sheen (the
-   Premiere card is light glass, where the warm note is allowed), while a
+   Premier card is light glass, where the warm note is allowed), while a
    small cyan-glow star rises and settles beside it, then twinkles. The
    star remounts (key=run) so it re-rises on hover. */
 
@@ -280,7 +286,7 @@ const starTwinkleV: Variants = {
   },
 };
 
-function PremiereWord({ hov, run }: { hov: boolean; run: number }) {
+function PremierWord({ hov, run }: { hov: boolean; run: number }) {
   return (
     <span className="inline-flex items-center gap-[0.28em]">
       <motion.span
@@ -297,7 +303,7 @@ function PremiereWord({ hov, run }: { hov: boolean; run: number }) {
           color: "transparent",
         }}
       >
-        Premiere
+        Premier
       </motion.span>
       <motion.span
         key={run}
@@ -315,7 +321,7 @@ function PremiereWord({ hov, run }: { hov: boolean; run: number }) {
           animate={hov ? "amp" : "show"}
           className="inline-block"
         >
-          <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden>
+          <svg width="0.73em" height="0.73em" viewBox="0 0 24 24" aria-hidden>
             <defs>
               <linearGradient id="tn-star-g" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0" stopColor="var(--color-cyan)" />
@@ -340,7 +346,10 @@ export default function TierName({ tier }: { tier: TierKey }) {
   const [run, setRun] = useState(0);
   return (
     <motion.span
-      className="inline-flex items-baseline gap-[0.35em]"
+      /* wraps rather than overflows: at display size the longer names need
+         most of a column, so on very narrow phones the qualifier drops to
+         its own line instead of running past the card edge */
+      className="inline-flex flex-wrap items-baseline gap-x-[0.35em] leading-[1.05]"
       onHoverStart={() => {
         setHov(true);
         setRun((r) => r + 1);
@@ -351,7 +360,7 @@ export default function TierName({ tier }: { tier: TierKey }) {
       {tier === "lite" && <LiteWord hov={hov} />}
       {tier === "plus" && <PlusWord hov={hov} run={run} />}
       {tier === "elite" && <EliteWord hov={hov} />}
-      {tier === "premiere" && <PremiereWord hov={hov} run={run} />}
+      {tier === "premier" && <PremierWord hov={hov} run={run} />}
     </motion.span>
   );
 }
