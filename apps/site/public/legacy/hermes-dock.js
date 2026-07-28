@@ -27,8 +27,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     /* timings straight from the handoff's motion table, not compressed */
     const ROLL = 720;     /* horizontal roll / compact-card reveal          */
     const CTRL = 200;      /* pause after arrival, before the card grows     */
-    const GROW = 900;     /* card growth into the full dock                 */
-    const CLIMB = 1250;   /* logo rolls UP the left edge — deliberately slower */
+    const GROW = 1000;     /* card growth into the full dock                 */
+    const CLIMB = 1000;   /* vertical phase — body and logo share it exactly */
     const HOME = 560;      /* logo returns to its corner                     */
     const FOLD = 620;     /* close fold                                     */
     let seq = 0;
@@ -67,13 +67,11 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const r = panel.getBoundingClientRect();
       const b = btn.getBoundingClientRect();       // btn has no transform here
       const img = panel.querySelector(".dock-head img");
-      const head = panel.querySelector(".dock-head");
       let dx = -(Math.round(r.width) - 58), dy = -(Math.round(r.height) - 58);
       if (img) {
         const t = img.getBoundingClientRect();
         dx = Math.round((t.left + t.width / 2) - (b.left + b.width / 2));
-        const hr = head ? head.getBoundingClientRect() : t;
-        dy = Math.round((hr.top + hr.height / 2) - (b.top + b.height / 2));
+        dy = Math.round((t.top + t.height / 2) - (b.top + b.height / 2));
       }
       const size = { w: Math.round(r.width), h: Math.round(r.height), dx, dy };
       panel.classList.remove("is-content");
@@ -523,7 +521,6 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     // "Switch" control injected into the header (before the close button).
     let switchBtn = null;
     (() => {
-      const head = panel.querySelector(".dock-head");
       const closeBtn = document.getElementById("dock-close");
       if (!head || PERSONAS.length < 2) return;
       switchBtn = document.createElement("button");
@@ -986,6 +983,22 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       btn.style.transform = `translate(${dx}px,${dy}px) rotate(-720deg)`;
       panel.classList.add("is-content");            // content only at full size
       dock.classList.remove("is-animating");
+      requestAnimationFrame(() => {
+        if (!alive(run)) return;
+        const img = panel.querySelector(".dock-head img");
+        if (!img) return;
+        const t = img.getBoundingClientRect();
+        const prev = btn.style.transform;
+        btn.style.transform = "";                  // read the untransformed anchor
+        const a = btn.getBoundingClientRect();
+        btn.style.transform = prev;
+        const nx = Math.round((t.left + t.width / 2) - (a.left + a.width / 2));
+        const ny = Math.round((t.top + t.height / 2) - (a.top + a.height / 2));
+        slot = { dx: nx, dy: ny };                 // close retraces from here
+        btn.style.transition = "transform 220ms cubic-bezier(.22,1,.36,1)";
+        btn.style.transform = `translate(${nx}px,${ny}px) rotate(-720deg)`;
+        setTimeout(() => { btn.style.transition = ""; }, 260);
+      });
     }
 
     /* closing is the exact reverse: content out, fold down while the launcher
