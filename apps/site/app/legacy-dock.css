@@ -1264,3 +1264,20 @@
 .dock.is-animating .dock-panel {
   border: 1px solid rgba(255, 255, 255, 0.72);
 }
+
+/* ---------- the rolled logo TAKES the header's logo slot ------------------
+   Once open, the launcher logo comes to rest on the panel header's own logo
+   position. The header's image keeps its space (visibility, not display) so
+   the title stays put, but it is not painted — otherwise the two logos would
+   sit on top of one another. */
+.dock.is-shell-open .dock-head img,
+.dock.is-animating .dock-head img {
+  visibility: hidden;
+}
+
+/* it rests over the header, so it must sit above the panel's own chrome and
+   stop behaving like a floating action button up there */
+.dock.is-shell-open .dock-btn {
+  z-index: 8;
+  box-shadow: none;
+}

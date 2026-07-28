@@ -58,9 +58,21 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     };
     /* the shell's open size, measured from CSS rather than hard-coded */
     const shellSize = () => {
+      /* children are display:none while morphing, so the header slot can only
+         be measured by briefly applying the settled open state */
       dock.classList.add("is-shell-open");
+      panel.classList.add("is-content");
       const r = panel.getBoundingClientRect();
-      const size = { w: Math.round(r.width), h: Math.round(r.height) };
+      const b = btn.getBoundingClientRect();       // btn has no transform here
+      const img = panel.querySelector(".dock-head img");
+      let dx = -(Math.round(r.width) - 58), dy = -(Math.round(r.height) - 58);
+      if (img) {
+        const t = img.getBoundingClientRect();
+        dx = Math.round((t.left + t.width / 2) - (b.left + b.width / 2));
+        dy = Math.round((t.top + t.height / 2) - (b.top + b.height / 2));
+      }
+      const size = { w: Math.round(r.width), h: Math.round(r.height), dx, dy };
+      panel.classList.remove("is-content");
       dock.classList.remove("is-shell-open");
       return size;
     };
@@ -933,7 +945,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
        dock, and only then does any content appear. */
     async function rollOpen() {
       resetLauncher();
-      const { w, h } = shellSize();
+      const { w, h, dx, dy } = shellSize();
       if (reducedMotion) {                          // immediate open
         dock.classList.add("is-shell-open");
         panel.classList.add("is-morph", "is-content");
@@ -954,18 +966,19 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (!alive(run)) return;
       await wait(CTRL);                             /* settle at the compact card */
       if (!alive(run)) return;
-      /* then it grows up into the dock while the logo rolls home to the corner */
+      /* then it grows up while the logo ROLLS UP the left edge, landing on the
+         header's logo slot (-720deg = two full turns, so it lands upright) */
       await Promise.all([
         play(panel, [{ height: "58px" }, { height: h + "px" }], GROW, GROW_EASE),
         play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
-                   { transform: "translate(0,0) rotate(0deg)" }], HOME),
+                   { transform: `translate(${dx}px,${dy}px) rotate(-720deg)` }], GROW, GROW_EASE),
       ]);
       if (!alive(run)) return;
       stopAnims();
       panel.style.width = "";
       panel.style.height = "";
       dock.classList.add("is-shell-open");
-      btn.style.transform = "";
+      btn.style.transform = `translate(${dx}px,${dy}px) rotate(-720deg)`;
       panel.classList.add("is-content");            // content only at full size
       dock.classList.remove("is-animating");
     }
@@ -983,6 +996,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       }
       const run = ++seq;
       const x = travel(w);
+      const { dx, dy } = shellSize();
       stopAnims();
       dock.classList.add("is-animating");
       dock.classList.remove("is-shell-open");       // drive the size ourselves
@@ -992,10 +1006,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       panel.classList.remove("is-content");         // 1. content out first
       await wait(200);
       if (!alive(run)) return;
-      await Promise.all([                           // 2. fold down + roll out
+      await Promise.all([                           // 2. roll DOWN the left edge
         play(panel, [{ height: h + "px" }, { height: "58px" }], FOLD, GROW_EASE),
-        play(btn, [{ transform: "translate(0,0) rotate(0deg)" },
-                   { transform: `translate(${-x}px,0) rotate(-450deg)` }], HOME),
+        play(btn, [{ transform: `translate(${dx}px,${dy}px) rotate(-720deg)` },
+                   { transform: `translate(${-x}px,0) rotate(-450deg)` }], FOLD, GROW_EASE),
       ]);
       if (!alive(run)) return;
       await Promise.all([                           // 3. retract + roll home
