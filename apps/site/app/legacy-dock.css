@@ -1359,3 +1359,10 @@
 @media (prefers-reduced-motion: reduce) {
   .dock .dock-panel.is-content > * { animation: none; }
 }
+
+/* The composer's input would not shrink (flex items default to min-width:auto),
+   so it pushed the send button past the panel edge no matter how much padding
+   the form carried. Letting it shrink puts the button back inside, with the
+   same gap it has on the left. */
+.dock .dock-form > input,
+.dock .dock-form > textarea { min-width: 0; }
