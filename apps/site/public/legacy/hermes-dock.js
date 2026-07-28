@@ -14,6 +14,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
        every open threw "finePointer is not defined" before this. Local to
        the IIFE so it cannot clash with a global of the same name. */
     const finePointer = window.matchMedia("(pointer: fine)").matches;
+    /* the panel header — used by the persona-switch control below */
+    const head = panel.querySelector(".dock-head");
 
     /* ---------- launcher motion (roll-out / roll-home + attention bounce) ----
        Motion ported from the chat-dock animation handoff, on our own glass and
