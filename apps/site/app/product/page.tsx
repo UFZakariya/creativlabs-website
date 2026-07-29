@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/product" },
   title: "Product — Sardauna, the AI Business Assistant | Safetyline",
   description:
     "Sardauna is a house of agents: a chief of staff running six departments of specialist AI agents for your business — on WhatsApp, with a dashboard, under your approval.",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function ProductPage() {
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar onLight />
 

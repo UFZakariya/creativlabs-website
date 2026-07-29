@@ -11,11 +11,22 @@ export default function Reveal({
   children,
   className,
   delay = 0,
+  immediate = false,
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
+  /* Above-the-fold blocks opt out. A Reveal renders its children at opacity 0
+     until framer-motion hydrates, so wrapping the hero headline meant the LCP
+     element was invisible in the server HTML and the paint waited on JS. Here
+     the right answer is to render visible and animate nothing — the entrance
+     is not worth the delay on the first thing a visitor sees. */
+  immediate?: boolean;
 }) {
+  if (immediate) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={className}

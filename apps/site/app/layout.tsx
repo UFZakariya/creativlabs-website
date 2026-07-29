@@ -4,6 +4,7 @@ import "./globals.css";
 import "./legacy-dock.css";
 import Analytics from "@/components/Analytics";
 import LegacyDock from "@/components/LegacyDock";
+import MotionProvider from "@/components/MotionProvider";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -43,7 +44,10 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable} ${robotoMono.variable}`}>
       <body>
         <div className="page-bg" aria-hidden />
-        {children}
+        {/* skip link: the nav is long and identical on every route, so keyboard
+            users had to tab it in full before reaching any page content */}
+        <a href="#main" className="skip-link">Skip to content</a>
+        <MotionProvider>{children}</MotionProvider>
         <Analytics />
         <LegacyDock />
       </body>

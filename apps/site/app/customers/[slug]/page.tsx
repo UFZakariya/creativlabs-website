@@ -20,6 +20,7 @@ export async function generateMetadata({
   const cs = getCaseStudy(slug);
   if (!cs) return {};
   return {
+    alternates: { canonical: `/customers/${slug}` },
     title: `${cs.name} — Customer story | Safetyline`,
     description: cs.intro,
   };
@@ -35,7 +36,7 @@ export default async function CaseStudyPage({
   if (!cs) notFound();
 
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar />
 

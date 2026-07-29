@@ -54,7 +54,8 @@ export default function Footer() {
 
         {COLS.map((col) => (
           <nav key={col.head} aria-label={col.head}>
-            <h3 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-black/40">
+            {/* /40 composited to #999 on white = 2.85:1, under AA for 12px text */}
+            <h3 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-black/60">
               {col.head}
             </h3>
             <ul className="space-y-2">
@@ -73,7 +74,7 @@ export default function Footer() {
         ))}
       </div>
 
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 border-t border-black/5 px-6 py-5 text-[12px] text-black/45">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 border-t border-black/5 px-6 py-5 text-[12px] text-black/55">
         <span>© {new Date().getFullYear()} Safetyline Communications Ltd (RC 432180)</span>
         <span>Think, ideate, plan — the agents do the dirty work.</span>
       </div>

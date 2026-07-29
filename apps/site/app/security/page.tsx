@@ -8,6 +8,7 @@ import TiltCard from "@/components/TiltCard";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/security" },
   title: "Security & control — Autonomy you can audit | Safetyline",
   description:
     "Sardauna's trust story is real machinery: tiered autonomy where anything outbound waits for your approval, a full audit trail of every agent action, and agents promoted draft → evaluate → shadow → canary → live, with rollback.",
@@ -150,7 +151,7 @@ const LIFECYCLE = [
 
 export default function SecurityPage() {
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar onLight />
 

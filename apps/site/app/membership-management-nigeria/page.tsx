@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import SeoLanding from "@/components/SeoLanding";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/membership-management-nigeria" },
   title: "Membership Management in Nigeria — Registers that scale | Safetyline",
   description:
     "Membership registration, records and printable slips for Nigerian organisations — structured down to state, LGA and ward. Built and proven on a national portal, offered with Sardauna's agents.",

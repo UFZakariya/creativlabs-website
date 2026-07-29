@@ -10,6 +10,7 @@ import UcShowcase from "@/components/UcShowcase";
 import "../uc-demo.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/customers" },
   title: "Customers — Built on real operations, not demos | Safetyline",
   description:
     "The deployments behind Sardauna: a farm-management system live in production, a food business's ops admin and ordering app, a membership portal, and the front desk running on safetyline.com.ng right now.",
@@ -56,13 +57,13 @@ const BILLBOARDS = [
 
 export default function CustomersPage() {
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar onLight />
 
       {/* light hero on the waves */}
       <section className="px-5 pb-14 pt-36 text-center sm:pt-44">
-        <Reveal className="mx-auto max-w-4xl">
+        <Reveal immediate className="mx-auto max-w-4xl">
           <p className="mb-6 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Customers
           </p>

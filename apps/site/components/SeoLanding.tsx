@@ -25,7 +25,7 @@ export default function SeoLanding({ eyebrow, h1, intro, points, proof }: SeoLan
       <Navbar onLight />
 
       <section className="px-5 pb-14 pt-36 text-center sm:pt-44">
-        <Reveal className="mx-auto max-w-4xl">
+        <Reveal immediate className="mx-auto max-w-4xl">
           <p className="mb-6 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             {eyebrow}
           </p>

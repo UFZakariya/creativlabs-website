@@ -8,6 +8,7 @@ import TiltCard from "@/components/TiltCard";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/about" },
   title: "About — Safetyline | The house behind Sardauna",
   description:
     "Safetyline is a Nigerian AI-integration company. We build houses of agents that run real businesses — starting with our own systems, proven in production before we sold a single seat.",
@@ -48,7 +49,7 @@ function TeamPlaceholder({ role }: { role: string }) {
 
 export default function AboutPage() {
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar onLight />
 

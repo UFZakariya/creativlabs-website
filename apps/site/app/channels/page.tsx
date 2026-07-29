@@ -9,6 +9,7 @@ import Reveal from "@/components/Reveal";
 import WaMiniDemo from "@/components/WaMiniDemo";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/channels" },
   title: "Channels — One house, every door | Safetyline",
   description:
     "Sardauna is WhatsApp-first — proven live in production — with email in the design and Instagram, Facebook, X, Teams and Slack offered. One house behind every door: same agents, same approvals, one record.",
@@ -120,7 +121,7 @@ const CHANNELS = [
 
 export default function ChannelsPage() {
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar onLight />
 

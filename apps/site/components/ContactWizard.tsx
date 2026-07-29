@@ -154,7 +154,7 @@ export default function ContactWizard() {
   }
 
   const input =
-    "w-full rounded-2xl border border-black/10 bg-white px-4 py-3.5 text-[15px] text-[var(--color-ink)] placeholder:text-black/35 outline-none transition-colors focus:border-[var(--color-blue)]/60";
+    "w-full rounded-2xl border border-black/10 bg-white px-4 py-3.5 text-[15px] text-[var(--color-ink)] placeholder:text-black/55 outline-none transition-colors focus:border-[var(--color-blue)]/60";
 
   return (
     <div className="glass-ring mx-auto max-w-xl overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(16,20,42,0.08)]">
@@ -168,7 +168,7 @@ export default function ContactWizard() {
                   ? "bg-[#22c55e] text-white"
                   : i === step
                     ? "bg-[var(--color-blue)] text-white"
-                    : "bg-black/6 text-black/45"
+                    : "bg-black/6 text-[var(--color-ink-soft)]"
               }`}
             >
               {i < step ? (
@@ -181,7 +181,7 @@ export default function ContactWizard() {
             </span>
             <span
               className={`text-[13px] font-semibold ${
-                i === step ? "text-[var(--color-ink)]" : "text-black/40"
+                i === step ? "text-[var(--color-ink)]" : "text-[var(--color-ink-soft)]"
               } ${i > 0 ? "hidden sm:inline" : ""}`}
             >
               {s}
@@ -228,7 +228,7 @@ export default function ContactWizard() {
             </div>
             <div>
               <label htmlFor="cw-company" className="mb-1.5 block text-[13.5px] font-semibold">
-                Business name <span className="font-normal text-black/40">(optional)</span>
+                Business name <span className="font-normal text-[var(--color-ink-soft)]">(optional)</span>
               </label>
               <input
                 id="cw-company"
@@ -247,7 +247,7 @@ export default function ContactWizard() {
             <div>
               <p className="mb-2 text-[13.5px] font-semibold">
                 What should the house take over first?{" "}
-                <span className="font-normal text-black/40">(pick any)</span>
+                <span className="font-normal text-[var(--color-ink-soft)]">(pick any)</span>
               </p>
               <div className="flex flex-wrap gap-2">
                 {FOCUS_OPTIONS.map((opt) => {
@@ -272,7 +272,7 @@ export default function ContactWizard() {
             </div>
             <div>
               <label htmlFor="cw-message" className="mb-1.5 block text-[13.5px] font-semibold">
-                Anything else? <span className="font-normal text-black/40">(optional)</span>
+                Anything else? <span className="font-normal text-[var(--color-ink-soft)]">(optional)</span>
               </label>
               <textarea
                 id="cw-message"
@@ -289,7 +289,7 @@ export default function ContactWizard() {
           <>
             <div>
               <label htmlFor="cw-phone" className="mb-1.5 block text-[13.5px] font-semibold">
-                WhatsApp number <span className="font-normal text-black/40">(how most people hear back)</span>
+                WhatsApp number <span className="font-normal text-[var(--color-ink-soft)]">(how most people hear back)</span>
               </label>
               <input
                 id="cw-phone"
@@ -303,7 +303,7 @@ export default function ContactWizard() {
             </div>
             <div>
               <label htmlFor="cw-email" className="mb-1.5 block text-[13.5px] font-semibold">
-                Email <span className="font-normal text-black/40">(if you prefer)</span>
+                Email <span className="font-normal text-[var(--color-ink-soft)]">(if you prefer)</span>
               </label>
               <input
                 id="cw-email"
@@ -315,7 +315,7 @@ export default function ContactWizard() {
                 autoComplete="email"
               />
             </div>
-            <p className="text-[12.5px] leading-relaxed text-black/45">
+            <p className="text-[12.5px] leading-relaxed text-[var(--color-ink-soft)]">
               One of the two is enough. Your enquiry goes straight into our own
               lead pipeline — the same one Sardauna runs — and a real person
               follows up.

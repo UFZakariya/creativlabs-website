@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import SeoLanding from "@/components/SeoLanding";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/ai-agent-for-business-nigeria" },
   title: "AI Agent for Business in Nigeria — Sardauna | Safetyline",
   description:
     "Sardauna is the AI business assistant built for Nigerian reality: a chief-of-staff agent running departments of specialists on WhatsApp — orders, money, marketing and reports, under your approval.",

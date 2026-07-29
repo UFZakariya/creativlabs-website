@@ -60,6 +60,19 @@
     radial-gradient(160% 130% at 50% 0%, var(--color-blue) 20%, var(--color-navy) 68%, var(--color-navy-deep) 100%);
 }
 
+/* Card variant of azure-dawn. The base utility puts a cyan hotspot at 50%/-10%
+   of its own box; on a tall page band that lands harmlessly in the sky, but on
+   a pricing CARD it lands exactly on the nameplate row, taking cyan text to
+   ~1.7-2.4:1 and the 11.5px cyan badge far under AA. This variant keeps the
+   same blue family and direction of light but holds the top dark enough for
+   cyan to clear AA comfortably. */
+@utility bg-azure-dawn-card {
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(51, 242, 255, 0.16) 0%, transparent 34%),
+    radial-gradient(140% 110% at 50% -20%, rgba(0, 183, 255, 0.14) 8%, transparent 52%),
+    linear-gradient(155deg, #0b3bda 0%, #0a1d7a 55%, #050b3d 100%);
+}
+
 /* gradient text for accent phrases — on light surfaces */
 @utility text-dawn-gradient {
   background: linear-gradient(92deg, var(--color-cyan), var(--color-azure) 38%, var(--color-blue) 75%, var(--color-violet));
@@ -263,4 +276,62 @@ body {
 /* Instagram story ring around the avatar */
 .ig-ring {
   background: conic-gradient(from 210deg, #f9ce34, #ee2a7b 45%, #6228d7 80%, #f9ce34);
+}
+
+/* ============================================================
+   REDUCED MOTION
+   The dock, the device showcase, RotatingStatement and WaveBackground all
+   honour prefers-reduced-motion already — globals.css was the gap, and it is
+   where the perpetual animations live (the hero's shimmering headline, the
+   aurora sweep, the typing dots) plus the orbit/halo/dash utilities used
+   inline by ProofCards. Level A 2.2.2 asks that motion which loops
+   indefinitely can be turned off; this is that switch.
+
+   The shimmer keeps its gradient and background-clip — only the sweep stops —
+   so the text still paints its ramp rather than turning transparent.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .text-shimmer,
+  .text-shimmer-ink,
+  .aurora-beams::after,
+  .typing-dot,
+  [class*="animation:orbit"],
+  [class*="animation:halo-pulse"],
+  [class*="animation:dash-flow"] {
+    animation: none !important;
+  }
+
+  /* anything else that loops: let it settle on its final frame instead of
+     running, without blanket-disabling the dock's own staged rules */
+  .page-bg *,
+  main * {
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* skip link — visually hidden until focused, then pinned top-left above
+   everything. The nav is long and identical on every route, so without this a
+   keyboard user tabs the whole thing before reaching content on every page. */
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 300;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0 12px 0;
+  background: var(--color-ink);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transform: translateY(-120%);
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus-visible,
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 3px solid var(--color-cyan);
+  outline-offset: 2px;
 }

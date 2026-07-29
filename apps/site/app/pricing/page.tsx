@@ -9,6 +9,7 @@ import TierName, { type TierKey } from "@/components/TierName";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/pricing" },
   title: "Pricing — Start free, scale when it works | Safetyline",
   description:
     "Sardauna's four-tier ladder: get seen free on Sardauna Lite, get answered 24/7 on Sardauna Plus+, get your whole back office run on Sardauna Elite, or get custom systems built for you with Sardauna Premier. Naira-billed, WhatsApp-first, priced with you before you commit.",
@@ -109,7 +110,7 @@ const PREMIER = TIERS.find((t) => t.tier === "premier")!;
 
 export default function PricingPage() {
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar onLight />
 
@@ -146,7 +147,7 @@ export default function PricingPage() {
             <article
               className={
                 t.featured
-                  ? "bg-azure-dawn glass-ring relative flex h-full flex-col overflow-hidden rounded-[32px] p-7 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)]"
+                  ? "bg-azure-dawn-card glass-ring relative flex h-full flex-col overflow-hidden rounded-[32px] p-7 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)]"
                   : "liquid-glass glass-ring relative flex h-full flex-col rounded-[32px] p-7 shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
               }
             >
@@ -158,7 +159,7 @@ export default function PricingPage() {
                   absolute positioning collided with the display-size name */}
               <div className="mb-2.5 flex h-7 items-center justify-end">
                 {t.featured && (
-                  <span className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[11.5px] font-semibold text-[var(--color-cyan)]">
+                  <span className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[11.5px] font-semibold text-white">
                     The core promise
                   </span>
                 )}
@@ -172,7 +173,7 @@ export default function PricingPage() {
               <p className={`mt-1.5 text-[13px] font-medium ${t.featured ? "text-white/70" : "text-[var(--color-ink-soft)]"}`}>
                 {t.priceSub}
               </p>
-              <p className={`mt-4 text-[14.5px] leading-relaxed ${t.featured ? "text-white/85" : "text-[var(--color-ink-soft)]"}`}>
+              <p className={`mt-4 text-[14.5px] leading-relaxed ${t.featured ? "text-white/90" : "text-[var(--color-ink-soft)]"}`}>
                 {t.blurb}
               </p>
               <ul className="mt-6 flex flex-col gap-2.5">
@@ -214,7 +215,7 @@ export default function PricingPage() {
                 {/* two columns on desktop (pitch above its CTA, features
                     alongside); narrower than that it flows pitch -> features ->
                     CTA, so nobody meets the button before they know what it buys */}
-                <article className="bg-azure-dawn glass-ring relative flex h-full flex-col gap-8 overflow-hidden rounded-[32px] p-8 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)] xl:grid xl:grid-cols-2 xl:items-start xl:gap-x-12 xl:gap-y-8 xl:p-11">
+                <article className="bg-azure-dawn-card glass-ring relative flex h-full flex-col gap-8 overflow-hidden rounded-[32px] p-8 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)] xl:grid xl:grid-cols-2 xl:items-start xl:gap-x-12 xl:gap-y-8 xl:p-11">
                   <div className="xl:col-start-1 xl:row-start-1">
                     <h2 className="text-[32px] font-bold tracking-tight text-[var(--color-cyan)]">
                       <TierName tier={PREMIER.tier} />
@@ -222,10 +223,10 @@ export default function PricingPage() {
                     <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <span className="text-[15px] font-bold leading-none tracking-tight">{PREMIER.price}</span>
                     </div>
-                    <p className="mt-1.5 text-[13px] font-medium text-white/70">
+                    <p className="mt-1.5 text-[13px] font-medium text-white/85">
                       {PREMIER.priceSub}
                     </p>
-                    <p className="mt-4 text-[14.5px] leading-relaxed text-white/85">
+                    <p className="mt-4 text-[14.5px] leading-relaxed text-white/90">
                       {PREMIER.blurb}
                     </p>
                   </div>

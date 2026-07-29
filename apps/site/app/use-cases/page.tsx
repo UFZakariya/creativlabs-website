@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/use-cases" },
   title: "Use cases — See the house at work | Safetyline",
   description:
     "Five department threads from a running house of agents — plus the same house answering Instagram DMs: support answered, leads qualified, stock reordered under your approval, books kept current, and a daily brief that tells you the whole story.",
@@ -15,13 +16,13 @@ export const metadata: Metadata = {
 
 export default function UseCasesPage() {
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar onLight />
 
       {/* light hero on the waves */}
       <section className="px-5 pb-16 pt-36 text-center sm:pb-20 sm:pt-44">
-        <Reveal className="mx-auto max-w-4xl">
+        <Reveal immediate className="mx-auto max-w-4xl">
           <p className="mb-6 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Use cases
           </p>

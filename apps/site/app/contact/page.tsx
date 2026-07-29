@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact" },
   title: "Contact — Start with a free readiness audit | Safetyline",
   description:
     "Three quick steps and your enquiry lands in our own lead pipeline — the same one Sardauna runs. Start with the free AI readiness audit: one conversation with Biba or Bari, no card, no obligation.",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main>
+    <main id="main">
       <WaveBackground />
       <Navbar onLight />
 
