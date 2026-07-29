@@ -593,7 +593,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         const p = agentOf(next.key);
         agentKey = p.key;
         persona = p.name;
-        quizActive = false; leadCardOpen = false; // handover resets transient flows
+        abandonQuiz(); leadCardOpen = false; // handover resets transient flows
         if (nameEl) nameEl.textContent = p.name;
         if (status) status.textContent = live ? `Online — ${p.name}` : `${p.name} · Safetyline`;
         dock.dataset.agent = p.key;
@@ -610,8 +610,16 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 
     // ── In-chat quick actions (WhatsApp / Telegram style) ───────────────────
     // Programmatic send — lets chips and the tool bar drive the conversation.
+    let sending = false; // one live turn at a time — no concurrent streams
+
     const sendText = (t) => {
-      if (composerSwapped || !t) return;
+      /* guard BEFORE touching the composer: this used to write the text in and
+         only then bail, so a tap during an in-flight turn left the visitor's
+         box pre-filled with a message that was never sent */
+      if (composerSwapped || sending || !t) {
+        if (sending) input.value = "";
+        return;
+      }
       input.value = t;
       form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
     };
@@ -678,6 +686,14 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     // tappable option buttons in the chat (WhatsApp/Telegram style). Feeds the
     // score into the agent's context (sessionStorage bar-score → page.readiness).
     let quizActive = false;
+    /* clearing the flag alone left the rendered options clickable — answering
+       one then pushed a reply into a conversation that had already moved on */
+    const abandonQuiz = () => {
+      quizActive = false;
+      try {
+        msgs.querySelectorAll(".dock-quiz-opt:not(:disabled)").forEach((b) => { b.disabled = true; });
+      } catch (_) {}
+    };
     const startReadinessQuiz = () => {
       const BAR = window.SL_BAR;
       if (quizActive) return;
@@ -874,7 +890,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const openLeadCard = () => {
       if (leadCardOpen || leadSending || composerSwapped) return;
       leadCardOpen = true;
-      quizActive = false; // opening the form abandons any in-chat quiz
+      abandonQuiz();      // opening the form abandons any in-chat quiz
       const msg = add("", "bot");
       const t = document.createElement("div");
       t.className = "dock-msg-text";
@@ -1007,7 +1023,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         /* focus lands in rollOpen's post-assembly frame, once the composer
            is actually in the layout */
       } else {
-        quizActive = false;   // don't leave the Readiness tool latched off
+        abandonQuiz();        // flag AND the live option buttons
         clearNudge();
         clearFirstNudge();
         rollClose();
@@ -1089,26 +1105,37 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
        to the foot, then the card retracts as the logo rolls home to the
        bottom-right corner. */
     async function rollClose() {
-      const pr = panel.getBoundingClientRect();
-      const br = btn.getBoundingClientRect();
-      const w = Math.round(pr.width), h = Math.round(pr.height);
       if (reducedMotion) {
         panel.classList.remove("open");
         resetLauncher();
         return;
       }
       const run = ++seq;
+      /* Escape (or SL_DOCK.close) can arrive mid-open, while the body is still
+         growing. Stop the in-flight legs FIRST, then measure — reading the
+         geometry before stopAnims() sampled a moving target and the close
+         started from the wrong place. Deliberately NOT swallowing Escape for
+         the length of the open sequence: that would trap a keyboard user in a
+         dialog they just opened, trading a cosmetic glitch for a real barrier. */
+      stopAnims();
+      const settled = panel.classList.contains("is-content");
+      const pr = panel.getBoundingClientRect();
+      const br = btn.getBoundingClientRect();
+      const w = Math.round(pr.width), h = Math.round(pr.height);
       const x = travel(w);
       /* where the logo IS right now (it is laid out, so this tracks any resize
          since open), expressed as an offset from its closed corner */
       const dx = Math.round(br.left - (pr.right - 58));
       const dy = Math.round(br.top - (pr.bottom - 58));
-      stopAnims();
       /* 1. the contents disassemble — reverse of the build, while the body is
-         still at full size and the logo still rests on the header */
-      panel.classList.add("is-morph", "is-closing");
-      await wait(EXIT);
-      if (!alive(run)) return;
+         still at full size and the logo still rests on the header. If the open
+         never completed there is nothing assembled to take apart, so skip it. */
+      panel.classList.add("is-morph");
+      if (settled) {
+        panel.classList.add("is-closing");
+        await wait(EXIT);
+        if (!alive(run)) return;
+      }
       /* swap the resting logo from layout back into transform space in one
          synchronous block, so no intermediate frame ever paints */
       dock.classList.add("is-animating");
@@ -1189,12 +1216,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     // the context-aware teaser once (maybeTeaser is still once-per-session +
     // dismissible). If they open the dock first, it never fires.
     let teaserArmed = false;
-    const armTeaser = () => { if (teaserArmed || open) return; teaserArmed = true; maybeTeaser(); };
+    const armTeaser = () => { if (teaserArmed || open || greeted) return; teaserArmed = true; maybeTeaser(); };
     setTimeout(armTeaser, 20000); // general engaged-dwell fallback
     const HIGH_INTENT = new Set(["products", "systems", "agents", "readiness", "contact"]);
     let sectionTimer = null;
     window.addEventListener("scroll", () => {
-      if (teaserArmed || open) return;
+      if (teaserArmed || open || greeted) return;
       const sec = document.querySelector("[data-nav].is-active");
       const id = sec && sec.dataset.nav;
       if (id && HIGH_INTENT.has(id)) {
@@ -1436,7 +1463,6 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         : (live ? `Online — ${persona}` : `${persona} · Safetyline`);
     };
 
-    let sending = false; // one live turn at a time — no concurrent streams
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (composerSwapped || sending) return;

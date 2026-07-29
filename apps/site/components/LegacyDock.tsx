@@ -5,6 +5,7 @@
    vanilla JS module served from /legacy/hermes-dock.js. This component only
    injects the shell and loads config + module once. */
 
+import { LEGACY_V } from "@/lib/legacy-version";
 import { useEffect, useRef } from "react";
 
 const SHELL = `
@@ -64,9 +65,9 @@ export default function LegacyDock() {
         document.body.appendChild(s);
       });
 
-    load("/legacy/hermes-config.js")
+    load(`/legacy/hermes-config.js?v=${LEGACY_V["hermes-config"]}`)
       .then(() => load("/legacy/sl-bar.js")) // quiz data the Readiness tool needs
-      .then(() => load("/legacy/hermes-dock.js"))
+      .then(() => load(`/legacy/hermes-dock.js?v=${LEGACY_V["hermes-dock"]}`))
       .catch(() => {});
   }, []);
 

@@ -11,6 +11,7 @@
    stylesheet's <=700px phone-frame overrides are scoped to it.
    Only change from the archived markup: href="#contact" -> "/contact". */
 
+import { LEGACY_V } from "@/lib/legacy-version";
 import { useEffect, useRef, useState } from "react";
 
 const SHELL = `
@@ -757,7 +758,7 @@ export default function UcShowcase() {
     // load the legacy module AFTER the shell exists — it queries the DOM
     // at execution time (same contract as hermes-dock.js)
     const s = document.createElement("script");
-    s.src = "/legacy/uc-demo.js";
+    s.src = `/legacy/uc-demo.js?v=${LEGACY_V["uc-demo"]}`;
     document.body.appendChild(s);
 
     // mirror the legacy app tabs so the phone strip follows the visible app

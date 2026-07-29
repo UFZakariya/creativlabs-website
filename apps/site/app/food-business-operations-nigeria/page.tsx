@@ -4,7 +4,7 @@ import SeoLanding from "@/components/SeoLanding";
 export const metadata: Metadata = {
   alternates: { canonical: "/food-business-operations-nigeria" },
   openGraph: { url: "/food-business-operations-nigeria" },
-  title: "Food Business Operations in Nigeria — Orders to closeout | Safetyline",
+  title: "Food Business Operations in Nigeria | Safetyline",
   description:
     "Run a Nigerian food business end to end: orders in by chat and app, stock and vendors managed, cash reconciled daily. Built on TruckVille OS, proven live — now offered with Sardauna's agents.",
 };

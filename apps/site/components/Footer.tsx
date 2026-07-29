@@ -70,9 +70,9 @@ export default function Footer() {
         {COLS.map((col) => (
           <nav key={col.head} aria-label={col.head}>
             {/* /40 composited to #999 on white = 2.85:1, under AA for 12px text */}
-            <h3 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-black/60">
+            <h2 className="mb-3 text-[12px] font-bold uppercase tracking-[0.14em] text-black/60">
               {col.head}
-            </h3>
+            </h2>
             <ul className="space-y-2">
               {col.links.map((l) => (
                 <li key={l.label}>
