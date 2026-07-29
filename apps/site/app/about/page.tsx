@@ -30,24 +30,6 @@ const VALUES = [
   },
 ];
 
-/* placeholder card — owner supplies photo + bio before launch */
-function TeamPlaceholder({ role }: { role: string }) {
-  return (
-    <div className="glass-ring flex h-full flex-col items-center gap-3 rounded-[24px] bg-white p-8 text-center shadow-[0_16px_40px_rgba(16,20,42,0.06)]">
-      <span className="grid h-24 w-24 place-items-center rounded-full border-2 border-dashed border-[var(--color-blue)]/30 bg-[var(--color-blue)]/5">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#083cff" strokeWidth="1.6" opacity="0.5" aria-hidden>
-          <circle cx="12" cy="8" r="3.6" />
-          <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
-        </svg>
-      </span>
-      <div>
-        <p className="text-[15px] font-bold tracking-tight">{role}</p>
-        <p className="mt-1 text-[12.5px] text-[var(--color-ink-soft)]/70">Photo &amp; bio coming soon</p>
-      </div>
-    </div>
-  );
-}
-
 export default function AboutPage() {
   return (
     <>
@@ -118,7 +100,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* team — placeholders until the owner supplies photos & bios */}
+      {/* team — no photos yet, so this points at the conversation instead
+          of shipping empty placeholder cards */}
       <section className="mx-auto max-w-5xl px-5 pb-20 sm:pb-24">
         <Reveal className="mb-10 text-center">
           <h2 className="text-display-3 mx-auto max-w-2xl">The people behind the house</h2>
@@ -127,14 +110,24 @@ export default function AboutPage() {
             way our customers do: start a conversation.
           </p>
         </Reveal>
-        <div className="mx-auto grid max-w-2xl gap-5 sm:grid-cols-2">
-          <Reveal delay={0.05} className="h-full">
-            <TeamPlaceholder role="Founder" />
-          </Reveal>
-          <Reveal delay={0.13} className="h-full">
-            <TeamPlaceholder role="The team" />
-          </Reveal>
-        </div>
+        <Reveal delay={0.05}>
+          <div className="mx-auto flex max-w-md flex-wrap items-center justify-center gap-3">
+            <a
+              href="/contact"
+              className="rounded-full bg-[var(--color-ink)] px-6 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Start a conversation
+            </a>
+            <a
+              href="https://wa.me/2348102354786"
+              target="_blank"
+              rel="noopener"
+              className="rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-5 py-3 text-sm font-semibold text-[var(--color-blue)] transition-colors hover:bg-[var(--color-blue)]/10"
+            >
+              Message us on WhatsApp
+            </a>
+          </div>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="mt-8 text-center text-[13px] text-[var(--color-ink-soft)]/80">
             Safetyline Communications Ltd · RC 432180 · Lagos &amp; Abuja, Nigeria

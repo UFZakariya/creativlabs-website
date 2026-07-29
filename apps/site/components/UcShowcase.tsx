@@ -21,11 +21,11 @@ const SHELL = `
           <button class="uc-tab is-active" id="uc-tab-ufms" role="tab" aria-selected="true" data-app="ufms" data-device="laptop" type="button">UFMS</button>
           <button class="uc-tab" id="uc-tab-os" role="tab" aria-selected="false" data-app="os" data-device="laptop" tabindex="-1" type="button">TruckVille&nbsp;OS</button>
           <button class="uc-tab" id="uc-tab-order" role="tab" aria-selected="false" data-app="order" data-device="phone" tabindex="-1" type="button">Ordering&nbsp;App</button>
-          <button class="uc-tab" id="uc-tab-labour" role="tab" aria-selected="false" data-app="labour" data-device="laptop" tabindex="-1" type="button">Labour&nbsp;Party</button>
+          <button class="uc-tab" id="uc-tab-labour" role="tab" aria-selected="false" data-app="labour" data-device="laptop" tabindex="-1" type="button">Membership&nbsp;Portal</button>
         </div>
 
         <div class="uc-stage" data-uc-stage data-device="laptop" data-reveal>
-          <!-- LAPTOP — desktop apps (UFMS, TruckVille OS, Labour Party portal) -->
+          <!-- LAPTOP — desktop apps (UFMS, TruckVille OS, membership portal) -->
           <div class="uc-laptop">
             <div class="uc-laptop-lid">
               <div class="uc-laptop-screen">
@@ -439,7 +439,7 @@ const SHELL = `
                   <div class="uc-app" data-app-view="labour"><div class="uc-app-inner">
                     <div class="lp">
                       <header class="lp-header">
-                        <div class="lp-brand"><span class="lp-logo">LP</span><span class="lp-brandtxt"><strong>Labour Party</strong><small>Membership Portal</small></span></div>
+                        <div class="lp-brand"><span class="lp-logo">LP</span><span class="lp-brandtxt"><strong>Membership Portal</strong><small>National register</small></span></div>
                         <span class="lp-burger" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
                         <nav class="lp-nav">
                           <a>Home</a><a>How to Register</a><a>FAQ</a><a>Verify Member</a>
@@ -505,7 +505,7 @@ const SHELL = `
                                 <div class="lp-cardactions"><span class="lp-btn lp-btn--primary">Print</span><span class="lp-btn lp-btn--secondary">Download PDF</span><span class="lp-btn lp-btn--secondary">Open Full Preview</span></div>
                               </div>
                               <div class="lp-slip">
-                                <div class="lp-slip-head"><h2>Labour Party (LP)</h2><p>Temporary Membership Slip</p></div>
+                                <div class="lp-slip-head"><h2>National Membership Register</h2><p>Temporary Membership Slip</p></div>
                                 <div class="lp-slip-div"></div>
                                 <div class="lp-slip-main">
                                   <div class="lp-slip-photo">No Photo</div>
@@ -521,7 +521,7 @@ const SHELL = `
                                   <div class="lp-loc-item"><strong>IKEJA</strong><span>LGA</span></div>
                                   <div class="lp-loc-item"><strong>07</strong><span>Ward</span></div>
                                 </div>
-                                <div class="lp-slip-foot">&copy; 2026 Labour Party</div>
+                                <div class="lp-slip-foot">&copy; 2026 National Membership Register</div>
                               </div>
                             </section>
 
@@ -590,7 +590,7 @@ const SHELL = `
                       </div>
                       </div>
                     </div>
-                  </div><div class="uc-boot"><span class="uc-boot-dot"></span>Labour Party portal</div></div>
+                  </div><div class="uc-boot"><span class="uc-boot-dot"></span>Membership portal</div></div>
                 </div>
                 <div class="uc-scroll-hint" data-uc-hint="laptop" aria-hidden="true"><span></span></div>
               </div>

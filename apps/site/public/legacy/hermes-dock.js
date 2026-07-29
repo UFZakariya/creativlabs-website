@@ -857,7 +857,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       { emoji: "🐔", name: "UFMS", desc: "Poultry farm system", q: "Tell me about UFMS, the farm system." },
       { emoji: "🍔", name: "TruckVille OS", desc: "Food-venue operations", q: "Tell me about TruckVille OS." },
       { emoji: "📱", name: "Ordering App", desc: "Customer ordering", q: "Tell me about the TruckVille ordering app." },
-      { emoji: "🗳️", name: "Labour Party", desc: "Membership portal", q: "Tell me about the Labour Party membership portal." },
+      { emoji: "🗳️", name: "Membership portal", desc: "National register", q: "Tell me about the membership portal you built." },
     ];
     const showUseCaseGallery = () => {
       const msg = add("", "bot");
