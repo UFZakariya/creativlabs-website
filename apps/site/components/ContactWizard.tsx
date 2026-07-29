@@ -203,11 +203,16 @@ export default function ContactWizard() {
         aria-hidden
       />
 
-      {/* keyed remount per step — enter animation, no exit dependency */}
+      {/* Keyed remount per step — enter animation, no exit dependency.
+          The FIRST step must not start hidden: this is the site's only lead
+          form, and `initial="hide"` shipped the name/phone fields at opacity 0
+          in the server HTML, so they were invisible until framer-motion
+          hydrated. Steps 2 and 3 only ever appear after an interaction, by
+          which point hydration has happened, so they keep the animation. */}
       <motion.div
         key={step}
         variants={stepVariants}
-        initial="hide"
+        initial={step === 0 ? false : "hide"}
         animate="show"
         className="flex flex-col gap-4 px-7 py-7"
       >
