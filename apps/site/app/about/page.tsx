@@ -49,9 +49,10 @@ function TeamPlaceholder({ role }: { role: string }) {
 
 export default function AboutPage() {
   return (
-    <main id="main">
+    <>
       <WaveBackground />
       <Navbar onLight />
+      <main id="main" tabIndex={-1}>
 
       {/* light hero on the waves */}
       <section className="px-5 pb-14 pt-36 text-center sm:pt-44">
@@ -75,7 +76,7 @@ export default function AboutPage() {
       {/* mission band */}
       <section className="bg-azure-dawn rounded-[var(--radius-band)] mx-3 px-5 py-20 text-center sm:py-24">
         <Reveal className="mx-auto max-w-3xl">
-          <p className="mb-4 inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)]">
+          <p className="mb-4 inline-block rounded-full border border-white/25 bg-[#0a1d7a] px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)]">
             The mission
           </p>
           <h2 className="text-display-2 text-white">
@@ -143,5 +144,6 @@ export default function AboutPage() {
       <CTABand />
       <Footer />
     </main>
+    </>
   );
 }

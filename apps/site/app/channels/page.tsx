@@ -121,9 +121,10 @@ const CHANNELS = [
 
 export default function ChannelsPage() {
   return (
-    <main id="main">
+    <>
       <WaveBackground />
       <Navbar onLight />
+      <main id="main" tabIndex={-1}>
 
       {/* light hero on the waves */}
       <section className="px-5 pb-14 pt-36 text-center sm:pt-44">
@@ -268,5 +269,6 @@ export default function ChannelsPage() {
       <CTABand />
       <Footer />
     </main>
+    </>
   );
 }

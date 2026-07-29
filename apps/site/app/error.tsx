@@ -21,7 +21,15 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="page-bg grid min-h-dvh place-items-center px-5 py-24 text-center">
+    /* NOT .page-bg — that utility is position:fixed, z-index:-20 and
+       pointer-events:none (globals.css), so using it as a container made every
+       control on this page dead and un-scrollable. The layout already paints
+       the backdrop behind every route. */
+    <main
+      id="main"
+      tabIndex={-1}
+      className="grid min-h-dvh place-items-center px-5 py-24 text-center"
+    >
       <div className="mx-auto max-w-xl">
         <h1 className="text-display-2 text-[var(--color-ink)]">
           Something went wrong on our side.

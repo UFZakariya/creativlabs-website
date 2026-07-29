@@ -576,7 +576,7 @@ export default function UseCaseThreads() {
     <section className="bg-azure-dawn rounded-[var(--radius-band)] mx-3 px-5 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center">
-          <p className="mb-4 inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)]">
+          <p className="mb-4 inline-block rounded-full border border-white/25 bg-[#0a1d7a] px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)]">
             The starter demo
           </p>
           <h2 className="text-display-2 mx-auto max-w-3xl text-white">

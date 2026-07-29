@@ -20,9 +20,10 @@ export type SeoLandingProps = {
 
 export default function SeoLanding({ eyebrow, h1, intro, points, proof }: SeoLandingProps) {
   return (
-    <main>
+    <>
       <WaveBackground />
       <Navbar onLight />
+      <main id="main" tabIndex={-1}>
 
       <section className="px-5 pb-14 pt-36 text-center sm:pt-44">
         <Reveal immediate className="mx-auto max-w-4xl">
@@ -88,5 +89,6 @@ export default function SeoLanding({ eyebrow, h1, intro, points, proof }: SeoLan
       </Reveal>
       <Footer />
     </main>
+    </>
   );
 }

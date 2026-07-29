@@ -36,16 +36,17 @@ export default async function CaseStudyPage({
   if (!cs) notFound();
 
   return (
-    <main id="main">
+    <>
       <WaveBackground />
       <Navbar />
+      <main id="main" tabIndex={-1}>
 
       {/* dark billboard hero */}
       <section className="bg-azure-dawn rounded-b-[var(--radius-band)] px-5 pb-16 pt-36 text-center sm:pb-20 sm:pt-44">
         <div className="mx-auto max-w-4xl">
           <a
             href="/customers"
-            className="mb-6 inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)] transition-opacity hover:opacity-80"
+            className="mb-6 inline-block rounded-full border border-white/25 bg-[#0a1d7a] px-3.5 py-1 text-[13px] font-semibold text-[var(--color-cyan)] transition-opacity hover:opacity-80"
           >
             ← All customers
           </a>
@@ -65,5 +66,6 @@ export default async function CaseStudyPage({
       <CTABand />
       <Footer />
     </main>
+    </>
   );
 }

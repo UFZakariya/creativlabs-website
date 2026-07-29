@@ -20,9 +20,10 @@ const LINKS = [
 
 export default function NotFound() {
   return (
-    <main id="main">
+    <>
       <WaveBackground />
       <Navbar onLight />
+      <main id="main" tabIndex={-1}>
 
       <section className="px-5 pb-24 pt-36 text-center sm:pt-44">
         <div className="mx-auto max-w-2xl">
@@ -60,5 +61,6 @@ export default function NotFound() {
 
       <Footer />
     </main>
+    </>
   );
 }

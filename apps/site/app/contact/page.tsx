@@ -14,13 +14,14 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main id="main">
+    <>
       <WaveBackground />
       <Navbar onLight />
+      <main id="main" tabIndex={-1}>
 
       {/* light hero on the waves */}
       <section className="px-5 pb-12 pt-36 text-center sm:pt-44">
-        <Reveal className="mx-auto max-w-4xl">
+        <Reveal immediate className="mx-auto max-w-4xl">
           <p className="mb-6 inline-block rounded-full border border-[var(--color-blue)]/25 bg-[var(--color-blue)]/5 px-3.5 py-1 text-[13px] font-semibold text-[var(--color-blue)]">
             Contact
           </p>
@@ -37,7 +38,7 @@ export default function ContactPage() {
 
       {/* the wizard */}
       <section className="px-5 pb-16 sm:pb-20">
-        <Reveal delay={0.08}>
+        <Reveal immediate>
           <ContactWizard />
         </Reveal>
         <p className="mx-auto mt-6 max-w-md text-center text-[12.5px] leading-relaxed text-[var(--color-ink-soft)]/80">
@@ -60,5 +61,6 @@ export default function ContactPage() {
 
       <Footer />
     </main>
+    </>
   );
 }

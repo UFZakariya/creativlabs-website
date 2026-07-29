@@ -19,13 +19,14 @@ export const metadata: Metadata = {
 
 export default function ProductPage() {
   return (
-    <main id="main">
+    <>
       <WaveBackground />
       <Navbar onLight />
+      <main id="main" tabIndex={-1}>
 
       {/* light hero on the waves */}
       <section className="px-5 pb-16 pt-36 text-center sm:pb-20 sm:pt-44">
-        <Reveal className="mx-auto max-w-4xl">
+        <Reveal immediate className="mx-auto max-w-4xl">
           <div className="mb-8 flex items-center justify-center gap-3">
             <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#25d366] shadow-[0_14px_34px_rgba(37,211,102,0.35)]">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
@@ -112,5 +113,6 @@ export default function ProductPage() {
       </Reveal>
       <Footer />
     </main>
+    </>
   );
 }

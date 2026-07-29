@@ -22,10 +22,11 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main id="main">
+    <>
       {/* the Safetyline wave ribbons — fixed behind every light section */}
       <WaveBackground />
       <Navbar />
+      <main id="main" tabIndex={-1}>
       <Hero />
 
       {/* viktor-structure rotating positioning statement on the wave background */}
@@ -63,5 +64,6 @@ export default function Home() {
 
       <Footer />
     </main>
+    </>
   );
 }

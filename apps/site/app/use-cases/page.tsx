@@ -16,9 +16,10 @@ export const metadata: Metadata = {
 
 export default function UseCasesPage() {
   return (
-    <main id="main">
+    <>
       <WaveBackground />
       <Navbar onLight />
+      <main id="main" tabIndex={-1}>
 
       {/* light hero on the waves */}
       <section className="px-5 pb-16 pt-36 text-center sm:pb-20 sm:pt-44">
@@ -65,5 +66,6 @@ export default function UseCasesPage() {
       </Reveal>
       <Footer />
     </main>
+    </>
   );
 }
