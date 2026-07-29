@@ -1366,3 +1366,25 @@
    same gap it has on the left. */
 .dock .dock-form > input,
 .dock .dock-form > textarea { min-width: 0; }
+
+/* ---------- close: the panel disassembles before the fold -----------------
+   Exact mirror of the build. The build rises bottom-up (composer, tools,
+   thread, header); the disassemble releases top-down — header first, composer
+   last — each piece dropping the same 16px path it arrived on. Transform and
+   opacity only, so it composites; `both` holds each piece hidden once gone. */
+.dock .dock-panel.is-content.is-closing > * {
+  animation: dock-disassemble 230ms cubic-bezier(0.45, 0, 0.55, 0.2) both;
+}
+.dock .dock-panel.is-content.is-closing > .dock-head  { animation-delay: 0ms; }
+.dock .dock-panel.is-content.is-closing > .dock-msgs  { animation-delay: 45ms; }
+.dock .dock-panel.is-content.is-closing > .dock-tools { animation-delay: 90ms; }
+.dock .dock-panel.is-content.is-closing > .dock-form  { animation-delay: 130ms; }
+
+@keyframes dock-disassemble {
+  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  to   { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.985); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock .dock-panel.is-content.is-closing > * { animation: none; }
+}

@@ -26,21 +26,23 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 
        A monotonically increasing token guards every await, so a stale sequence
        can never keep running after a reset and leave the panel half-grown. */
-    /* timings straight from the handoff's motion table, not compressed */
-    const ROLL = 720;     /* horizontal roll / compact-card reveal          */
-    const CTRL = 200;      /* pause after arrival, before the card grows     */
-    const GROW = 1000;     /* card growth into the full dock                 */
-    const CLIMB = 1000;   /* vertical phase — body and logo share it exactly */
-    const HOME = 560;      /* logo returns to its corner                     */
-    const FOLD = 620;     /* close fold                                     */
+    /* One timeline, two phases each way. Open: horizontal (roll out across the
+       compact card), then vertical (body grows while the logo climbs to the
+       header slot), then the contents assemble. Close mirrors it exactly:
+       contents disassemble, vertical (fold + descent), horizontal (retract +
+       roll home). The vertical pair always shares ONE duration so the body and
+       the logo land together, and every leg shares the site's easing family. */
+    const ROLL = 680;     /* horizontal legs (out + retract)                 */
+    const CTRL = 180;     /* beat at the compact card before the growth      */
+    const RISE = 900;     /* vertical legs — body and logo share it exactly  */
+    const EXIT = 360;     /* the contents' disassemble before the fold       */
     let seq = 0;
-    let slot = { dx: 0, dy: 0 };
     let anims = [];
     const alive = (run) => run === seq;
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     const stopAnims = () => { anims.forEach((a) => { try { a.cancel(); } catch {} }); anims = []; };
-    const ROLL_EASE = "cubic-bezier(.32,.72,.28,1)";
-    const GROW_EASE = "cubic-bezier(.16,.84,.24,1)";
+    const ROLL_EASE = "cubic-bezier(.32,.72,.28,1)";   /* near-constant roll, soft landing */
+    const GROW_EASE = "cubic-bezier(.22,1,.36,1)";     /* the site's signature ease */
     const play = (el, frames, ms, ease) => {
       const a = el.animate(frames, { duration: ms, easing: ease || ROLL_EASE, fill: "forwards" });
       anims.push(a);
@@ -57,9 +59,32 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       btn.style.transform = "";
       panel.style.width = "";
       panel.style.height = "";
-      panel.classList.remove("is-morph", "is-content");
+      panel.classList.remove("is-morph", "is-content", "is-closing");
       dock.classList.remove("is-animating", "is-shell-open");
     };
+    /* The resting logo is laid out from --logo-left/--logo-top, which are read
+       from the header's own (hidden) logo box. Re-published on every panel or
+       header resize, so the rest position is exact at ANY width — the header
+       grows when its title wraps, so no constant can be right everywhere. */
+    const placeRestingLogo = () => {
+      const img = panel.querySelector(".dock-head img");
+      if (!img) return;
+      const pr = panel.getBoundingClientRect();
+      const t = img.getBoundingClientRect();
+      if (!pr.width || !t.height) return;
+      dock.style.setProperty("--logo-left", Math.round((t.left - pr.left) - (58 - t.width) / 2) + "px");
+      dock.style.setProperty("--logo-top", Math.round((t.top - pr.top) - (58 - t.height) / 2) + "px");
+    };
+    if (typeof ResizeObserver === "function") {
+      const ro = new ResizeObserver(() => {
+        if (dock.classList.contains("is-shell-open") && !dock.classList.contains("is-animating")) {
+          placeRestingLogo();
+        }
+      });
+      ro.observe(panel);
+      const headEl = panel.querySelector(".dock-head");
+      if (headEl) ro.observe(headEl);
+    }
     /* the shell's open size, measured from CSS rather than hard-coded */
     /* Where the logo comes to rest: the header's own logo box.
        X is stable (padding 16 + half of a 30px logo, less half the 58px
@@ -75,22 +100,16 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       panel.classList.add("is-content");           // header must be laid out to read it
       const r = panel.getBoundingClientRect();
       const w = Math.round(r.width), h = Math.round(r.height);
-      const img = panel.querySelector(".dock-head img");
-      let dy = SLOT_Y - h;
-      if (img) {
-        const t = img.getBoundingClientRect();
-        /* the button's top so its centred logo lands exactly on the header's
-           slot; published as --logo-top so CSS can hold the resting position
-           (and keep holding it through any resize) */
-        const top = Math.round((t.top - r.top) - (58 - t.height) / 2);
-        const left = Math.round((t.left - r.left) - (58 - t.width) / 2);
-        dock.style.setProperty("--logo-top", top + "px");
-        dock.style.setProperty("--logo-left", left + "px");
-        dy = top - (h - 58);                       // same point, as an offset
-      }
+      placeRestingLogo();                          // publishes --logo-left/top
+      const top = parseInt(dock.style.getPropertyValue("--logo-top"), 10);
+      const left = parseInt(dock.style.getPropertyValue("--logo-left"), 10);
       panel.classList.remove("is-content");
       dock.classList.remove("is-shell-open");
-      return { w, h, dx: SLOT_X - w, dy };
+      /* the climb's endpoint, as an offset from the button's closed corner at
+         (w-58, h-58) — the same point the CSS rest rule then holds via layout */
+      const dx = (isNaN(left) ? SLOT_X - 58 : left) - (w - 58);
+      const dy = (isNaN(top) ? SLOT_Y - 58 : top) - (h - 58);
+      return { w, h, dx, dy };
     };
     /* one descending three-bounce on the whole launcher — glass, logo and the
        unread dot travel together (the dot is a child, so it rides along) */
@@ -961,10 +980,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     async function rollOpen() {
       resetLauncher();
       const { w, h, dx, dy } = shellSize();
-      slot = { dx, dy };
       if (reducedMotion) {                          // immediate open
         dock.classList.add("is-shell-open");
         panel.classList.add("is-morph", "is-content");
+        placeRestingLogo();
         return;
       }
       const run = ++seq;
@@ -985,50 +1004,63 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       /* then it grows up while the logo ROLLS UP the left edge, landing on the
          header's logo slot (-720deg = two full turns, so it lands upright) */
       await Promise.all([
-        play(panel, [{ height: "58px" }, { height: h + "px" }], GROW, GROW_EASE),
+        play(panel, [{ height: "58px" }, { height: h + "px" }], RISE, GROW_EASE),
         play(btn, [{ transform: `translate(${-x}px,0) rotate(-450deg)` },
-                   { transform: `translate(${dx}px,${dy}px) rotate(-720deg)` }], CLIMB, GROW_EASE),
+                   { transform: `translate(${dx}px,${dy}px) rotate(-720deg)` }], RISE, GROW_EASE),
       ]);
       if (!alive(run)) return;
       stopAnims();
       panel.style.width = "";
       panel.style.height = "";
       dock.classList.add("is-shell-open");
-      /* hand the resting position to CSS (left/top + --logo-top). Holding it
-         with a transform pinned it to the size measured at open time, so a
+      /* hand the resting position to CSS (left/top + --logo-left/top). Holding
+         it with a transform pinned it to the size measured at open time, so a
          later resize left the logo stranded outside the panel. */
       btn.style.transform = "";
       dock.classList.remove("is-animating");        // lets the CSS rest rule apply
       panel.classList.add("is-content");            // content only at full size
+      /* one correction after the contents are truly laid out (fonts, greeting)
+         — the observer keeps it exact from here on */
+      requestAnimationFrame(() => { if (alive(run)) placeRestingLogo(); });
     }
 
-    /* closing is the exact reverse: content out, fold down while the launcher
-       rolls out, then the card retracts as the launcher rolls home. */
+    /* closing mirrors opening exactly: the contents disassemble (reverse of
+       the build), the body folds down while the logo rolls DOWN the left edge
+       to the foot, then the card retracts as the logo rolls home to the
+       bottom-right corner. */
     async function rollClose() {
-      const r = panel.getBoundingClientRect();
-      const w = Math.round(r.width), h = Math.round(r.height);
+      const pr = panel.getBoundingClientRect();
+      const br = btn.getBoundingClientRect();
+      const w = Math.round(pr.width), h = Math.round(pr.height);
       if (reducedMotion) {
         panel.classList.remove("open");
         resetLauncher();
-        
         return;
       }
       const run = ++seq;
       const x = travel(w);
-      const { dx, dy } = slot;   // measured at open; never re-measure here
+      /* where the logo IS right now (it is laid out, so this tracks any resize
+         since open), expressed as an offset from its closed corner */
+      const dx = Math.round(br.left - (pr.right - 58));
+      const dy = Math.round(br.top - (pr.bottom - 58));
       stopAnims();
+      /* 1. the contents disassemble — reverse of the build, while the body is
+         still at full size and the logo still rests on the header */
+      panel.classList.add("is-morph", "is-closing");
+      await wait(EXIT);
+      if (!alive(run)) return;
+      /* swap the resting logo from layout back into transform space in one
+         synchronous block, so no intermediate frame ever paints */
       dock.classList.add("is-animating");
+      btn.style.transform = `translate(${dx}px,${dy}px) rotate(-720deg)`;
+      panel.classList.remove("is-content", "is-closing");
       dock.classList.remove("is-shell-open");       // drive the size ourselves
       panel.style.width = w + "px";
       panel.style.height = h + "px";
-      panel.classList.add("is-morph");
-      panel.classList.remove("is-content");         // 1. content out first
-      await wait(200);
-      if (!alive(run)) return;
-      await Promise.all([                           // 2. roll DOWN the left edge
-        play(panel, [{ height: h + "px" }, { height: "58px" }], CLIMB, GROW_EASE),
+      await Promise.all([                           // 2. fold + roll DOWN the left edge
+        play(panel, [{ height: h + "px" }, { height: "58px" }], RISE, GROW_EASE),
         play(btn, [{ transform: `translate(${dx}px,${dy}px) rotate(-720deg)` },
-                   { transform: `translate(${-x}px,0) rotate(-450deg)` }], CLIMB, GROW_EASE),
+                   { transform: `translate(${-x}px,0) rotate(-450deg)` }], RISE, GROW_EASE),
       ]);
       if (!alive(run)) return;
       await Promise.all([                           // 3. retract + roll home
