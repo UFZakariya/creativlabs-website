@@ -10,9 +10,10 @@ import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/pricing" },
+  openGraph: { url: "/pricing" },
   title: "Pricing — Start free, scale when it works | Safetyline",
   description:
-    "Sardauna's four-tier ladder: get seen free on Sardauna Lite, get answered 24/7 on Sardauna Plus+, get your whole back office run on Sardauna Elite, or get custom systems built for you with Sardauna Premier. Naira-billed, WhatsApp-first, priced with you before you commit.",
+    "Sardauna's four-tier ladder: start free on Lite, get answered 24/7 on Plus+, run the back office on Elite, or build custom with Premier. Naira-billed, priced with you first.",
 };
 
 const check = (

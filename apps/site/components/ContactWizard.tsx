@@ -7,7 +7,7 @@
    at least one reachable channel, 400 errors are customer-safe to show,
    network failure falls back to a prefilled WhatsApp link. */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { slTrack } from "@/lib/track";
 
@@ -53,6 +53,27 @@ export default function ContactWizard() {
     botField: "",
   });
   const [stepError, setStepError] = useState("");
+  /* Keyboard focus fell to <body> on every step change, so a keyboard or
+     screen-reader user lost their place three times across the form. Focus the
+     new step's first field instead; the label is announced with it. */
+  const stepRef = useRef<HTMLDivElement>(null);
+  const sentRef = useRef<HTMLDivElement>(null);
+  const firstRender = useRef(true);
+
+  useEffect(() => {
+    if (status.kind === "sent") sentRef.current?.focus();
+  }, [status.kind]);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;   // don't steal focus on page load
+      return;
+    }
+    const field = stepRef.current?.querySelector<HTMLElement>(
+      "input:not([type=hidden]):not(.hidden), textarea, button[role=checkbox]"
+    );
+    (field ?? stepRef.current)?.focus();
+  }, [step]);
 
   const set = (k: keyof typeof f, v: string | string[]) =>
     setF((prev) => ({ ...prev, [k]: v }));
@@ -84,16 +105,36 @@ export default function ContactWizard() {
   };
 
   const submit = async () => {
-    if (!f.phone.trim() && !f.email.trim()) {
+    const phone = f.phone.trim();
+    const email = f.email.trim();
+    if (!phone && !email) {
       setStepError("Add a WhatsApp number or an email so we can reach you.");
+      return;
+    }
+    /* E.164 digit range, country-agnostic on purpose */
+    const phoneOk = !phone || /^\d{8,15}$/.test(phone.replace(/\D/g, ""));
+    const emailOk = !email || /^\S+@\S+\.\S{2,}$/.test(email);
+    if (!phoneOk && !email) {
+      setStepError("That number looks incomplete — check it and try again.");
+      return;
+    }
+    if (!emailOk && !phone) {
+      setStepError("That email address looks incomplete — check it and try again.");
       return;
     }
     setStepError("");
     setStatus({ kind: "sending" });
+    /* a stalled network otherwise leaves the button reading "Sending…" forever
+       with no way out. AbortController, not AbortSignal.timeout — the latter
+       throws on older Android WebViews, inside this try, and would surface as
+       a network error before a request was even attempted. */
+    const ac = new AbortController();
+    const killer = setTimeout(() => ac.abort(), 20000);
     try {
       const res = await fetch(LEAD_URL, {
         method: "POST",
         credentials: "include",
+        signal: ac.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: f.name.trim(),
@@ -123,7 +164,7 @@ export default function ContactWizard() {
       setStatus({ kind: "sent" });
       slTrack("form_submit", { status: "ok" });
     } catch {
-      slTrack("form_error", { status: "network" });
+      slTrack("form_error", { status: ac.signal.aborted ? "timeout" : "network" });
       setStatus({
         kind: "error",
         message: "That didn't go through — ",
@@ -138,7 +179,11 @@ export default function ContactWizard() {
 
   if (status.kind === "sent") {
     return (
-      <div className="glass-ring mx-auto max-w-xl rounded-[32px] bg-white p-10 text-center shadow-[0_20px_60px_rgba(16,20,42,0.08)]">
+      <div
+        ref={sentRef}
+        tabIndex={-1}
+        className="glass-ring mx-auto max-w-xl rounded-[32px] bg-white p-10 text-center shadow-[0_20px_60px_rgba(16,20,42,0.08)] focus:outline-none"
+      >
         <span className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-full bg-[#22c55e]">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" aria-hidden>
             <path d="m5 13 4.5 4.5L19 8" />
@@ -157,7 +202,16 @@ export default function ContactWizard() {
     "w-full rounded-2xl border border-black/10 bg-white px-4 py-3.5 text-[15px] text-[var(--color-ink)] placeholder:text-black/55 outline-none transition-colors focus:border-[var(--color-blue)]/60";
 
   return (
-    <div className="glass-ring mx-auto max-w-xl overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(16,20,42,0.08)]">
+    <form
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (status.kind === "sending") return;
+        if (step < 2) next();
+        else void submit();
+      }}
+      className="glass-ring mx-auto max-w-xl overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(16,20,42,0.08)]"
+    >
       {/* step header */}
       <div className="flex items-center gap-2 border-b border-black/6 px-7 py-5">
         {STEPS.map((s, i) => (
@@ -214,6 +268,7 @@ export default function ContactWizard() {
         variants={stepVariants}
         initial={step === 0 ? false : "hide"}
         animate="show"
+        ref={stepRef}
         className="flex flex-col gap-4 px-7 py-7"
       >
         {step === 0 && (
@@ -364,16 +419,14 @@ export default function ContactWizard() {
           )}
           {step < 2 ? (
             <button
-              type="button"
-              onClick={next}
+              type="submit"
               className="rounded-full bg-[var(--color-ink)] px-7 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Continue
             </button>
           ) : (
             <button
-              type="button"
-              onClick={submit}
+              type="submit"
               disabled={status.kind === "sending"}
               className="rounded-full bg-[var(--color-ink)] px-7 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             >
@@ -382,6 +435,6 @@ export default function ContactWizard() {
           )}
         </div>
       </motion.div>
-    </div>
+    </form>
   );
 }

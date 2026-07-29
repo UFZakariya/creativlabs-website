@@ -18,6 +18,7 @@ import type { Metadata } from "next";
    compete with any query-string or trailing-slash variant. */
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
+  openGraph: { url: "/" },
 };
 
 export default function Home() {

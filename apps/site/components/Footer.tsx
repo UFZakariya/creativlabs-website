@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 /* Mega footer: link columns, contact + legal line, and a giant cropped
    wordmark anchoring the page's end. */
 
@@ -20,6 +22,19 @@ const COLS: { head: string; links: { label: string; href: string }[] }[] = [
     ],
   },
   {
+    /* The four industry landing pages existed only in the sitemap — no page on
+       the site linked to them, so crawlers reached them with zero internal
+       PageRank and visitors could not navigate to them at all. The footer is
+       on every route, so listing them here gives each one 15 inbound links. */
+    head: "By industry",
+    links: [
+      { label: "Farm management", href: "/farm-management-system-nigeria" },
+      { label: "Food business ops", href: "/food-business-operations-nigeria" },
+      { label: "AI agent for business", href: "/ai-agent-for-business-nigeria" },
+      { label: "Membership management", href: "/membership-management-nigeria" },
+    ],
+  },
+  {
     head: "Trust",
     links: [
       { label: "Security", href: "/security" },
@@ -33,7 +48,7 @@ const COLS: { head: string; links: { label: string; href: string }[] }[] = [
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden border-t border-black/5 bg-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 pb-10 pt-14 sm:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 pb-10 pt-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2.5">
             <img src="/logo-128.png" alt="" width={30} height={32} />
@@ -61,12 +76,12 @@ export default function Footer() {
             <ul className="space-y-2">
               {col.links.map((l) => (
                 <li key={l.label}>
-                  <a
+                  <Link
                     href={l.href}
                     className="text-[14px] font-medium text-[var(--color-ink-soft)] transition-colors hover:text-[var(--color-blue)]"
                   >
                     {l.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

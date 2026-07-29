@@ -218,15 +218,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const el = e.target.closest && e.target.closest("[data-cta],[data-wa]");
       if (el) track("cta_click", { target: (el.getAttribute("data-cta") || "whatsapp").slice(0, 80) });
     }, { passive: true });
-
-    let sessionId;
-    try {
-      sessionId = localStorage.getItem("hermes-session") ||
-        (crypto.randomUUID ? crypto.randomUUID() : String(Math.floor(performance.now() * 1e6)));
-      localStorage.setItem("hermes-session", sessionId);
-    } catch {
-      sessionId = "anon";
-    }
+    /* the old hermes-session id was written on every load and never read —
+       the backend issues its own httpOnly cookie. Remove the orphan from
+       devices that already carry it; this cleanup can go in a release or two. */
+    try { localStorage.removeItem("hermes-session"); } catch {}
 
     // WhatsApp-style message meta: a subtle timestamp, plus sent/read ticks on
     // the visitor's own messages.
@@ -572,7 +567,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       addStarters();
       showTools();
       scheduleFirstNudge();
-      if (finePointer) setTimeout(() => input && input.focus(), 60);
+      /* focus is handled after the open sequence reveals the composer */
     };
 
     // "Switch" control injected into the header (before the close button).
@@ -610,8 +605,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         msgs.appendChild(div);
         add(p.handover || `Hi, I'm ${p.name} — I've got everything from your chat so far. How can I help?`, "bot");
         msgs.scrollTop = msgs.scrollHeight;
-        setTimeout(() => input && input.focus(), 60);
-      });
+        });
     })();
 
     // ── In-chat quick actions (WhatsApp / Telegram style) ───────────────────
@@ -876,8 +870,9 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 
     // Inline lead-capture card — a strong, low-friction conversion CTA.
     let leadCardOpen = false;
+    let leadSending = false;
     const openLeadCard = () => {
-      if (leadCardOpen || composerSwapped) return;
+      if (leadCardOpen || leadSending || composerSwapped) return;
       leadCardOpen = true;
       quizActive = false; // opening the form abandons any in-chat quiz
       const msg = add("", "bot");
@@ -896,23 +891,43 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         const name = nameI.value.trim(), phone = phoneI.value.trim(), want = wantI.value.trim();
         if (!name || !phone) { box.classList.add("is-error"); (name ? phoneI : nameI).focus(); return; }
         box.querySelectorAll("input,button").forEach((x) => { x.disabled = true; });
-        leadCardOpen = false;
-        track("lead_submit", {});
+        /* leadCardOpen used to clear here, which let a second card open while
+           this POST was still in flight; a separate flag keeps "a card exists"
+           and "a send is running" from being conflated */
+        leadSending = true;
         // Durable capture FIRST (deterministic lead store + team alert); the
         // confirmation is only shown once it actually lands — no false "Sent".
         let saved = false;
+        /* a stalled network otherwise disables the card forever with no
+           confirmation and no way back */
+        const ac = new AbortController();
+        const killer = setTimeout(() => ac.abort(), 20000);
         if (leadUrl) {
           try {
             const res = await fetch(leadUrl, {
               method: "POST",
               credentials: "include",
+              signal: ac.signal,
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ name, phone, need: want })
             });
             saved = res.ok;
           } catch (_) { /* fall through to the WhatsApp fallback */ }
         }
+        clearTimeout(killer);
+        leadCardOpen = false;
+        leadSending = false;
+        /* report what actually happened, not what we attempted: this fired
+           before the POST, so the funnel counted attempts as submissions */
+        track("lead_submit", { status: leadUrl ? (saved ? "ok" : "failed") : "offline" });
         const done = document.createElement("p"); done.className = "dock-leadform-done";
+        if (!saved) {
+          /* re-enable so the visitor can retry rather than only escaping to
+             WhatsApp, and mark the message as a failure so it stops rendering
+             in success green */
+          done.classList.add("is-fail");
+          box.querySelectorAll("input,button").forEach((x) => { x.disabled = false; });
+        }
         if (saved) {
           done.textContent = "✓ Sent — the team will reach out. Thank you!";
           box.appendChild(done);
@@ -989,7 +1004,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
           }
         }
         track("dock_opened", {});
-        if (finePointer) setTimeout(() => input?.focus(), 250);
+        /* focus lands in rollOpen's post-assembly frame, once the composer
+           is actually in the layout */
       } else {
         quizActive = false;   // don't leave the Readiness tool latched off
         clearNudge();
@@ -1053,6 +1069,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       requestAnimationFrame(() => {
         if (!alive(run)) return;
         placeRestingLogo();
+        /* land on the NEWEST message, not the oldest — layout has flushed by
+           this frame, so scrollHeight is finally trustworthy */
+        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        /* the composer only leaves display:none at is-content, so every
+           earlier focus() call was a no-op on a hidden element */
+        if (finePointer && input) input.focus();
         requestAnimationFrame(() => { if (alive(run)) placeRestingLogo(); });
       });
       setTimeout(() => {
@@ -1430,10 +1452,18 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         sending = true;
         setTyping(true);
         const t = typing();
+        /* a stalled connection otherwise leaves the typing indicator running
+           forever — no reply, no error, no way for the visitor to tell.
+           AbortController rather than AbortSignal.timeout: the latter throws
+           on older Android WebViews, inside this try, and would be reported
+           as a failed turn before any request was attempted. */
+        const ac = new AbortController();
+        const killer = setTimeout(() => ac.abort(), 30000);
         try {
           const res = await fetch(cfg.endpoint, {
             method: "POST",
             credentials: "include",
+            signal: ac.signal,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               message: text,
@@ -1459,6 +1489,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
             offlineReply(text);
           }
         } finally {
+          clearTimeout(killer);
           setTyping(false);
           sending = false;
         }

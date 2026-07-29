@@ -335,3 +335,37 @@ body {
   outline: 3px solid var(--color-cyan);
   outline-offset: 2px;
 }
+
+/* ============================================================
+   FOCUS VISIBILITY
+   The site had no global focus baseline, and .glass-ring paints a decorative
+   outline that beat whatever the browser drew — so keyboard users lost the
+   focus indicator on exactly the elements most likely to be focused (cards,
+   buttons, the dock). WCAG 2.4.7 is Level AA.
+
+   Two rings so the indicator is visible on both surfaces: cyan reads on the
+   dark blue bands, ink reads on white and light glass.
+   ============================================================ */
+:focus-visible {
+  outline: 3px solid var(--color-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* on the dark bands, cyan is the legible one */
+.bg-azure-dawn :focus-visible,
+.bg-azure-dawn-card :focus-visible,
+.bg-azure-dawn-hero :focus-visible {
+  outline-color: var(--color-cyan);
+}
+
+/* .glass-ring's decorative outline must not win over a real focus ring */
+.glass-ring:focus-visible {
+  outline: 3px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+.bg-azure-dawn .glass-ring:focus-visible,
+.bg-azure-dawn-card .glass-ring:focus-visible {
+  outline-color: var(--color-cyan);
+}

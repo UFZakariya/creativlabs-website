@@ -9,9 +9,10 @@ import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/use-cases" },
+  openGraph: { url: "/use-cases" },
   title: "Use cases — See the house at work | Safetyline",
   description:
-    "Five department threads from a running house of agents — plus the same house answering Instagram DMs: support answered, leads qualified, stock reordered under your approval, books kept current, and a daily brief that tells you the whole story.",
+    "Five department threads from a running house of agents, plus the same agents answering Instagram DMs: support, leads, stock, books and a daily brief.",
 };
 
 export default function UseCasesPage() {

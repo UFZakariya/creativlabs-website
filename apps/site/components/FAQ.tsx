@@ -11,7 +11,7 @@ const ITEMS = [
   },
   {
     q: "Which channels does it work on?",
-    a: "WhatsApp first — that's where Nigerian business happens, and it's where Sardauna is proven in production today. Instagram, Facebook, X, Microsoft Teams and Slack are offered as integrations, alongside email and the Sardauna dashboard.",
+    a: "WhatsApp first — that's where Nigerian business happens, and it's where Sardauna is proven in production today. Instagram, Facebook, X, Microsoft Teams and Slack are offered as integrations, and you get the Sardauna dashboard. Email is in the design, not shipped yet.",
   },
   {
     q: "What can the agents actually do?",

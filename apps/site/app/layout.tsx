@@ -5,6 +5,7 @@ import "./legacy-dock.css";
 import Analytics from "@/components/Analytics";
 import LegacyDock from "@/components/LegacyDock";
 import MotionProvider from "@/components/MotionProvider";
+import StructuredData from "@/components/StructuredData";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -16,6 +17,10 @@ const robotoMono = Roboto_Mono({
   weight: ["400"],
   variable: "--font-roboto-mono",
 });
+
+/* the footer prints the current year; without this every fully static page
+   would keep its build-time year until the next deploy */
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://safetyline.com.ng"),
@@ -48,6 +53,7 @@ export default function RootLayout({
             users had to tab it in full before reaching any page content */}
         <a href="#main" className="skip-link">Skip to content</a>
         <MotionProvider>{children}</MotionProvider>
+        <StructuredData />
         <Analytics />
         <LegacyDock />
       </body>

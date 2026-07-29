@@ -10,9 +10,10 @@ import WaMiniDemo from "@/components/WaMiniDemo";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/channels" },
+  openGraph: { url: "/channels" },
   title: "Channels — One house, every door | Safetyline",
   description:
-    "Sardauna is WhatsApp-first — proven live in production — with email in the design and Instagram, Facebook, X, Teams and Slack offered. One house behind every door: same agents, same approvals, one record.",
+    "Sardauna is WhatsApp-first and proven in production, with Instagram, Facebook, X, Teams and Slack offered. One house behind every door, one record.",
 };
 
 /* hand-drawn channel glyphs — no lifted brand assets */

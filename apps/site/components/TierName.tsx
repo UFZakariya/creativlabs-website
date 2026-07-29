@@ -19,11 +19,19 @@
    so the heading never reflows. */
 
 import { useState } from "react";
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export type TierKey = "lite" | "plus" | "elite" | "premier";
+
+/* plain-text fallback used under prefers-reduced-motion */
+const QUALIFIER: Record<TierKey, string> = {
+  lite: "Lite",
+  plus: "Plus+",
+  elite: "Elite",
+  premier: "Premier",
+};
 
 /* ------------------------------------------------------------------ Lite */
 /* Airy shimmer: thin letters, each carrying its own silver/cyan sweep with
@@ -345,6 +353,11 @@ function PremierWord({ hov, run }: { hov: boolean; run: number }) {
 export default function TierName({ tier }: { tier: TierKey }) {
   const [hov, setHov] = useState(false);
   const [run, setRun] = useState(0);
+  /* MotionConfig's reducedMotion="user" skips transform/opacity tweens but not
+     repeating background-position / filter tracks, so these nameplates kept
+     shimmering forever for someone who asked for less motion. Freeze them at
+     their resting frame instead. */
+  const reduce = useReducedMotion();
   return (
     <motion.span
       /* wraps rather than overflows: at display size the longer names need
@@ -358,10 +371,11 @@ export default function TierName({ tier }: { tier: TierKey }) {
       onHoverEnd={() => setHov(false)}
     >
       <span>Sardauna</span>{" "}
-      {tier === "lite" && <LiteWord hov={hov} />}
-      {tier === "plus" && <PlusWord hov={hov} run={run} />}
-      {tier === "elite" && <EliteWord hov={hov} />}
-      {tier === "premier" && <PremierWord hov={hov} run={run} />}
+      {reduce && <span className="font-light">{QUALIFIER[tier]}</span>}
+      {!reduce && tier === "lite" && <LiteWord hov={hov} />}
+      {!reduce && tier === "plus" && <PlusWord hov={hov} run={run} />}
+      {!reduce && tier === "elite" && <EliteWord hov={hov} />}
+      {!reduce && tier === "premier" && <PremierWord hov={hov} run={run} />}
     </motion.span>
   );
 }

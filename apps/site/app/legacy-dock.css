@@ -1444,3 +1444,9 @@
   .dock .dock-panel.is-content > *,
   .dock .dock-panel.is-content.is-closing > * { animation: none; }
 }
+
+/* a failed lead send used to render in the success green — the visitor read
+   "couldn't send" in the colour that means "sent" */
+.dock-leadform-done.is-fail {
+  color: #c0392b;
+}

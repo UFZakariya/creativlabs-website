@@ -11,9 +11,10 @@ import "../uc-demo.css";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/customers" },
+  openGraph: { url: "/customers" },
   title: "Customers — Built on real operations, not demos | Safetyline",
   description:
-    "The deployments behind Sardauna: a farm-management system live in production, a food business's ops admin and ordering app, a membership portal, and the front desk running on safetyline.com.ng right now.",
+    "The deployments behind Sardauna: a farm management system live in production, a food business's ops admin and ordering app, and a national membership portal.",
 };
 
 const BILLBOARDS = [

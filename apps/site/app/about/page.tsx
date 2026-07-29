@@ -9,6 +9,7 @@ import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/about" },
+  openGraph: { url: "/about" },
   title: "About — Safetyline | The house behind Sardauna",
   description:
     "Safetyline is a Nigerian AI-integration company. We build houses of agents that run real businesses — starting with our own systems, proven in production before we sold a single seat.",

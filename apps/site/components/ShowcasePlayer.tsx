@@ -388,23 +388,26 @@ export default function ShowcasePlayer() {
   const doneRef = useRef(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  /* Start the scene when the card scrolls into view on EVERY device. This was
+     gated behind `(hover: hover)` being false, i.e. touch only — so on a
+     desktop the hero showcase sat as an empty conversation until a mouse
+     happened to enter it, and a visitor who never hovered saw nothing at all.
+     Hover remains the replay trigger; it is no longer the only way to start. */
   useEffect(() => {
     if (engaged) return;
-    if (!window.matchMedia("(hover: hover)").matches) {
-      const el = cardRef.current;
-      if (!el) return;
-      const io = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((e) => e.isIntersecting)) {
-            setEngaged(true);
-            io.disconnect();
-          }
-        },
-        { threshold: 0.35 }
-      );
-      io.observe(el);
-      return () => io.disconnect();
-    }
+    const el = cardRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setEngaged(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, [engaged]);
 
   const active = useMemo(
