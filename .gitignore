@@ -8,3 +8,6 @@ node_modules/
 
 # workflow worktrees
 .claude/worktrees/
+
+# build artefact produced by the deploy packaging step
+apps/site/sardauna-site.tar.gz
