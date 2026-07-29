@@ -1384,3 +1384,63 @@
 @media (prefers-reduced-motion: reduce) {
   .dock .dock-panel.is-content.is-closing > * { animation: none; }
 }
+
+/* ---------- header controls: close reads red, switch reads green ---------- */
+.dock .dock-close {
+  color: #d92d20;                 /* AA on the light glass header */
+  font-weight: 700;
+}
+.dock .dock-close:hover {
+  color: #b42318;
+  background: rgba(217, 45, 32, 0.09);
+}
+
+.dock .dock-switch {
+  color: #067647;
+  font-weight: 700;
+}
+.dock .dock-switch:hover {
+  color: #05603a;
+  background: rgba(6, 118, 71, 0.09);
+}
+
+/* ---------- reveal / disappear, paced to the roll ------------------------
+   The build used to run 420ms with a 210ms tail, so it kept going long after
+   the body had settled — that trailing dead time is what read as lag. It is
+   now 280ms with a 55ms step (465ms total), landing just as the movement
+   stops, and the disassemble mirrors it at 200ms/45ms. Both share the roll's
+   easing family so the whole sequence feels like one gesture. */
+.dock .dock-panel.is-content > * {
+  animation: dock-assemble 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.dock .dock-panel.is-content > .dock-form  { animation-delay: 0ms; }
+.dock .dock-panel.is-content > .dock-tools { animation-delay: 55ms; }
+.dock .dock-panel.is-content > .dock-msgs  { animation-delay: 110ms; }
+.dock .dock-panel.is-content > .dock-head  { animation-delay: 165ms; }
+
+.dock .dock-panel.is-content.is-closing > * {
+  animation: dock-disassemble 200ms cubic-bezier(0.4, 0, 0.7, 0.2) both;
+}
+.dock .dock-panel.is-content.is-closing > .dock-head  { animation-delay: 0ms; }
+.dock .dock-panel.is-content.is-closing > .dock-msgs  { animation-delay: 45ms; }
+.dock .dock-panel.is-content.is-closing > .dock-tools { animation-delay: 90ms; }
+.dock .dock-panel.is-content.is-closing > .dock-form  { animation-delay: 130ms; }
+
+/* a touch more travel and a whisper of blur-free scale so the pieces read as
+   arriving, not just fading */
+@keyframes dock-assemble {
+  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.98); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes dock-disassemble {
+  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  to   { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.985); }
+}
+
+/* keep the reduced-motion opt-out LAST so it still wins on source order */
+@media (prefers-reduced-motion: reduce) {
+  .dock .dock-panel.is-content > *,
+  .dock .dock-panel.is-content.is-closing > * { animation: none; }
+}

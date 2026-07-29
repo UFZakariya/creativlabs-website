@@ -35,8 +35,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const ROLL = 680;     /* horizontal legs (out + retract)                 */
     const CTRL = 180;     /* beat at the compact card before the growth      */
     const RISE = 900;     /* vertical legs — body and logo share it exactly  */
-    const EXIT = 360;     /* the contents' disassemble before the fold       */
-    const ASSEMBLE = 660; /* build window: 420ms rise + 210ms last delay     */
+    const EXIT = 330;     /* disassemble: 200ms fall + 130ms last delay      */
+    const ASSEMBLE = 450; /* build: 280ms rise + 165ms last delay            */
     let seq = 0;
     let anims = [];
     const alive = (run) => run === seq;
@@ -72,13 +72,32 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
        header resize, so the rest position is exact at ANY width — the header
        grows when its title wraps, so no constant can be right everywhere. */
     const placeRestingLogo = () => {
-      const img = panel.querySelector(".dock-head img");
-      if (!img) return;
+      const target = panel.querySelector(".dock-head img");   // the header's own slot
+      const mine = btn.querySelector("img");                  // the logo that flew here
+      if (!target || !mine) return;
       const pr = panel.getBoundingClientRect();
-      const t = img.getBoundingClientRect();
+      const t = target.getBoundingClientRect();
       if (!pr.width || !t.height) return;
-      dock.style.setProperty("--logo-left", Math.round((t.left - pr.left) - (58 - t.width) / 2) + "px");
-      dock.style.setProperty("--logo-top", Math.round((t.top - pr.top) - (58 - t.height) / 2) + "px");
+      /* Correct by the MEASURED delta between the two logo boxes rather than
+         assuming the button centres its image. Earlier passes derived the
+         position from the 58px button and a presumed centring, and any
+         difference (grid alignment, the badge, line-height in the header row)
+         showed up as the logo sagging below the slot. Reading where our logo
+         actually rendered and nudging by the difference cannot drift: it is a
+         fixed point, and the second pass lands exactly. */
+      const seen = mine.getBoundingClientRect();
+      const cs = getComputedStyle(btn);
+      const curLeft = parseFloat(cs.left) || 0;
+      const curTop = parseFloat(cs.top) || 0;
+      const nextLeft = curLeft + (t.left - seen.left);
+      const nextTop = curTop + (t.top - seen.top);
+      /* first paint has no left/top yet (the button is still corner-anchored),
+         so fall back to the geometric estimate for that one frame */
+      const usable = dock.classList.contains("is-shell-open") && cs.left !== "auto";
+      dock.style.setProperty("--logo-left",
+        Math.round(usable ? nextLeft : (t.left - pr.left) - (58 - t.width) / 2) + "px");
+      dock.style.setProperty("--logo-top",
+        Math.round(usable ? nextTop : (t.top - pr.top) - (58 - t.height) / 2) + "px");
     };
     if (typeof ResizeObserver === "function") {
       const ro = new ResizeObserver(() => {
@@ -1028,8 +1047,19 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       panel.classList.add("is-content", "is-assembling");
       /* one correction after the contents are truly laid out (fonts, greeting)
          — the observer keeps it exact from here on */
-      requestAnimationFrame(() => { if (alive(run)) placeRestingLogo(); });
-      setTimeout(() => { if (alive(run)) panel.classList.remove("is-assembling"); }, ASSEMBLE);
+      /* two settle passes: the first switches from the geometric estimate to
+         the measured delta, the second confirms it after the assembly has
+         moved the header into place. Both are cheap reads. */
+      requestAnimationFrame(() => {
+        if (!alive(run)) return;
+        placeRestingLogo();
+        requestAnimationFrame(() => { if (alive(run)) placeRestingLogo(); });
+      });
+      setTimeout(() => {
+        if (!alive(run)) return;
+        panel.classList.remove("is-assembling");
+        placeRestingLogo();                        // final word once nothing moves
+      }, ASSEMBLE);
     }
 
     /* closing mirrors opening exactly: the contents disassemble (reverse of
