@@ -27,7 +27,7 @@ const ITEMS = [
   },
   {
     q: "What does it cost?",
-    a: "Sardauna is a ladder of four tiers. Sardauna Lite is free — a website, a WhatsApp door and a readiness mini-audit. Sardauna Plus+ adds the 24/7 AI employee so you stop losing enquiries; Sardauna Elite puts your whole back office on AI staff; Sardauna Premier is project work layered on top of any tier. Paid tiers are naira-billed monthly and priced with you on the intro call — real numbers before you commit to anything.",
+    a: "Sardauna is a ladder of four tiers. Sardauna Lite is free — a website, a WhatsApp door and a readiness mini-audit — with no monthly fee; we keep 2.5% of the remote sales it brings you. Sardauna Plus+ is ₦19,999 a month and adds the 24/7 AI employee so you stop losing enquiries. Sardauna Elite is ₦49,999 a month and puts your whole back office on AI staff, with payments integrated (Paystack, Moniepoint, OPay and the rest). Sardauna Premier is a full custom build, quoted per project and layered on any tier.",
   },
 ];
 

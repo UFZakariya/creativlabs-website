@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: { url: "/pricing" },
   title: "Pricing — Start free, scale when it works | Safetyline",
   description:
-    "Sardauna's four-tier ladder: start free on Lite, get answered 24/7 on Plus+, run the back office on Elite, or build custom with Premier. Naira-billed, priced with you first.",
+    "Sardauna's four tiers: Lite is free (we keep 2.5% of remote sales), Plus+ is ₦19,999/month, Elite ₦49,999/month with payments integrated, and Premier is a custom build priced per project.",
 };
 
 const check = (
@@ -38,14 +38,15 @@ const TIERS: Tier[] = [
     name: "Sardauna Lite",
     tier: "lite",
     price: "Free",
-    priceSub: "tier 1 · get seen",
+    priceSub: "tier 1 · get seen · 2.5% of remote sales",
     blurb:
-      "Get your business onto the platform and see it work — a clean website, a WhatsApp door for customers, and a mini-audit of what an AI employee would take off your plate.",
+      "Get your business onto the platform and see it work — a clean website, a WhatsApp door for customers, and a mini-audit of what an AI employee would take off your plate. No monthly fee: we earn 2.5% of the remote sales the platform brings you, so it only costs you when it works.",
     features: [
       "A professional business website — one clean template",
       "AI-readiness & WhatsApp-response mini-audit",
       "Basic contact capture, consent-gated",
       "WhatsApp click-to-chat wired to your number",
+      "No monthly fee — 2.5% of remote sales instead",
     ],
     cta: { label: "Start free", href: "/contact" },
     featured: false,
@@ -53,11 +54,12 @@ const TIERS: Tier[] = [
   {
     name: "Sardauna Plus+",
     tier: "plus",
-    price: "Monthly",
-    priceSub: "tier 2 · get answered · naira-billed",
+    price: "₦19,999",
+    priceSub: "per month · tier 2 · get answered",
     blurb:
       "The core AI-employee promise: your business stops losing enquiries. Messages, calls, bookings and reviews — answered around the clock on your site and WhatsApp.",
     features: [
+      "Everything in Sardauna Lite, plus:",
       "AI chat that answers 24/7 — website and WhatsApp",
       "Online booking and calendar",
       "Missed-call text-back, so no enquiry rings out",
@@ -71,11 +73,13 @@ const TIERS: Tier[] = [
   {
     name: "Sardauna Elite",
     tier: "elite",
-    price: "Monthly",
-    priceSub: "tier 3 · get run · naira-billed",
+    price: "₦49,999",
+    priceSub: "per month · tier 3 · get run",
     blurb:
       "Your business isn't just answered — it's operated. The full back-office AI staff: money, follow-ups, funnels, compliance, content and a daily brief.",
     features: [
+      "Everything in Sardauna Plus+, plus:",
+      "Payments integrated — Paystack, Moniepoint, OPay and the rest",
       "Follow-up sequences, nurture and a funnel builder",
       "Unified inbox across your channels",
       "Finance & invoicing — NGN, WHT/VAT-aware — plus proposals",
@@ -92,12 +96,13 @@ const TIERS: Tier[] = [
     price: "Per project",
     priceSub: "tier 4 · on top of any tier",
     blurb:
-      "A services engagement layered on any subscription: we design and build the custom AI systems your business needs, on a delivery board you can watch.",
+      "A full custom build: every feature above, plus the systems your business needs that nothing off the shelf covers — designed, built and delivered on a board you can watch.",
     features: [
+      "Everything in Sardauna Elite, plus:",
+      "Full custom build — bespoke features on demand",
       "Custom AI systems and automation builds",
       "A projects & delivery board with honest status",
       "Scoped and quoted before any work starts",
-      "Layers on whichever tier you're on",
     ],
     cta: { label: "Scope a build", href: "/contact" },
     featured: false,
@@ -126,10 +131,12 @@ export default function PricingPage() {
             Start free. <span className="text-dawn-gradient">Scale when it works.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-ink-soft)]">
-            No subscriptions. No charges. That&apos;s how you start — Sardauna
-            Lite is free. From there the ladder is a clean climb: get answered
-            on Plus+, get run on Elite, get built for you on Premier — each
-            step naira-billed, and only when you choose it.
+            Start with nothing to pay. Sardauna Lite is free — we simply keep
+            2.5% of the remote sales it brings you, so it only earns when you
+            do. From there the ladder is a clean climb: get answered on Plus+
+            at &#8358;19,999 a month, get your back office run on Elite at
+            &#8358;49,999, and get built for you on Premier — priced per
+            project. Naira-billed, and only when you choose it.
           </p>
         </div>
       </section>
@@ -256,9 +263,10 @@ export default function PricingPage() {
         </div>
 
         <p className="mt-5 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">
-          Price bands are being finalised. Until they&apos;re published, every
-          paid tier is priced with you on the intro call — real numbers, in
-          naira, before you commit to anything.
+          Prices are in naira and billed monthly; Premier is quoted per project
+          before any work starts. Sardauna Lite carries no monthly fee — we keep
+          2.5% of the remote sales it brings you instead. No card needed to
+          start, and nothing is charged until you choose a paid tier.
         </p>
       </section>
 

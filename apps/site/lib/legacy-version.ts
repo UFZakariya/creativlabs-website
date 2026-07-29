@@ -2,6 +2,6 @@
    Content hashes of the legacy scripts, used to cache-bust their URLs. */
 export const LEGACY_V = {
   "hermes-dock": "d4930caf",
-  "hermes-config": "e3d63a83",
+  "hermes-config": "7f30a499",
   "uc-demo": "7cbfc9eb"
 } as const;
