@@ -1097,15 +1097,8 @@
 /* the logo holds its translate to the header slot while open — never reset it */
 .dock.is-animating .dock-btn { will-change: transform; }
 
-/* the panel fills the shell rather than floating above the launcher */
-.dock .dock-panel {
-  position: absolute;
-  inset: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
+/* (the .dock .dock-panel geometry lives in the one-glass-body block below —
+   an earlier duplicate here was fully shadowed and has been removed) */
 
 /* leave a pocket at the foot so the logo never covers the composer */
 .dock .dock-form { padding-right: 62px; }
@@ -1222,7 +1215,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .dock-pulse { transition: none; }
-  .dock .dock-panel.is-content > * { animation: none; }
+  /* the assemble/disassemble opt-out lives at the END of this file — it must
+     come AFTER those rules to win on source order (media queries add no
+     specificity), so do not re-add it here */
 }
 
 /* ---------- make the morph cheap so it runs at frame rate ----------------
@@ -1297,8 +1292,6 @@
 /* the resting logo carries an inline transform, which already beats the
    hover lift, so no hover override is needed here */
 
-/* smoother hand-off: the body's own transition never fights the WAAPI legs */
-.dock .dock-panel { transition: none; }
 
 /* ---------- the composer reclaims the corner when open -------------------
    The pocket exists only because the logo parks at the lower right. Once open
@@ -1352,9 +1345,12 @@
   to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
-/* the thread's own bubbles should not each animate on top of the assembly —
-   one movement, not two competing ones */
-.dock .dock-panel.is-content .dock-msgs > * { animation: none; }
+/* The thread's bubbles must not each spring while the panel is assembling —
+   one movement, not two competing. Scoped to .is-assembling (a window the JS
+   opens for the assembly and then closes) so that afterwards every NEW message
+   keeps its pop-in; keyed on is-content it silently killed the bubble
+   animation for the whole session. */
+.dock .dock-panel.is-assembling .dock-msgs > * { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .dock .dock-panel.is-content > * { animation: none; }

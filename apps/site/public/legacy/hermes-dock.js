@@ -36,6 +36,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const CTRL = 180;     /* beat at the compact card before the growth      */
     const RISE = 900;     /* vertical legs — body and logo share it exactly  */
     const EXIT = 360;     /* the contents' disassemble before the fold       */
+    const ASSEMBLE = 660; /* build window: 420ms rise + 210ms last delay     */
     let seq = 0;
     let anims = [];
     const alive = (run) => run === seq;
@@ -59,8 +60,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       btn.style.transform = "";
       panel.style.width = "";
       panel.style.height = "";
-      panel.classList.remove("is-morph", "is-content", "is-closing");
+      panel.classList.remove("is-morph", "is-content", "is-closing", "is-assembling");
       dock.classList.remove("is-animating", "is-shell-open");
+      /* the published rest offsets belong to the open body; drop them so a
+         reopen at a different size can never inherit the previous one */
+      dock.style.removeProperty("--logo-left");
+      dock.style.removeProperty("--logo-top");
     };
     /* The resting logo is laid out from --logo-left/--logo-top, which are read
        from the header's own (hidden) logo box. Re-published on every panel or
@@ -1018,10 +1023,13 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
          later resize left the logo stranded outside the panel. */
       btn.style.transform = "";
       dock.classList.remove("is-animating");        // lets the CSS rest rule apply
-      panel.classList.add("is-content");            // content only at full size
+      /* is-assembling brackets the build so the thread's bubbles stay still
+         while it runs; once it lifts, every new message pops in as normal */
+      panel.classList.add("is-content", "is-assembling");
       /* one correction after the contents are truly laid out (fonts, greeting)
          — the observer keeps it exact from here on */
       requestAnimationFrame(() => { if (alive(run)) placeRestingLogo(); });
+      setTimeout(() => { if (alive(run)) panel.classList.remove("is-assembling"); }, ASSEMBLE);
     }
 
     /* closing mirrors opening exactly: the contents disassemble (reverse of
@@ -1073,7 +1081,13 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       resetLauncher();
     }
 
-    btn.addEventListener("click", () => setOpen(!open));
+    /* the handoff is explicit: ignore launcher clicks while any motion plays.
+       Without this a click mid-sequence starts a competing timeline — the
+       token keeps state consistent, but the visitor sees the body jump. */
+    btn.addEventListener("click", () => {
+      if (dock.classList.contains("is-animating")) return;
+      setOpen(!open);
+    });
     document.getElementById("dock-close")?.addEventListener("click", () => setOpen(false));
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && open) setOpen(false);
