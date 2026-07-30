@@ -5,9 +5,10 @@ import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
 import TiltCard from "@/components/TiltCard";
-import TierName, { type TierKey } from "@/components/TierName";
+import TierName from "@/components/TierName";
 import Reveal from "@/components/Reveal";
 import PricingSchema from "@/components/PricingSchema";
+import { SUBSCRIPTION_TIERS, PREMIER } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/pricing" },
@@ -23,97 +24,7 @@ const check = (
   </svg>
 );
 
-type Tier = {
-  name: string;
-  tier: TierKey;
-  price: string;
-  priceSub: string;
-  blurb: string;
-  features: string[];
-  cta: { label: string; href: string };
-  featured: boolean;
-};
-
-const TIERS: Tier[] = [
-  {
-    name: "Sardauna Lite",
-    tier: "lite",
-    price: "Free",
-    priceSub: "tier 1 · get seen · 2.5% of remote sales",
-    blurb:
-      "Get your business onto the platform and see it work — a clean website, a WhatsApp door for customers, and a mini-audit of what an AI employee would take off your plate. No monthly fee: we earn 2.5% of the remote sales the platform brings you, so it only costs you when it works.",
-    features: [
-      "A professional business website — one clean template",
-      "AI-readiness & WhatsApp-response mini-audit",
-      "Basic contact capture, consent-gated",
-      "WhatsApp click-to-chat wired to your number",
-      "No monthly fee — 2.5% of remote sales instead",
-    ],
-    cta: { label: "Start free", href: "/contact" },
-    featured: false,
-  },
-  {
-    name: "Sardauna Plus+",
-    tier: "plus",
-    price: "₦19,999",
-    priceSub: "per month · tier 2 · get answered",
-    blurb:
-      "The core AI-employee promise: your business stops losing enquiries. Messages, calls, bookings and reviews — answered around the clock on your site and WhatsApp.",
-    features: [
-      "Everything in Sardauna Lite, plus:",
-      "AI chat that answers 24/7 — website and WhatsApp",
-      "Online booking and calendar",
-      "Missed-call text-back, so no enquiry rings out",
-      "Review automation",
-      "CRM, contacts and a lead pipeline",
-      "Basic content & social",
-    ],
-    cta: { label: "Get answered", href: "/contact" },
-    featured: true,
-  },
-  {
-    name: "Sardauna Elite",
-    tier: "elite",
-    price: "₦49,999",
-    priceSub: "per month · tier 3 · get run",
-    blurb:
-      "Your business isn't just answered — it's operated. The full back-office AI staff: money, follow-ups, funnels, compliance, content and a daily brief.",
-    features: [
-      "Everything in Sardauna Plus+, plus:",
-      "Payments integrated — Paystack, Moniepoint, OPay and the rest",
-      "Follow-up sequences, nurture and a funnel builder",
-      "Unified inbox across your channels",
-      "Finance & invoicing — NGN, WHT/VAT-aware — plus proposals",
-      "Support tickets and multi-channel social",
-      "Compliance calendar (Nigeria), SOPs, operating plans and the daily brief",
-      "The full AI-staff org — voice AI receptionist as a premium add-on",
-    ],
-    cta: { label: "Talk about Elite", href: "/contact" },
-    featured: false,
-  },
-  {
-    name: "Sardauna Premier",
-    tier: "premier",
-    price: "Per project",
-    priceSub: "tier 4 · on top of any tier",
-    blurb:
-      "A full custom build: every feature above, plus the systems your business needs that nothing off the shelf covers — designed, built and delivered on a board you can watch.",
-    features: [
-      "Everything in Sardauna Elite, plus:",
-      "Full custom build — bespoke features on demand",
-      "Custom AI systems and automation builds",
-      "A projects & delivery board with honest status",
-      "Scoped and quoted before any work starts",
-    ],
-    cta: { label: "Scope a build", href: "/contact" },
-    featured: false,
-  },
-];
-
-/* the three monthly rungs render as columns; Premier is a project
-   engagement layered on any of them, so it gets its own wide row below */
-const SUBSCRIPTION_TIERS = TIERS.filter((t) => t.tier !== "premier");
-const PREMIER = TIERS.find((t) => t.tier === "premier")!;
+/* tiers, prices and copy come from lib/pricing.ts — one source of truth */
 
 export default function PricingPage() {
   return (
@@ -176,10 +87,10 @@ export default function PricingPage() {
                 )}
               </div>
               <h2 className={`text-[32px] font-bold tracking-tight ${t.featured ? "text-[var(--color-cyan)]" : "text-[var(--color-blue)]"}`}>
-                <TierName tier={t.tier} />
+                <TierName tier={t.key} />
               </h2>
               <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="text-[15px] font-bold leading-none tracking-tight">{t.price}</span>
+                <span className="text-[15px] font-bold leading-none tracking-tight">{t.display}</span>
               </div>
               <p className={`mt-1.5 text-[13px] font-medium ${t.featured ? "text-white/70" : "text-[var(--color-ink-soft)]"}`}>
                 {t.priceSub}
@@ -229,10 +140,10 @@ export default function PricingPage() {
                 <article className="bg-azure-dawn-card glass-ring relative flex h-full flex-col gap-8 overflow-hidden rounded-[32px] p-8 text-white shadow-[0_40px_90px_rgba(2,6,31,0.45)] xl:grid xl:grid-cols-2 xl:items-start xl:gap-x-12 xl:gap-y-8 xl:p-11">
                   <div className="xl:col-start-1 xl:row-start-1">
                     <h2 className="text-[32px] font-bold tracking-tight text-[var(--color-cyan)]">
-                      <TierName tier={PREMIER.tier} />
+                      <TierName tier={PREMIER.key} />
                     </h2>
                     <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <span className="text-[15px] font-bold leading-none tracking-tight">{PREMIER.price}</span>
+                      <span className="text-[15px] font-bold leading-none tracking-tight">{PREMIER.display}</span>
                     </div>
                     <p className="mt-1.5 text-[13px] font-medium text-white/85">
                       {PREMIER.priceSub}

@@ -15,38 +15,9 @@
    Server component, so this lands in the static HTML for crawlers that do not
    run JavaScript. */
 
+import { PRICING, PREMIER } from "@/lib/pricing";
+
 const BASE = "https://safetyline.com.ng";
-
-type Tier = {
-  name: string;
-  price: string;          // "0" | monthly naira amount
-  description: string;
-  perMonth: boolean;
-};
-
-const TIERS: Tier[] = [
-  {
-    name: "Sardauna Lite",
-    price: "0",
-    perMonth: false,
-    description:
-      "Free with no monthly fee — Safetyline keeps 2.5% of the remote sales the platform brings the business. Includes a business website, an AI-readiness and WhatsApp-response mini-audit, consent-gated contact capture and WhatsApp click-to-chat.",
-  },
-  {
-    name: "Sardauna Plus+",
-    price: "19999",
-    perMonth: true,
-    description:
-      "Everything in Lite, plus AI chat answering 24/7 on the website and WhatsApp, online booking and calendar, missed-call text-back, review automation, and a CRM with a lead pipeline.",
-  },
-  {
-    name: "Sardauna Elite",
-    price: "49999",
-    perMonth: true,
-    description:
-      "Everything in Plus+, plus integrated payments (Paystack, Moniepoint, OPay), follow-up sequences and funnels, a unified inbox, NGN finance and invoicing, support tickets, a Nigeria compliance calendar and the daily brief.",
-  },
-];
 
 const SERVICE = {
   "@context": "https://schema.org",
@@ -61,18 +32,18 @@ const SERVICE = {
   areaServed: { "@type": "Country", name: "Nigeria" },
   url: `${BASE}/pricing`,
   offers: [
-    ...TIERS.map((t) => ({
+    ...PRICING.filter((t) => t.amount !== null).map((t) => ({
       "@type": "Offer",
       name: t.name,
-      description: t.description,
+      description: t.schemaDescription,
       url: `${BASE}/pricing`,
       priceCurrency: "NGN",
-      price: t.price,
-      ...(t.perMonth
+      price: String(t.amount),
+      ...(t.monthly
         ? {
             priceSpecification: {
               "@type": "UnitPriceSpecification",
-              price: t.price,
+              price: String(t.amount),
               priceCurrency: "NGN",
               /* schema.org duration for "per month" */
               billingDuration: 1,
@@ -84,9 +55,8 @@ const SERVICE = {
     })),
     {
       "@type": "Offer",
-      name: "Sardauna Premier",
-      description:
-        "Everything in Elite, plus a full custom build: bespoke features on demand, custom AI systems and automation, and a delivery board. Scoped and quoted per project before any work starts.",
+      name: PREMIER.name,
+      description: PREMIER.schemaDescription,
       url: `${BASE}/pricing`,
       priceCurrency: "NGN",
       /* quoted per project — no figure to publish, and inventing one would be

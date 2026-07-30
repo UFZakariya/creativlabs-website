@@ -121,13 +121,36 @@ export default function ComparisonTabs() {
 
       {/* tab pill row */}
       <div className="mt-10 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="mx-auto inline-flex min-w-max gap-1 rounded-full border border-black/5 bg-white p-1.5 shadow-[0_10px_30px_rgba(16,20,42,0.07)]">
+        <div
+          role="tablist"
+          aria-label="Compare what you get"
+          className="mx-auto inline-flex min-w-max gap-1 rounded-full border border-black/5 bg-white p-1.5 shadow-[0_10px_30px_rgba(16,20,42,0.07)]"
+        >
           {TABS.map((t) => {
             const active = t.key === key;
             return (
               <button
                 key={t.key}
+                type="button"
+                role="tab"
+                id={`cmp-tab-${t.key}`}
+                aria-selected={active}
+                aria-controls="cmp-panel"
+                tabIndex={active ? 0 : -1}
                 onClick={() => setKey(t.key)}
+                onKeyDown={(e) => {
+                  /* arrow keys move between tabs, as a tablist is expected to */
+                  if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+                  e.preventDefault();
+                  const i = TABS.findIndex((x) => x.key === key);
+                  const nextIdx =
+                    e.key === "ArrowRight"
+                      ? (i + 1) % TABS.length
+                      : (i - 1 + TABS.length) % TABS.length;
+                  const nextKey = TABS[nextIdx].key;
+                  setKey(nextKey);
+                  document.getElementById(`cmp-tab-${nextKey}`)?.focus();
+                }}
                 className="relative isolate flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-semibold transition-colors"
                 style={{ color: active ? "#fff" : "var(--color-ink-soft)" }}
               >
@@ -154,6 +177,9 @@ export default function ComparisonTabs() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          id="cmp-panel"
+          role="tabpanel"
+          aria-labelledby={`cmp-tab-${tab.key}`}
           className="mt-8 grid gap-5 text-left md:grid-cols-2"
         >
           {/* competitor — muted */}
