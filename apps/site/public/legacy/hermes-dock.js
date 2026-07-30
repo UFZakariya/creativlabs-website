@@ -495,7 +495,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     };
 
     // Hardcoded (non-model) error/degrade copy — safe to render as HTML.
-    const ERROR_HTML = "I'm having trouble reaching the agent right now. You can always <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a> or <a href='#contact'>book a consultation</a>.";
+    const ERROR_HTML = "I'm having trouble reaching the agent right now. You can always <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a> or <a href='/contact'>book a consultation</a>.";
 
     const waHref = () => {
       const num = cfg.waNumber || "2348102354786";
@@ -697,9 +697,11 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const startReadinessQuiz = () => {
       const BAR = window.SL_BAR;
       if (quizActive) return;
-      if (!BAR || !BAR.questions) { // fallback to the on-page test
-        setOpen(false);
-        document.querySelector("#readiness")?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" });
+      if (!BAR || !BAR.questions) {
+        /* the v1 site had an on-page #readiness section to scroll to; on the
+           multi-page site that element does not exist, so this silently did
+           nothing. Send them somewhere real instead. */
+        add("The readiness audit is one short conversation — <a href='/contact'>start it here</a> and you keep the report either way.", "bot");
         return;
       }
       quizActive = true;
@@ -1236,18 +1238,18 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const scripted = (text) => {
       const t = text.toLowerCase();
       if (/price|cost|how much|pay/.test(t)) {
-        return "Pricing depends on the size of the system and agent you need — most projects are scoped in the free consultation so you get a real number, not a guess. <a href='#contact'>Book one here</a>.";
+        return "Sardauna Lite is free — no monthly fee, we just keep 2.5% of the remote sales it brings you. Plus+ is ₦19,999/month and Elite ₦49,999/month (payments integrated: Paystack, Moniepoint, OPay). Premier is a full custom build, quoted per project. Full breakdown on the <a href='/pricing'>pricing page</a>.";
       }
       if (/whatsapp|agent|bot/.test(t)) {
-        return "Every system we build ships with an AI agent your team talks to on WhatsApp — it records data, runs reports, and asks for confirmation before saving anything. See it in action in the <a href='#agents'>Agents section</a>.";
+        return "Every system we build ships with an AI agent your team talks to on WhatsApp — it records data, runs reports, and asks for confirmation before saving anything. See it in action in the <a href='/product'>Product page</a>.";
       }
       if (/ready|test|score|quiz/.test(t)) {
-        return "The Business Agentic Readiness test takes about a minute — seven questions, instant score. <a href='#readiness'>Take it here</a>.";
+        return "The Business Agentic Readiness test takes about a minute — seven questions, instant score. <a href='/contact'>Start with the free audit</a>.";
       }
       if (/farm|ufms|poultry/.test(t)) {
-        return "UFMS is our farm operations system — daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='#products'>Use Cases</a>.";
+        return "UFMS is our farm operations system — daily records, egg production, feed, mortality, and finance, run by a WhatsApp agent. Check <a href='/use-cases'>Use cases</a>.";
       }
-      return `${cfg.offlineNote || "Here's where to go:"} <a href='#readiness'>take the 60-second readiness test</a>, <a href='#contact'>book a free consultation</a>, or <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a>.`;
+      return `${cfg.offlineNote || "Here's where to go:"} <a href='/pricing'>see the pricing</a>, <a href='/contact'>book a free consultation</a>, or <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a>.`;
     };
 
     // Offline scripted responder (also the graceful fallback when the live

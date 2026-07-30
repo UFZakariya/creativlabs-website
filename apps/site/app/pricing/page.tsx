@@ -7,6 +7,7 @@ import GlowingEffect from "@/components/GlowingEffect";
 import TiltCard from "@/components/TiltCard";
 import TierName, { type TierKey } from "@/components/TierName";
 import Reveal from "@/components/Reveal";
+import PricingSchema from "@/components/PricingSchema";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/pricing" },
@@ -117,6 +118,7 @@ const PREMIER = TIERS.find((t) => t.tier === "premier")!;
 export default function PricingPage() {
   return (
     <>
+      <PricingSchema />
       <WaveBackground />
       <Navbar onLight />
       <main id="main" tabIndex={-1}>
