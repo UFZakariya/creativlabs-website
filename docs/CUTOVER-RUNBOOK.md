@@ -13,6 +13,10 @@
   `infra/prod-docker-compose.yml`). Staging `sardauna-preview` untouched.
 - Caddy `safetyline.com.ng` block → `reverse_proxy sardauna-site:3000`,
   immutable cache on `/_next/static/*`. Backup: `Caddyfile.bak-cutover`.
+- 2026-07-31: the proxy strips the upstream's Cache-Control (`header_down
+  -Cache-Control`) — Next's ISR header was stacking with Caddy's, giving HTML
+  two contradictory cache policies. Caddy's site-level sets are now the single
+  caching authority. Backup: `Caddyfile.bak-cachecontrol-*`.
 - Verified live: 15 routes 200; old trailing-slash URLs 308 to clean paths;
   share-card, dock/demo assets, sitemap (15 URLs) all 200; POST /t accepts;
   neighbours (chat gateway, dashboard auth, UFMS, staging) unharmed.
