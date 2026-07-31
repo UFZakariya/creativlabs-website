@@ -8,10 +8,11 @@ import TiltCard from "@/components/TiltCard";
 import Reveal from "@/components/Reveal";
 import UcShowcase from "@/components/UcShowcase";
 import "../uc-demo.css";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/customers" },
-  openGraph: { url: "/customers" },
+  openGraph: og("/customers"),
   title: "Customers — Built on real operations, not demos | Safetyline",
   description:
     "The deployments behind Sardauna: a farm management system live in production, a food business's ops admin and ordering app, and a national membership portal.",
@@ -191,8 +192,8 @@ export default function CustomersPage() {
       </section>
 
       <CTABand />
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

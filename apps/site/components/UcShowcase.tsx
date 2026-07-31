@@ -62,7 +62,7 @@ const SHELL = `
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
                           <a class="ufms-nav"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c.6-3.6 3.4-5.6 7-5.6s6.4 2 7 5.6"/></svg>Admin</a>
                         </nav>
-                        <main class="ufms-main">
+                        <div class="ufms-main">
                           <div class="ufms-page is-active" data-ufms-page="dashboard">
                           <div class="ufms-pagehead">
                             <div><p class="mock-h1">Good morning, Zakariya</p><p>Universal Farms &middot; Layers operations cockpit &middot; live</p></div>
@@ -259,7 +259,7 @@ const SHELL = `
                               <div class="ufms-pager"><span>1–1 of 1</span><div class="ufms-pager-b"><span class="ufms-btn">‹ Prev</span><span class="ufms-pager-n">Page 1 / 1</span><span class="ufms-btn">Next ›</span></div></div>
                             </div>
                           </div>
-                        </main>
+                        </div>
                       </div>
                     </div>
                   </div></div>
@@ -439,7 +439,7 @@ const SHELL = `
                   <div class="uc-app" data-app-view="labour"><div class="uc-app-inner">
                     <div class="lp">
                       <header class="lp-header">
-                        <div class="lp-brand"><span class="lp-logo">LP</span><span class="lp-brandtxt"><strong>Membership Portal</strong><small>National register</small></span></div>
+                        <div class="lp-brand"><span class="lp-logo">MP</span><span class="lp-brandtxt"><strong>Membership Portal</strong><small>National register</small></span></div>
                         <span class="lp-burger" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
                         <nav class="lp-nav">
                           <a>Home</a><a>How to Register</a><a>FAQ</a><a>Verify Member</a>
@@ -459,13 +459,13 @@ const SHELL = `
                             <button class="lp-navitem" data-lpp-goto="update" data-goto-nav>Update Details</button>
                             <a class="lp-navitem lp-logout">Logout</a>
                           </aside>
-                          <main class="lp-main">
+                          <div class="lp-main">
                             <section class="lp-panel is-active" data-lpp-page="dashboard">
                               <div class="lp-card">
                                 <p class="mock-h1">Dashboard</p>
                                 <p class="lp-subtitle">Welcome, Adebayo Okonkwo</p>
                                 <div class="lp-stats">
-                                  <div class="lp-stat"><span>Membership ID</span><strong>LP/LA/2024/019823</strong></div>
+                                  <div class="lp-stat"><span>Membership ID</span><strong>MP/LA/2024/019823</strong></div>
                                   <div class="lp-stat"><span>Category</span><strong>Regular Member</strong></div>
                                   <div class="lp-stat"><span>Phone</span><strong>0803 &bull;&bull;&bull; 4471</strong></div>
                                   <div class="lp-stat"><span>Registered</span><strong>2024-11-05</strong></div>
@@ -480,7 +480,7 @@ const SHELL = `
                                 <div class="lp-pgrid">
                                   <div class="lp-photo">No Photo</div>
                                   <table class="lp-rtable"><tbody>
-                                    <tr><th>Membership ID</th><td>LP/LA/2024/019823</td></tr>
+                                    <tr><th>Membership ID</th><td>MP/LA/2024/019823</td></tr>
                                     <tr><th>Full Name</th><td>OKONKWO ADEBAYO CHUKWUMA</td></tr>
                                     <tr><th>Date of Birth</th><td>1988-03-14</td></tr>
                                     <tr><th>Gender</th><td>Male</td></tr>
@@ -511,10 +511,10 @@ const SHELL = `
                                   <div class="lp-slip-photo">No Photo</div>
                                   <div class="lp-slip-meta">
                                     <h3>ADEBAYO OKONKWO</h3>
-                                    <p><strong>Membership ID:</strong> LP/LA/2024/019823</p>
+                                    <p><strong>Membership ID:</strong> MP/LA/2024/019823</p>
                                     <p><strong>Registration Date:</strong> 2024-11-05</p>
                                   </div>
-                                  <div class="lp-slip-brand"><span class="lp-logo lp-logo-sm">LP</span><span class="lp-slip-lp">LP</span></div>
+                                  <div class="lp-slip-brand"><span class="lp-logo lp-logo-sm">MP</span><span class="lp-slip-lp">MP</span></div>
                                 </div>
                                 <div class="lp-slip-loc">
                                   <div class="lp-loc-item"><strong>LAGOS</strong><span>State</span></div>
@@ -549,7 +549,7 @@ const SHELL = `
                                 </div>
                               </div>
                             </section>
-                          </main>
+                          </div>
                         </div>
                       </div>
                       </div>

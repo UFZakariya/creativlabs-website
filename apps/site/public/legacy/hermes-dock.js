@@ -75,6 +75,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const target = panel.querySelector(".dock-head img");   // the header's own slot
       const mine = btn.querySelector("img");                  // the logo that flew here
       if (!target || !mine) return;
+      /* while the assembly stagger runs, the header is mid-flight on its
+         18px rise — measuring now would republish a low anchor. The 450ms
+         post-assembly call and the ResizeObserver take over from there. */
+      if (panel.classList.contains("is-assembling")) return;
       const pr = panel.getBoundingClientRect();
       const t = target.getBoundingClientRect();
       if (!pr.width || !t.height) return;
@@ -121,13 +125,16 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const SLOT_Y = 63;
     const shellSize = () => {
       dock.classList.add("is-shell-open");
-      panel.classList.add("is-content");           // header must be laid out to read it
+      /* is-measuring kills the assemble animations for this unpainted
+         measurement — their from-keyframe holds the header 18px low during
+         the before-phase fill, which skewed every measurement taken here */
+      panel.classList.add("is-content", "is-measuring");
       const r = panel.getBoundingClientRect();
       const w = Math.round(r.width), h = Math.round(r.height);
       placeRestingLogo();                          // publishes --logo-left/top
       const top = parseInt(dock.style.getPropertyValue("--logo-top"), 10);
       const left = parseInt(dock.style.getPropertyValue("--logo-left"), 10);
-      panel.classList.remove("is-content");
+      panel.classList.remove("is-content", "is-measuring");
       dock.classList.remove("is-shell-open");
       /* the climb's endpoint, as an offset from the button's closed corner at
          (w-58, h-58) — the same point the CSS rest rule then holds via layout */
@@ -279,6 +286,15 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (text || who === "user") addMeta(el, who, time); // empty bot bubbles get meta in renderBotMessage
       if (who === "bot") markRead();
       if (!asHTML && text) record(who, text, time); // persist plain user/bot text
+      /* announce non-streamed bot messages (streamed ones announce once via
+         finalize()); replay of a saved transcript stays silent */
+      if (who === "bot" && !restoring) {
+        const spoken = (el.textContent || "").trim();
+        if (spoken) {
+          const lr = document.getElementById("dock-live");
+          if (lr) lr.textContent = spoken;
+        }
+      }
       msgs.scrollTop = msgs.scrollHeight;
       return el;
     };
@@ -428,11 +444,24 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       return utm;
     })();
 
-    // Real single-page signals sent with every live turn.
+    // Page signals sent with every live turn. The v1 site was a single page
+    // with a scrollspy ([data-nav].is-active); the v2 site is multi-page, so
+    // the section comes from the pathname — the scrollspy selector matched
+    // nothing and left the contextual openers dead in production.
+    const SECTION_BY_PATH = [
+      ["/use-cases", "products"], ["/customers", "products"],
+      ["/product", "agents"], ["/channels", "agents"],
+      ["/pricing", "products"], ["/contact", "contact"], ["/security", "agents"],
+    ];
+    const sectionForPath = () => {
+      const p = location.pathname;
+      const hit = SECTION_BY_PATH.find(([prefix]) => p.startsWith(prefix));
+      return hit ? hit[1] : undefined;
+    };
     const pageContext = () => {
-      const ctx = { referrer: document.referrer || "", utm: utmParams };
-      const sec = document.querySelector("[data-nav].is-active");
-      if (sec && sec.dataset.nav) ctx.section = sec.dataset.nav;                  // scrollspy section
+      const ctx = { referrer: document.referrer || "", utm: utmParams, path: location.pathname };
+      const sec = sectionForPath();
+      if (sec) ctx.section = sec;
       const uc = document.querySelector(".uc-tab.is-active");
       if (uc && uc.dataset.app) ctx.use_case = uc.dataset.app;                    // ufms|os|order|labour
       try {
@@ -701,7 +730,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         /* the v1 site had an on-page #readiness section to scroll to; on the
            multi-page site that element does not exist, so this silently did
            nothing. Send them somewhere real instead. */
-        add("The readiness audit is one short conversation — <a href='/contact'>start it here</a> and you keep the report either way.", "bot");
+        add("The readiness audit is one short conversation — <a href='/contact'>start it here</a> and you keep the report either way.", "bot", true);
         return;
       }
       quizActive = true;
@@ -905,6 +934,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const wantI = document.createElement("input"); wantI.type = "text"; wantI.placeholder = "What you'd like to build (optional)"; wantI.setAttribute("aria-label", "What you'd like to build");
       const submit = document.createElement("button");
       submit.type = "button"; submit.className = "dock-action dock-action--primary dock-lead-send"; submit.textContent = "Send my details";
+      let doneEl = null;   // single status line, reused across retries
+      let waEl = null;     // single WhatsApp fallback link, reused across retries
       submit.addEventListener("click", async () => {
         const name = nameI.value.trim(), phone = phoneI.value.trim(), want = wantI.value.trim();
         if (!name || !phone) { box.classList.add("is-error"); (name ? phoneI : nameI).focus(); return; }
@@ -933,34 +964,34 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
           } catch (_) { /* fall through to the WhatsApp fallback */ }
         }
         clearTimeout(killer);
-        leadCardOpen = false;
         leadSending = false;
-        /* report what actually happened, not what we attempted: this fired
-           before the POST, so the funnel counted attempts as submissions */
+        /* report what actually happened, not what we attempted */
         track("lead_submit", { status: leadUrl ? (saved ? "ok" : "failed") : "offline" });
-        const done = document.createElement("p"); done.className = "dock-leadform-done";
-        if (!saved) {
-          /* re-enable so the visitor can retry rather than only escaping to
-             WhatsApp, and mark the message as a failure so it stops rendering
-             in success green */
-          done.classList.add("is-fail");
-          box.querySelectorAll("input,button").forEach((x) => { x.disabled = false; });
-        }
+        /* ONE status line and ONE WhatsApp link, reused across retries — each
+           failed attempt used to append fresh copies of both, stacking them */
+        if (!doneEl) { doneEl = document.createElement("p"); doneEl.className = "dock-leadform-done"; box.appendChild(doneEl); }
         if (saved) {
-          done.textContent = "✓ Sent — the team will reach out. Thank you!";
-          box.appendChild(done);
+          /* only now is the card finished with — clearing this on failure let
+             a second live card open and double-submit */
+          leadCardOpen = false;
+          doneEl.classList.remove("is-fail");
+          doneEl.textContent = "✓ Sent — the team will reach out. Thank you!";
+          if (waEl) { waEl.remove(); waEl = null; }
           // Conversational context for the agent (best-effort; lead is safe).
           sendText(`Please have the team follow up with me. Name: ${name}. WhatsApp: ${phone}.${want ? " I'd like to build: " + want + "." : ""}`);
         } else {
-          done.textContent = "Couldn't send just now — tap below and your details are ready to go:";
-          box.appendChild(done);
-          const wa = document.createElement("a");
-          wa.className = "dock-action dock-action--wa";
-          wa.href = "https://wa.me/" + (cfg.waNumber || "2348102354786") + "?text=" +
+          doneEl.classList.add("is-fail");
+          doneEl.textContent = "Couldn't send just now — try again, or tap below and your details are ready to go:";
+          box.querySelectorAll("input,button").forEach((x) => { x.disabled = false; });
+          if (!waEl) {
+            waEl = document.createElement("a");
+            waEl.className = "dock-action dock-action--wa";
+            waEl.target = "_blank"; waEl.rel = "noopener";
+            waEl.textContent = "Send on WhatsApp";
+            box.appendChild(waEl);
+          }
+          waEl.href = "https://wa.me/" + (cfg.waNumber || "2348102354786") + "?text=" +
             encodeURIComponent(`Hi Safetyline! Please follow up with me. Name: ${name}. WhatsApp: ${phone}.${want ? " I'd like to build: " + want + "." : ""}`);
-          wa.target = "_blank"; wa.rel = "noopener";
-          wa.textContent = "Send on WhatsApp";
-          box.appendChild(wa);
         }
       });
       [nameI, phoneI, wantI, submit].forEach((x) => box.appendChild(x));
@@ -996,6 +1027,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     };
 
     const setOpen = (next) => {
+      if (next === open) return;   // idempotent: SL_DOCK.open() while open no-ops
       open = next;
       btn.setAttribute("aria-expanded", String(next));
       if (next) {
@@ -1042,6 +1074,10 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
         dock.classList.add("is-shell-open");
         panel.classList.add("is-morph", "is-content");
         placeRestingLogo();
+        /* parity with the animated path's settle frame: land on the newest
+           message and put the caret in the composer */
+        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        if (finePointer && input) input.focus();
         return;
       }
       const run = ++seq;
@@ -1110,6 +1146,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (reducedMotion) {
         panel.classList.remove("open");
         resetLauncher();
+        btn.focus();               // hand focus back to the launcher
         return;
       }
       const run = ++seq;
@@ -1160,6 +1197,9 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (!alive(run)) return;
       panel.classList.remove("open");
       resetLauncher();
+      /* the dialog is gone — without this, focus fell to <body> and a keyboard
+         user restarted tabbing from the top of the page */
+      btn.focus();
     }
 
     /* the handoff is explicit: ignore launcher clicks while any motion plays.
@@ -1221,6 +1261,9 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const armTeaser = () => { if (teaserArmed || open || greeted) return; teaserArmed = true; maybeTeaser(); };
     setTimeout(armTeaser, 20000); // general engaged-dwell fallback
     const HIGH_INTENT = new Set(["products", "systems", "agents", "readiness", "contact"]);
+    /* on the multi-page site, BEING on a high-intent page is the signal the
+       v1 scrollspy used to provide — arm sooner there than the generic 20s */
+    if (HIGH_INTENT.has(sectionForPath() || "")) setTimeout(armTeaser, 6000);
     let sectionTimer = null;
     window.addEventListener("scroll", () => {
       if (teaserArmed || open || greeted) return;
@@ -1240,8 +1283,11 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       if (/price|cost|how much|pay/.test(t)) {
         return "Sardauna Lite is free — no monthly fee, we just keep 2.5% of the remote sales it brings you. Plus+ is ₦19,999/month and Elite ₦49,999/month (payments integrated: Paystack, Moniepoint, OPay). Premier is a full custom build, quoted per project. Full breakdown on the <a href='/pricing'>pricing page</a>.";
       }
+      if (/book|consult|call|follow.?up/.test(t)) {
+        return "Happy to set that up — <a href='/contact'>book your free consultation</a> or <a href='https://wa.me/2348102354786' target='_blank' rel='noopener'>message us on WhatsApp</a> and the team takes it from there.";
+      }
       if (/whatsapp|agent|bot/.test(t)) {
-        return "Every system we build ships with an AI agent your team talks to on WhatsApp — it records data, runs reports, and asks for confirmation before saving anything. See it in action in the <a href='/product'>Product page</a>.";
+        return "Sardauna is a house of AI agents run by a chief of staff — they answer customers, chase money and report back on the WhatsApp you already use, and anything outbound waits for your approval. See how it works on the <a href='/product'>Product page</a>.";
       }
       if (/ready|test|score|quiz/.test(t)) {
         return "The Business Agentic Readiness test takes about a minute — seven questions, instant score. <a href='/contact'>Start with the free audit</a>.";
@@ -1265,12 +1311,15 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 
     // Degraded-mode honesty: apologise ONCE per outage (not on every failed
     // turn) and stop claiming "Online" while unreachable; recover on success.
-    let degradedShown = false;
+    let degradedShown = false;   // apology shown once per outage
+    let degradedStatus = false;  // header should read offline until recovery
     const showDegraded = () => {
       if (!degradedShown && cfg.degradedCopy) { add(cfg.degradedCopy, "bot"); degradedShown = true; }
+      degradedStatus = true;
       if (status) status.textContent = `${persona} · offline — WhatsApp is fastest`;
     };
     const clearDegraded = () => {
+      degradedStatus = false;
       if (!degradedShown) return;
       degradedShown = false;
       if (status) status.textContent = live ? `Online — ${persona}` : `${persona} · Safetyline`;
@@ -1460,9 +1509,13 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     // Telegram-style header status: "{persona} is typing…" during a live turn.
     const setTyping = (on) => {
       if (!status) return;
+      /* the idle branch must respect an active outage — it used to write
+         "Online" straight over showDegraded()'s status in the same tick */
       status.textContent = on
         ? `${persona} is typing…`
-        : (live ? `Online — ${persona}` : `${persona} · Safetyline`);
+        : degradedStatus
+          ? `${persona} · offline — WhatsApp is fastest`
+          : (live ? `Online — ${persona}` : `${persona} · Safetyline`);
     };
 
     form.addEventListener("submit", async (e) => {

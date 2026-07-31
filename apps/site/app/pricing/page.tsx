@@ -9,17 +9,18 @@ import TierName from "@/components/TierName";
 import Reveal from "@/components/Reveal";
 import PricingSchema from "@/components/PricingSchema";
 import { SUBSCRIPTION_TIERS, PREMIER } from "@/lib/pricing";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/pricing" },
-  openGraph: { url: "/pricing" },
+  openGraph: og("/pricing"),
   title: "Pricing — Start free, scale when it works | Safetyline",
   description:
     "Sardauna's four tiers: Lite is free (we keep 2.5% of remote sales), Plus+ is ₦19,999/month, Elite ₦49,999/month with payments integrated, and Premier is a custom build priced per project.",
 };
 
 const check = (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" className="mt-[3px] shrink-0">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" className="mt-[3px] shrink-0" aria-hidden>
     <path d="m4.5 12.5 5 5L19.5 7" />
   </svg>
 );
@@ -206,8 +207,8 @@ export default function PricingPage() {
       <Reveal>
         <CTABand />
       </Reveal>
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

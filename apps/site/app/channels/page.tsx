@@ -7,10 +7,11 @@ import GlowingEffect from "@/components/GlowingEffect";
 import TiltCard from "@/components/TiltCard";
 import Reveal from "@/components/Reveal";
 import WaMiniDemo from "@/components/WaMiniDemo";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/channels" },
-  openGraph: { url: "/channels" },
+  openGraph: og("/channels"),
   title: "Channels — One house, every door | Safetyline",
   description:
     "Sardauna is WhatsApp-first and proven in production, with Instagram, Facebook, X, Teams and Slack offered. One house behind every door, one record.",
@@ -268,8 +269,8 @@ export default function ChannelsPage() {
       </section>
 
       <CTABand />
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

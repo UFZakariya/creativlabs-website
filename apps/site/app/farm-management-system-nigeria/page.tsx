@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import SeoLanding from "@/components/SeoLanding";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/farm-management-system-nigeria" },
-  openGraph: { url: "/farm-management-system-nigeria" },
+  openGraph: og("/farm-management-system-nigeria"),
   title: "Farm Management System in Nigeria | Safetyline",
   description:
     "A farm management system proven on a working Nigerian poultry operation: daily records over WhatsApp, one dashboard for lay rates, stock and batch economics — run by Sardauna's house of agents.",

@@ -12,13 +12,14 @@ import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 
 import type { Metadata } from "next";
+import { og } from "@/lib/og";
 
 /* title/description/OG are inherited from the root layout; the home
    route only needs its own canonical so the domain root does not
    compete with any query-string or trailing-slash variant. */
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
-  openGraph: { url: "/" },
+  openGraph: og("/"),
 };
 
 export default function Home() {
@@ -62,9 +63,9 @@ export default function Home() {
       <Reveal>
         <CTABand />
       </Reveal>
+    </main>
 
       <Footer />
-    </main>
     </>
   );
 }

@@ -31,7 +31,7 @@
       ufms: "UFMS — running daily at Universal Farms, our founder’s own poultry operation.",
       os: "TruckVille OS — the operations backbone for a real Abuja food-court destination.",
       order: "TruckVille ordering — customers order from their phone; vendors see it instantly.",
-      labour: "Membership portal — built for the Labour Party’s nationwide member registration.",
+      labour: "Membership portal — a national organisation’s member registration and records, down to the ward.",
     };
 
     // scale each device's app to exactly fill its screen width
@@ -81,7 +81,7 @@
       stage.dataset.device = tab.dataset.device;
       stage.querySelectorAll(".uc-app").forEach((v) => v.classList.toggle("is-active", v.dataset.appView === app));
       if (caption && CAPTIONS[app]) caption.textContent = CAPTIONS[app];
-      // Both laptop apps (UFMS / TruckVille OS / Labour Party) share ONE
+      // Both laptop apps (UFMS / TruckVille OS / Member Portal) share ONE
       // scrolling viewport — without this, switching tabs after scrolling
       // down in one app opened the next one already scrolled partway (or
       // past its own content), looking blank/broken instead of starting
@@ -170,7 +170,7 @@
          per namespace:
            data-tvos-goto → [data-tvos-page]  TruckVille OS pages (?tvos=)
            data-tvcl-goto → [data-tvcl-page]  TVOS closeout steps  (?tvcl=)
-           data-lp-goto   → [data-lp-page]    Labour portal pages  (?lp=)
+           data-lp-goto   → [data-lp-page]    Member portal pages  (?lp=)
            data-lpp-goto  → [data-lpp-panel|page] member panels    (?lpp=)
          Only elements marked data-goto-nav carry active state
          (is-active/is-on) — plain action buttons ("Open closeout",

@@ -73,9 +73,9 @@
         recs: [
           "Put ONE core process — daily sales, stock, or records — into a simple digital system first",
           "The task your team repeats most is your future agent's first job; note it down",
-          "Our consultation maps the shortest path from where you are to agent-ready — in plain steps"
+          "Start free on Sardauna Lite — a website and a WhatsApp door, no monthly fee — and see it work"
         ],
-        cta: "Start My Systemization Plan"
+        cta: "Start Free on Sardauna Lite"
       },
       {
         min: 30,
@@ -84,20 +84,20 @@
         recs: [
           "Centralize your scattered records — one place the whole team trusts",
           "Document your most repeated process; that becomes the agent's playbook",
-          "A consultation will show which gap to close first for the fastest payoff"
+          "Sardauna Plus+ answers every enquiry 24/7 while you close those gaps — the consultation maps which first"
         ],
-        cta: "Map My Path to Agent-Ready"
+        cta: "Map My Path — Free Consultation"
       },
       {
         min: 55,
         name: "Nearly Ready",
-        summary: "You're closer than you think. Solid digital habits, real structure, and plenty of routine work worth handing over — usually just one process to document or one record to centralize before an agent slots in. This is exactly the stage where an Agent-as-a-System build pays off fastest.",
+        summary: "You're closer than you think. Solid digital habits, real structure, and plenty of routine work worth handing over — usually just one process to document or one record to centralize before an agent slots in. This is exactly the stage where Sardauna Plus+ or Elite pays off fastest.",
         recs: [
           "Connect the tools you already use into one operating layer for the business",
           "Your team's daily channels are the agent's front door — it meets them where they are",
-          "In the consultation we'll pick the first workflow the agent takes over"
+          "In the consultation we'll pick the right Sardauna tier and the first workflow the agents take over"
         ],
-        cta: "Book My Free Readiness Consultation"
+        cta: "Book My Free Consultation"
       },
       {
         min: 80,
@@ -106,9 +106,9 @@
         recs: [
           "Pilot an agent on your highest-volume workflow first — that's where weeks are won",
           "Preview→confirm control means you keep full authority while the agent works",
-          "The consultation scopes your first agent: timeline, integrations, and cost"
+          "The tiers are public — Plus+ is ₦19,999/month, Elite ₦49,999/month; the consultation maps you to the right one"
         ],
-        cta: "Scope My First Agent"
+        cta: "Pick My Tier — Free Consultation"
       }
     ];
     window.SL_BAR = {

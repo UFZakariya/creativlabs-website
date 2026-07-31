@@ -1,5 +1,20 @@
 "use client";
 
+import { PRICING, PREMIER } from "@/lib/pricing";
+
+/* The cost answer is DERIVED from lib/pricing.ts — it was a fourth hardcoded
+   copy of the figures, which is exactly the drift the single source was
+   introduced to stop. */
+const money = (t: (typeof PRICING)[number]) =>
+  t.amount === null ? "quoted per project" : t.amount === 0 ? "free" : `${t.display} a month`;
+
+const PRICING_ANSWER = [
+  `Sardauna is a ladder of four tiers. ${PRICING[0].name} is ${money(PRICING[0])} — a website, a WhatsApp door and a readiness mini-audit — with no monthly fee; we keep 2.5% of the remote sales it brings you.`,
+  `${PRICING[1].name} is ${money(PRICING[1])} and adds the 24/7 AI employee so you stop losing enquiries.`,
+  `${PRICING[2].name} is ${money(PRICING[2])} and puts your whole back office on AI staff, with payments integrated (Paystack, Moniepoint, OPay and the rest).`,
+  `${PREMIER.name} is a full custom build, ${money(PREMIER)} and layered on whichever tier you're on.`,
+].join(" ");
+
 /* FAQ split layout: sticky heading left, accordion right. Native <details>
    for a11y with styled markers. Original questions grounded in the claims
    register. */
@@ -7,7 +22,7 @@
 const ITEMS = [
   {
     q: "What exactly is Sardauna?",
-    a: "Sardauna is Safetyline's AI business assistant — a chief-of-staff agent that runs a house of specialist department agents (sales, support, operations, finance, growth) for your business. You talk to Sardauna; the house does the work.",
+    a: "Sardauna is Safetyline's AI business assistant — a chief-of-staff agent that runs a house of specialist department agents (operations, finance, growth, comms, delivery, analysis) for your business. You talk to Sardauna; the house does the work.",
   },
   {
     q: "Which channels does it work on?",
@@ -27,7 +42,7 @@ const ITEMS = [
   },
   {
     q: "What does it cost?",
-    a: "Sardauna is a ladder of four tiers. Sardauna Lite is free — a website, a WhatsApp door and a readiness mini-audit — with no monthly fee; we keep 2.5% of the remote sales it brings you. Sardauna Plus+ is ₦19,999 a month and adds the 24/7 AI employee so you stop losing enquiries. Sardauna Elite is ₦49,999 a month and puts your whole back office on AI staff, with payments integrated (Paystack, Moniepoint, OPay and the rest). Sardauna Premier is a full custom build, quoted per project and layered on any tier.",
+    a: PRICING_ANSWER,
   },
 ];
 

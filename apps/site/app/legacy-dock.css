@@ -1450,3 +1450,29 @@
 .dock-leadform-done.is-fail {
   color: #c0392b;
 }
+
+/* shellSize() applies the open state for one unpainted frame to measure the
+   header. Without this, the dock-assemble from-keyframe (translateY 18px,
+   fill both) held the header low during that measurement, so the logo's climb
+   aimed 18px short and snapped into place at the end of every animated open. */
+.dock .dock-panel.is-measuring > * {
+  animation: none !important;
+}
+
+
+/* Closed-state hover lifts the WHOLE object — glass, logo and badge together.
+   The button's own hover previously lifted just the logo out of a stationary
+   glass circle, splitting the one-body illusion the launcher is built on. */
+.dock {
+  transition: transform 200ms cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+
+.dock:not(.is-shell-open):not(.is-animating):hover {
+  transform: translateY(-3px) scale(1.03);
+}
+
+/* the logo alone must not lift: closed, the wrapper carries the hover; open,
+   the rest rule pins it to the header slot */
+.dock .dock-btn:hover {
+  transform: none;
+}

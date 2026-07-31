@@ -110,9 +110,9 @@ export const PRICING: PricingTier[] = [
     monthly: false,
     priceSub: "tier 4 · on top of any tier",
     blurb:
-      "A full custom build: every feature above, plus the systems your business needs that nothing off the shelf covers — designed, built and delivered on a board you can watch.",
+      "A full custom build layered on whichever tier you’re on: the systems your business needs that nothing off the shelf covers — designed, built and delivered on a board you can watch.",
     features: [
-      "Everything in Sardauna Elite, plus:",
+      "Everything in your current tier, plus:",
       "Full custom build — bespoke features on demand",
       "Custom AI systems and automation builds",
       "A projects & delivery board with honest status",
@@ -121,7 +121,7 @@ export const PRICING: PricingTier[] = [
     cta: { label: "Scope a build", href: "/contact" },
     featured: false,
     schemaDescription:
-      "Everything in Elite, plus a full custom build: bespoke features on demand, custom AI systems and automation, and a delivery board. Scoped and quoted per project before any work starts.",
+      "A full custom build layered on whichever tier the business is on: bespoke features on demand, custom AI systems and automation, and a delivery board. Scoped and quoted per project before any work starts.",
   },
 ];
 

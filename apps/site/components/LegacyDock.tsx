@@ -14,7 +14,7 @@ const SHELL = `
       <img src="/logo-128.png" alt="" width="30" height="32">
       <span class="dock-pulse" aria-hidden="true"></span>
     </button>
-    <div class="dock-panel glass-panel" id="dock-panel" role="dialog" aria-label="Safetyline assistant" hidden>
+    <div class="dock-panel glass-panel" id="dock-panel" role="dialog" aria-label="Safetyline assistant">
       <header class="dock-head">
         <img src="/logo-128.png" alt="" width="30" height="32">
         <div>
@@ -66,7 +66,7 @@ export default function LegacyDock() {
       });
 
     load(`/legacy/hermes-config.js?v=${LEGACY_V["hermes-config"]}`)
-      .then(() => load("/legacy/sl-bar.js")) // quiz data the Readiness tool needs
+      .then(() => load(`/legacy/sl-bar.js?v=${LEGACY_V["sl-bar"]}`)) // quiz data the Readiness tool needs
       .then(() => load(`/legacy/hermes-dock.js?v=${LEGACY_V["hermes-dock"]}`))
       .catch(() => {});
   }, []);

@@ -6,7 +6,7 @@
    logo tile and artifact chip. Original copy throughout. */
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 /* real competitor marks, inlined (owner direction) */
 const LOGOS: Record<string, React.ReactNode> = {
@@ -37,12 +37,17 @@ const LOGOS: Record<string, React.ReactNode> = {
   ),
 };
 
+const panelVariants = {
+  hide: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const } },
+};
+
 const TABS = [
   {
     key: "marketing",
     label: "Marketing",
     icon: (
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
         <path d="M3 10v4l11 5V5L3 10Z" />
         <path d="M14 7.5a17 17 0 0 0 7-1.5v12a17 17 0 0 0-7-1.5M7.5 14.6V19a1.6 1.6 0 0 0 3.2 0v-3" />
       </svg>
@@ -58,7 +63,7 @@ const TABS = [
     key: "meetings",
     label: "Meeting Follow-ups",
     icon: (
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
         <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
         <path d="M8 2.8V6m8-3.2V6M8 13.5l2.6 2.6 5.4-5.4" />
       </svg>
@@ -74,7 +79,7 @@ const TABS = [
     key: "workflow",
     label: "Workflow Automation",
     icon: (
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
         <circle cx="12" cy="12" r="3.2" />
         <path d="M12 2.8v3m0 12.4v3M2.8 12h3m12.4 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1" />
       </svg>
@@ -90,7 +95,7 @@ const TABS = [
     key: "compliance",
     label: "Compliance & Reports",
     icon: (
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
         <path d="M6 2.8h8L19.2 8v13.2H6z" />
         <path d="M13.5 3v5.5H19M9.5 13h5m-5 4h5" />
       </svg>
@@ -169,14 +174,14 @@ export default function ComparisonTabs() {
         </div>
       </div>
 
-      {/* side-by-side cards */}
-      <AnimatePresence mode="wait">
-        <motion.div
+      {/* side-by-side cards — keyed remount with NAMED variants, never
+          AnimatePresence mode="wait" + inline tweens: that pattern stranded
+          blank panes twice in this repo when frames were not compositing */}
+      <motion.div
           key={tab.key}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          variants={panelVariants}
+          initial="hide"
+          animate="show"
           id="cmp-panel"
           role="tabpanel"
           aria-labelledby={`cmp-tab-${tab.key}`}
@@ -224,8 +229,7 @@ export default function ComparisonTabs() {
               <span className="text-white/90">{tab.right.rest}</span>
             </p>
           </div>
-        </motion.div>
-      </AnimatePresence>
+      </motion.div>
     </section>
   );
 }

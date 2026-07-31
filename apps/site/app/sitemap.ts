@@ -19,6 +19,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/food-business-operations-nigeria",
     "/membership-management-nigeria",
     "/ai-agent-for-business-nigeria",
+    "/privacy",
+    "/terms",
   ];
   /* lastModified was omitted, so crawlers had no signal about freshness and
      re-fetched on their own schedule. Build time is the honest value for a

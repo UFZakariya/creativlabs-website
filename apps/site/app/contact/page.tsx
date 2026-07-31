@@ -4,10 +4,11 @@ import WaveBackground from "@/components/WaveBackground";
 import ContactWizard from "@/components/ContactWizard";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
-  openGraph: { url: "/contact" },
+  openGraph: og("/contact"),
   title: "Contact — Start with a free readiness audit | Safetyline",
   description:
     "Three quick steps and your enquiry lands in our own lead pipeline — the same one Sardauna runs. Start with the free AI readiness audit: one conversation with Biba or Bari, no card, no obligation.",
@@ -59,9 +60,9 @@ export default function ContactPage() {
           .
         </p>
       </section>
+    </main>
 
       <Footer />
-    </main>
     </>
   );
 }

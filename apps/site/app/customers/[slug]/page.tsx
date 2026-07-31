@@ -64,8 +64,8 @@ export default async function CaseStudyPage({
       <CaseStudyLayout sections={cs.sections} meta={cs.meta} />
 
       <CTABand />
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

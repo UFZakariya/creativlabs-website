@@ -6,10 +6,11 @@ import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
 import TiltCard from "@/components/TiltCard";
 import Reveal from "@/components/Reveal";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/security" },
-  openGraph: { url: "/security" },
+  openGraph: og("/security"),
   title: "Security & control — Autonomy you can audit | Safetyline",
   description:
     "Tiered autonomy where anything outbound waits for your approval, a full audit trail of every agent action, and agents promoted draft to live with rollback.",
@@ -284,8 +285,8 @@ export default function SecurityPage() {
       </section>
 
       <CTABand />
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

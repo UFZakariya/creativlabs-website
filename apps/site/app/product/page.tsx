@@ -9,10 +9,11 @@ import SuiteDashboard from "@/components/SuiteDashboard";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/product" },
-  openGraph: { url: "/product" },
+  openGraph: og("/product"),
   title: "Product — Sardauna, the AI Business Assistant | Safetyline",
   description:
     "Sardauna is a house of agents: a chief of staff running six departments of specialist AI agents for your business — on WhatsApp, with a dashboard, under your approval.",
@@ -112,8 +113,8 @@ export default function ProductPage() {
       <Reveal>
         <CTABand />
       </Reveal>
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

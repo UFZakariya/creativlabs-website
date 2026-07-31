@@ -6,10 +6,11 @@ import SpotlightRows from "@/components/SpotlightRows";
 import CTABand from "@/components/CTABand";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/use-cases" },
-  openGraph: { url: "/use-cases" },
+  openGraph: og("/use-cases"),
   title: "Use cases — See the house at work | Safetyline",
   description:
     "Five department threads from a running house of agents, plus the same agents answering Instagram DMs: support, leads, stock, books and a daily brief.",
@@ -32,7 +33,7 @@ export default function UseCasesPage() {
             See the house <span className="text-dawn-gradient">at work.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-ink-soft)]">
-            Five departments, one chief of staff, real conversations. Pick a
+            Five department threads, one chief of staff, real conversations. Pick a
             thread below and watch how orders, money, stock and growth move
             through Sardauna — on WhatsApp or in your Instagram DMs, with you
             approving what matters.
@@ -65,8 +66,8 @@ export default function UseCasesPage() {
       <Reveal>
         <CTABand />
       </Reveal>
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

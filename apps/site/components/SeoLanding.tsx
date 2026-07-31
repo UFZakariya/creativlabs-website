@@ -87,8 +87,8 @@ export default function SeoLanding({ eyebrow, h1, intro, points, proof }: SeoLan
       <Reveal>
         <CTABand />
       </Reveal>
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

@@ -70,7 +70,7 @@ export default function ContactWizard() {
       return;
     }
     const field = stepRef.current?.querySelector<HTMLElement>(
-      "input:not([type=hidden]):not(.hidden), textarea, button[role=checkbox]"
+      "input:not([type=hidden]):not(.hidden), button[aria-pressed], textarea"
     );
     (field ?? stepRef.current)?.focus();
   }, [step]);
@@ -114,12 +114,18 @@ export default function ContactWizard() {
     /* E.164 digit range, country-agnostic on purpose */
     const phoneOk = !phone || /^\d{8,15}$/.test(phone.replace(/\D/g, ""));
     const emailOk = !email || /^\S+@\S+\.\S{2,}$/.test(email);
-    if (!phoneOk && !email) {
-      setStepError("That number looks incomplete — check it and try again.");
-      return;
-    }
-    if (!emailOk && !phone) {
-      setStepError("That email address looks incomplete — check it and try again.");
+    /* At least ONE channel must be plausible. The previous pair of guards each
+       required the other field to be empty, so a lead with two malformed
+       values passed straight through to the POST. */
+    const reachable = (phone && phoneOk) || (email && emailOk);
+    if (!reachable) {
+      setStepError(
+        phone && !email
+          ? "That number looks incomplete — check it and try again."
+          : email && !phone
+            ? "That email address looks incomplete — check it and try again."
+            : "Those contact details look incomplete — check the number or the email and try again."
+      );
       return;
     }
     setStepError("");
@@ -128,6 +134,14 @@ export default function ContactWizard() {
        with no way out. AbortController, not AbortSignal.timeout — the latter
        throws on older Android WebViews, inside this try, and would surface as
        a network error before a request was even attempted. */
+    /* the in-chat readiness quiz stores its result under bar-score; without
+       this the lead lands in the pipeline unscored and the owner's digest
+       cannot tell a qualified lead from a cold one */
+    let readiness = "";
+    try {
+      readiness = sessionStorage.getItem("bar-score") || "";
+    } catch {}
+
     const ac = new AbortController();
     const killer = setTimeout(() => ac.abort(), 20000);
     try {
@@ -144,7 +158,7 @@ export default function ContactWizard() {
             .filter(Boolean)
             .join(" — "),
           need: f.message.trim(),
-          readiness_score: "",
+          readiness_score: readiness,
           "bot-field": f.botField,
         }),
       });
@@ -215,7 +229,7 @@ export default function ContactWizard() {
       {/* step header */}
       <div className="flex items-center gap-2 border-b border-black/6 px-7 py-5">
         {STEPS.map((s, i) => (
-          <div key={s} className="flex items-center gap-2">
+          <div key={s} className="flex items-center gap-2" aria-current={i === step ? "step" : undefined}>
             <span
               className={`grid h-7 w-7 place-items-center rounded-full text-[12.5px] font-bold ${
                 i < step
@@ -238,6 +252,7 @@ export default function ContactWizard() {
                 i === step ? "text-[var(--color-ink)]" : "text-[var(--color-ink-soft)]"
               } ${i > 0 ? "hidden sm:inline" : ""}`}
             >
+              <span className="sr-only">{`Step ${i + 1} of ${STEPS.length}: `}</span>
               {s}
             </span>
             {i < 2 && <span className="h-px w-6 bg-black/10" />}

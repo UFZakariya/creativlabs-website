@@ -6,10 +6,11 @@ import Footer from "@/components/Footer";
 import GlowingEffect from "@/components/GlowingEffect";
 import TiltCard from "@/components/TiltCard";
 import Reveal from "@/components/Reveal";
+import { og } from "@/lib/og";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/about" },
-  openGraph: { url: "/about" },
+  openGraph: og("/about"),
   title: "About — Safetyline | The house behind Sardauna",
   description:
     "Safetyline is a Nigerian AI-integration company. We build houses of agents that run real businesses — starting with our own systems, proven in production before we sold a single seat.",
@@ -136,8 +137,8 @@ export default function AboutPage() {
       </section>
 
       <CTABand />
-      <Footer />
     </main>
+      <Footer />
     </>
   );
 }

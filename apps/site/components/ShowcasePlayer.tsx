@@ -716,7 +716,7 @@ export default function ShowcasePlayer() {
           this caption sits below the boundary, so it must be ink, not white */}
       <p className="mt-3 text-center text-xs text-[var(--color-ink-soft)]">
         {skin === "whatsapp"
-          ? "Real flows from live deployments — orders, support, finance, growth, and the owner's daily brief."
+          ? "Transcripts illustrative — the flows mirror live deployments — orders, support, finance, growth, and the owner's daily brief."
           : "Instagram, Facebook, X, Teams and Slack ride the same House of Agents."}
       </p>
     </div>

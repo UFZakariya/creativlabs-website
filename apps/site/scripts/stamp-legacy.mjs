@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const FILES = ["hermes-dock", "hermes-config", "uc-demo"];
+const FILES = ["hermes-dock", "hermes-config", "uc-demo", "sl-bar"];
 
 const entries = FILES.map((name) => {
   const buf = readFileSync(join(root, "public", "legacy", `${name}.js`));
