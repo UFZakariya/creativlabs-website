@@ -36,7 +36,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     const CTRL = 180;     /* beat at the compact card before the growth      */
     const RISE = 900;     /* vertical legs — body and logo share it exactly  */
     const EXIT = 330;     /* disassemble: 200ms fall + 130ms last delay      */
-    const ASSEMBLE = 450; /* build: 280ms rise + 165ms last delay            */
+    const ASSEMBLE = 560; /* 445ms of stagger + real headroom               */
     let seq = 0;
     let anims = [];
     const alive = (run) => run === seq;
@@ -60,7 +60,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       btn.style.transform = "";
       panel.style.width = "";
       panel.style.height = "";
-      panel.classList.remove("is-morph", "is-content", "is-closing", "is-assembling");
+      panel.classList.remove("is-morph", "is-content", "is-closing", "is-assembling", "is-built");
       dock.classList.remove("is-animating", "is-shell-open");
       /* the published rest offsets belong to the open body; drop them so a
          reopen at a different size can never inherit the previous one */
@@ -142,6 +142,17 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       const dy = (isNaN(top) ? SLOT_Y - 58 : top) - (h - 58);
       return { w, h, dx, dy };
     };
+    /* Post-open settle: correct the resting anchor on a fixed clock. Live CDP
+       runs showed the header shifting ~12px AFTER every trigger we tried
+       (drift checks, fonts.ready, ResizeObserver) had already fired — a late
+       font-swap reflow. A clock cannot lose that race, and placeRestingLogo
+       is an idempotent fixed point, so the extra calls cost ~nothing. */
+    const settleLoop = (run, tick = 0) => {
+      if (!alive(run) || !panel.classList.contains("is-content")) return;
+      placeRestingLogo();
+      if (tick < 10) setTimeout(() => settleLoop(run, tick + 1), 300);
+    };
+
     /* one descending three-bounce on the whole launcher — glass, logo and the
        unread dot travel together (the dot is a child, so it rides along) */
     /* unread state — the badge shows only while a message is unseen, and is
@@ -1070,17 +1081,17 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
     async function rollOpen() {
       resetLauncher();
       const { w, h, dx, dy } = shellSize();
+      const run = ++seq;
       if (reducedMotion) {                          // immediate open
         dock.classList.add("is-shell-open");
-        panel.classList.add("is-morph", "is-content");
-        placeRestingLogo();
+        panel.classList.add("is-morph", "is-content", "is-built");
+        settleLoop(run);
         /* parity with the animated path's settle frame: land on the newest
            message and put the caret in the composer */
         if (msgs) msgs.scrollTop = msgs.scrollHeight;
         if (finePointer && input) input.focus();
         return;
       }
-      const run = ++seq;
       const x = travel(w);
       dock.classList.add("is-animating");
       panel.classList.add("is-morph");              // content stays hidden
@@ -1134,7 +1145,17 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
       setTimeout(() => {
         if (!alive(run)) return;
         panel.classList.remove("is-assembling");
-        placeRestingLogo();                        // final word once nothing moves
+        /* CDP timeline caught the header still ~11px shy of final when this
+           timer fired (445ms of animation vs a 450ms timer — a 5ms margin any
+           scheduling slip eats). is-built strips the finished animations
+           entirely (their end state IS natural layout), so this measurement —
+           and every later one from the ResizeObserver — is timing-proof. */
+        panel.classList.add("is-built");
+        /* Self-healing settle: the header can still move AFTER this moment —
+           the CDP timeline caught a ~12px late reflow (font swap) shifting the
+           slot with nothing re-correcting. placeRestingLogo is a fixed point,
+           so re-check until the drift is gone; bounded so it can never spin. */
+        settleLoop(run);
       }, ASSEMBLE);
     }
 

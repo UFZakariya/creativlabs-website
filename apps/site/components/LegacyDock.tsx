@@ -44,7 +44,7 @@ export default function LegacyDock() {
 
     // icon sprite + refraction filter the dock's <use href="#i-…"> refs need
     if (!document.getElementById("i-clock")) {
-      fetch("/legacy/sprite.html")
+      fetch(`/legacy/sprite.html?v=${LEGACY_V["sprite"]}`)
         .then((r) => r.text())
         .then((html) => {
           const holder = document.createElement("div");
@@ -56,19 +56,20 @@ export default function LegacyDock() {
         .catch(() => {});
     }
 
-    const load = (src: string) =>
-      new Promise<void>((res, rej) => {
-        const s = document.createElement("script");
-        s.src = src;
-        s.onload = () => res();
-        s.onerror = () => rej(new Error(src));
-        document.body.appendChild(s);
-      });
-
-    load(`/legacy/hermes-config.js?v=${LEGACY_V["hermes-config"]}`)
-      .then(() => load(`/legacy/sl-bar.js?v=${LEGACY_V["sl-bar"]}`)) // quiz data the Readiness tool needs
-      .then(() => load(`/legacy/hermes-dock.js?v=${LEGACY_V["hermes-dock"]}`))
-      .catch(() => {});
+    /* One pass, async=false: the browser fetches all three in parallel but
+       executes them in insertion order, which preserves the config -> sl-bar
+       -> dock dependency while collapsing three serial round trips into one.
+       (The old chain awaited each onload before even creating the next tag.) */
+    for (const src of [
+      `/legacy/hermes-config.js?v=${LEGACY_V["hermes-config"]}`,
+      `/legacy/sl-bar.js?v=${LEGACY_V["sl-bar"]}`,   // quiz data the Readiness tool needs
+      `/legacy/hermes-dock.js?v=${LEGACY_V["hermes-dock"]}`,
+    ]) {
+      const s = document.createElement("script");
+      s.src = src;
+      s.async = false;
+      document.body.appendChild(s);
+    }
   }, []);
 
   return <div ref={host} />;

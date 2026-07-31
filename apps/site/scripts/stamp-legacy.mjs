@@ -16,9 +16,13 @@ import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FILES = ["hermes-dock", "hermes-config", "uc-demo", "sl-bar"];
+const EXTRA = [["sprite", "sprite.html"]];
 
-const entries = FILES.map((name) => {
-  const buf = readFileSync(join(root, "public", "legacy", `${name}.js`));
+const entries = [
+  ...FILES.map((name) => [name, `${name}.js`]),
+  ...EXTRA,
+].map(([name, file]) => {
+  const buf = readFileSync(join(root, "public", "legacy", file));
   const hash = createHash("sha1").update(buf).digest("hex").slice(0, 8);
   return [name, hash];
 });

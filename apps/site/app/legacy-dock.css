@@ -40,15 +40,12 @@
   --font-body: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-* { box-sizing: border-box; }
-/* ============================================================
+* { box-sizing: border-box; }/* ============================================================
    LIQUID GLASS CORE
    Layered recipe: refraction (backdrop) → fill → rim light → sheen
    ============================================================ */
 
 .glass-panel,
-.glass-card,
-.glass-chip,
 .glass-btn {
   position: relative;
   isolation: isolate;
@@ -59,19 +56,10 @@
     var(--glass-inner-bottom),
     inset 2px 4px 10px -6px rgba(255, 255, 255, 0.95),
     var(--glass-shadow);
-}
-
-/* full refraction only where surfaces float over content — keeps paint cost low */
-.glass-btn,
-.mobile-menu {
+}/* full refraction only where surfaces float over content — keeps paint cost low */
+.glass-btn {
   -webkit-backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
   backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
-}
-
-.glass-card,
-.glass-chip {
-  -webkit-backdrop-filter: blur(6px) saturate(140%);
-  backdrop-filter: blur(6px) saturate(140%);
 }
 
 /* large panels skip the backdrop pass — over white it is invisible but it
@@ -89,18 +77,10 @@
 .mobile-menu.glass-panel {
   -webkit-backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
   backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
-}
-
-/* the liquid-glass rim — a masked gradient stroke instead of a flat border.
+}/* the liquid-glass rim — a masked gradient stroke instead of a flat border.
    (light curve that used to live here is folded into --glass-fill) */
 .glass-panel::before,
-.glass-card::before,
-.glass-chip::before,
-.glass-btn::before,
-.lg-nav::before,
-.nav-indicator::before,
-.card-icon::before,
-.km-icon::before {
+.glass-btn::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -116,8 +96,6 @@
 }
 
 .glass-panel { border-radius: var(--radius-lg); }
-.glass-card  { border-radius: var(--radius-md); }
-.glass-chip  { border-radius: 999px; }
 
 /* ---------- glass buttons ---------- */
 
@@ -193,14 +171,6 @@
     inset 0 -2px 6px rgba(4, 20, 90, 0.28),
     0 22px 52px rgba(8, 60, 255, 0.38),
     0 6px 16px rgba(8, 60, 255, 0.24);
-}
-
-.glass-btn--clear { background: var(--glass-fill); }
-
-.glass-btn--lg {
-  min-height: 54px;
-  padding: 0.9rem 2rem;
-  font-size: 0.98rem;
 }
 
 /* ============================================================
@@ -335,53 +305,6 @@
 .dock-switch:hover { background: rgba(8, 60, 255, 0.12); color: var(--blue-deep); }
 /* when the switch button is present, it takes the auto margin; close sits after it */
 .dock-switch + .dock-close { margin-left: 6px; }
-
-/* agent picker — two persona cards shown before the chat starts */
-.dock-picker { display: flex; flex-direction: column; gap: 10px; padding: 4px 2px 2px; }
-.dock-picker-h {
-  margin: 2px 2px 2px;
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-.dock-agent {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid rgba(8, 60, 255, 0.14);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.75);
-  text-align: left;
-  cursor: pointer;
-  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease, border-color 200ms ease;
-}
-.dock-agent:hover,
-.dock-agent:focus-visible {
-  transform: translateY(-1px);
-  border-color: rgba(8, 60, 255, 0.4);
-  box-shadow: 0 10px 24px rgba(8, 60, 255, 0.14);
-  outline: none;
-}
-.dock-agent-av {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  flex: none;
-  border-radius: 50%;
-  color: #fff;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.05rem;
-  box-shadow: 0 6px 14px rgba(8, 60, 255, 0.28);
-}
-.dock-agent--bari .dock-agent-av { background: linear-gradient(135deg, #0b3ea8, #083cff); }
-.dock-agent--biba .dock-agent-av { background: linear-gradient(135deg, #00b7ff, #33f2ff); color: #06283d; }
-.dock-agent-t { display: grid; gap: 1px; }
-.dock-agent-t strong { font-family: var(--font-display); font-size: 0.95rem; color: var(--ink); }
-.dock-agent-t small { color: var(--muted); font-size: 0.76rem; }
 
 .dock-msgs {
   flex: 1;
@@ -576,28 +499,6 @@
   cursor: pointer;
 }
 
-/* founder card (Why Safetyline) */
-.founder-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
-
-.founder-av {
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #083cff, #7b2ff7);
-  color: #fff;
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
 /* in-chat readiness quiz — tappable option buttons */
 .dock-quiz-opts {
   display: flex;
@@ -741,29 +642,6 @@
 .dock-msg--user .dock-meta { color: rgba(255, 255, 255, 0.85); text-align: right; }
 .dock-tick { margin-left: 4px; font-style: normal; letter-spacing: -1px; }
 .dock-tick.read { color: #7fe0ff; }
-
-.dock-quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-self: flex-start;
-  max-width: 100%;
-}
-
-.dock-quick button {
-  padding: 6px 12px;
-  border: 1px solid rgba(8, 60, 255, 0.25);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
-  color: var(--blue-deep);
-  font-family: var(--font-display);
-  font-size: 0.74rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 160ms ease;
-}
-
-.dock-quick button:hover { background: rgba(222, 246, 255, 0.95); }
 
 .dock-typing {
   align-self: flex-start;
@@ -941,62 +819,6 @@
   background: linear-gradient(135deg, var(--blue), var(--azure));
   color: #fff;
   font-size: 0.74rem;
-}
-
-/* ---------- FAQ ---------- */
-
-.faq-list {
-  display: grid;
-  gap: 12px;
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.faq-item { padding: 0; }
-
-.faq-item summary {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 19px 24px;
-  cursor: pointer;
-  list-style: none;
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.faq-item summary::-webkit-details-marker { display: none; }
-
-.faq-item summary::after {
-  content: "+";
-  margin-left: auto;
-  flex: none;
-  display: grid;
-  place-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(8, 60, 255, 0.08);
-  color: var(--blue-deep);
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: rotate 200ms ease, background 200ms ease;
-}
-
-.faq-item[open] summary::after {
-  rotate: 45deg;
-  background: rgba(8, 60, 255, 0.14);
-}
-
-.faq-item > p {
-  margin: 0;
-  padding: 0 24px 20px;
-  color: var(--muted);
-  font-size: 0.93rem;
-  line-height: 1.65;
-  max-width: 64ch;
 }
 
 @media (max-width: 560px) {
@@ -1410,7 +1232,7 @@
    now 280ms with a 55ms step (465ms total), landing just as the movement
    stops, and the disassemble mirrors it at 200ms/45ms. Both share the roll's
    easing family so the whole sequence feels like one gesture. */
-.dock .dock-panel.is-content > * {
+.dock .dock-panel.is-content:not(.is-built) > * {
   animation: dock-assemble 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .dock .dock-panel.is-content > .dock-form  { animation-delay: 0ms; }
