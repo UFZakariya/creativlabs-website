@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: og("/pricing"),
   title: "Pricing — Start free, scale when it works | Safetyline",
   description:
-    "Sardauna's four tiers: Lite is free (we keep 2.5% of remote sales), Plus+ is ₦19,999/month, Elite ₦49,999/month with payments integrated, and Premier is a custom build priced per project.",
+    "Sardauna's four tiers: Lite is free (we keep 2.5% of platform sales), Plus+ is ₦19,999/month, Elite ₦49,999/month with payments integrated, and Premier is a custom build priced per project.",
 };
 
 const check = (
@@ -46,8 +46,8 @@ export default function PricingPage() {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-ink-soft)]">
             Start with nothing to pay. Sardauna Lite is free — we simply keep
-            2.5% of the remote sales it brings you, so it only earns when you
-            do. From there the ladder is a clean climb: get answered on Plus+
+            2.5% of the sales made through the platform, so it only earns when
+            you do. From there the ladder is a clean climb: get answered on Plus+
             at &#8358;19,999 a month, get your back office run on Elite at
             &#8358;49,999, and get built for you on Premier — priced per
             project. Naira-billed, and only when you choose it.
@@ -179,7 +179,7 @@ export default function PricingPage() {
         <p className="mt-5 text-center text-[12.5px] text-[var(--color-ink-soft)]/80">
           Prices are in naira and billed monthly; Premier is quoted per project
           before any work starts. Sardauna Lite carries no monthly fee — we keep
-          2.5% of the remote sales it brings you instead. No card needed to
+          2.5% of the sales made through the platform instead. No card needed to
           start, and nothing is charged until you choose a paid tier.
         </p>
       </section>

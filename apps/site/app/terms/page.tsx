@@ -46,7 +46,7 @@ const SECTIONS: { h: string; body: React.ReactNode }[] = [
         Paid tiers are billed monthly, in naira, in advance — {plus.name} at{" "}
         {plus.display} and {elite.name} at {elite.display} per month.{" "}
         Sardauna Lite has no monthly fee; instead, Safetyline earns 2.5% of
-        the remote sales made through the platform we operate for you, as
+        the sales made through the platform we operate for you, as
         recorded by that platform and itemised in your daily brief. Sardauna
         Premier is custom work: scoped, quoted and agreed in writing before
         any work starts, and billed as that quote states.
@@ -59,7 +59,8 @@ const SECTIONS: { h: string; body: React.ReactNode }[] = [
       <>
         Cancel a monthly tier at any time by telling us on WhatsApp or by
         phone. Cancellation takes effect at the end of the billing period you
-        have already paid for; we do not bill you again after that. Your data
+        have already paid for; we do not bill you again after that, and we do
+        not refund the remainder of a month already billed. Your data
         remains yours — ask and we will export what we hold and then delete it,
         as the <a href="/privacy" className="font-semibold text-[var(--color-blue)]">privacy policy</a> describes.
       </>

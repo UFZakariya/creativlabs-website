@@ -9,7 +9,7 @@ const money = (t: (typeof PRICING)[number]) =>
   t.amount === null ? "quoted per project" : t.amount === 0 ? "free" : `${t.display} a month`;
 
 const PRICING_ANSWER = [
-  `Sardauna is a ladder of four tiers. ${PRICING[0].name} is ${money(PRICING[0])} — a website, a WhatsApp door and a readiness mini-audit — with no monthly fee; we keep 2.5% of the remote sales it brings you.`,
+  `Sardauna is a ladder of four tiers. ${PRICING[0].name} is ${money(PRICING[0])} — a website, a WhatsApp door and a readiness mini-audit — with no monthly fee; we keep 2.5% of the sales made through the platform.`,
   `${PRICING[1].name} is ${money(PRICING[1])} and adds the 24/7 AI employee so you stop losing enquiries.`,
   `${PRICING[2].name} is ${money(PRICING[2])} and puts your whole back office on AI staff, with payments integrated (Paystack, Moniepoint, OPay and the rest).`,
   `${PREMIER.name} is a full custom build, ${money(PREMIER)} and layered on whichever tier you're on.`,

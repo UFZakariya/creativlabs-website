@@ -40,20 +40,20 @@ export const PRICING: PricingTier[] = [
     display: "Free",
     amount: 0,
     monthly: false,
-    priceSub: "tier 1 · get seen · 2.5% of remote sales",
+    priceSub: "tier 1 · get seen · 2.5% of platform sales",
     blurb:
-      "Get your business onto the platform and see it work — a clean website, a WhatsApp door for customers, and a mini-audit of what an AI employee would take off your plate. No monthly fee: we earn 2.5% of the remote sales the platform brings you, so it only costs you when it works.",
+      "Get your business onto the platform and see it work — a clean website, a WhatsApp door for customers, and a mini-audit of what an AI employee would take off your plate. No monthly fee: we earn 2.5% of the sales made through the platform we run for you, so it only costs you when it works.",
     features: [
       "A professional business website — one clean template",
       "AI-readiness & WhatsApp-response mini-audit",
       "Basic contact capture, consent-gated",
       "WhatsApp click-to-chat wired to your number",
-      "No monthly fee — 2.5% of remote sales instead",
+      "No monthly fee — 2.5% of platform sales instead",
     ],
     cta: { label: "Start free", href: "/contact" },
     featured: false,
     schemaDescription:
-      "Free with no monthly fee — Safetyline keeps 2.5% of the remote sales the platform brings the business. Includes a business website, an AI-readiness and WhatsApp-response mini-audit, consent-gated contact capture and WhatsApp click-to-chat.",
+      "Free with no monthly fee — Safetyline keeps 2.5% of the sales made through the platform it runs for the business. Includes a business website, an AI-readiness and WhatsApp-response mini-audit, consent-gated contact capture and WhatsApp click-to-chat.",
   },
   {
     key: "plus",
